@@ -1,0 +1,232 @@
+{% extends 'frontend/base.html' %}
+{% load static %}
+
+{% block title %}Create {{ wish_type|title }} Surprise | Surprise Me ✨{% endblock %}
+
+{% block content %}
+{% with type=wish_type.lower temp=template_id.lower %}
+
+<div class="min-h-[calc(100vh-80px)] w-full flex items-center justify-center p-3 md:p-6 relative overflow-x-hidden transition-all duration-700 
+    {% if temp == 'matrix_rain' %} bg-black font-mono
+    {% elif type == 'sorry' %} bg-gradient-to-b from-slate-950 to-black
+    {% else %} bg-slate-950 {% endif %}">
+    
+    <div class="absolute top-1/4 -left-20 w-64 h-64 bg-pink-600/10 rounded-full blur-[100px] pointer-events-none"></div>
+    <div class="absolute bottom-1/4 -right-20 w-64 h-64 bg-violet-600/10 rounded-full blur-[100px] pointer-events-none"></div>
+
+    <div class="w-full max-w-5xl z-10">
+        <div class="transition-all duration-500 mx-auto
+            md:bg-white/5 md:backdrop-blur-3xl md:border md:border-white/10 md:p-10 md:rounded-[3rem] md:shadow-2xl 
+            p-4 rounded-none bg-transparent border-none shadow-none">
+            
+            <div class="text-center mb-6 md:mb-8">
+                <div class="inline-block px-3 py-1 mb-3 rounded-full bg-pink-500/10 border border-pink-500/20">
+                    <span class="text-pink-400 text-[9px] md:text-[10px] font-bold uppercase tracking-[0.2em]">
+                        CUSTOMIZE YOUR {{ display_name }} SURPRISE
+                    </span>
+                </div>
+                <h1 class="text-2xl md:text-4xl font-black bg-gradient-to-r from-pink-500 via-purple-400 to-violet-500 bg-clip-text text-transparent leading-tight">
+                    {% if temp == 'matrix_rain' %} Enter the Matrix
+                    {% elif temp == 'heart_shape' %} Crafting Your Heart
+                    {% elif type == 'sorry' %} A Sincere Apology
+                    {% else %} {{ wish_type|title }} Magic {% endif %}
+                </h1>
+            </div>
+
+            <form method="POST" enctype="multipart/form-data" class="space-y-5 md:space-y-6" id="wishForm">
+                {% csrf_token %}
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    
+                    <div class="space-y-5">
+                        <div class="grid grid-cols-2 gap-4">
+                            <div class="space-y-1.5">
+                                <label class="flex items-center gap-2 text-[10px] font-bold text-gray-400 ml-1 uppercase tracking-wider">
+                                    <i class="fas fa-paper-plane text-pink-500 text-[8px]"></i> From
+                                </label>
+                                <div class="magic-input-wrapper">
+                                    {{ form.sender_name }}
+                                </div>
+                            </div>
+                            <div class="space-y-1.5">
+                                <label class="flex items-center gap-2 text-[10px] font-bold text-gray-400 ml-1 uppercase tracking-wider">
+                                    <i class="fas fa-heart text-pink-500 text-[8px]"></i> To
+                                </label>
+                                <div class="magic-input-wrapper">
+                                    {{ form.receiver_name }}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="space-y-1.5">
+                            <label class="flex items-center gap-2 text-[10px] font-bold text-gray-400 ml-1 uppercase tracking-wider">
+                                <i class="fas fa-pen-nib text-pink-500 text-[8px]"></i> Heartfelt Message
+                            </label>
+                            <div class="magic-input-wrapper message-area">
+                                {{ form.message }}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="space-y-5">
+                        <div class="space-y-1.5">
+                            <label class="flex items-center gap-2 text-[10px] font-bold text-gray-400 ml-1 uppercase tracking-wider">
+                                <i class="fas fa-music text-[8px] 
+                                    {% if type == 'birthday' %} text-amber-500 
+                                    {% elif type == 'sorry' %} text-blue-500 
+                                    {% else %} text-violet-500 {% endif %}"></i> Audio Vibe
+                            </label>
+                            
+                            <div class="bg-black/40 border border-white/10 rounded-[1.2rem] p-3 md:p-4 transition-all duration-500 hover:border-white/20">
+                                <div class="magic-input-wrapper music-select-container relative group">
+                                    <div class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 group-focus-within:text-pink-500 transition-colors pointer-events-none">
+                                        <i class="fas fa-compact-disc animate-spin-slow text-xs"></i>
+                                    </div>
+                                    {{ form.selected_music }}
+                                </div>
+
+                                <div class="flex items-center gap-4 my-3">
+                                    <div class="h-[1px] flex-1 bg-gradient-to-r from-transparent via-white/10 to-transparent"></div>
+                                    <span class="text-[7px] text-gray-500 font-black uppercase tracking-[0.2em] italic">Or Upload Your Own</span>
+                                    <div class="h-[1px] flex-1 bg-gradient-to-r from-transparent via-white/10 to-transparent"></div>
+                                </div>
+
+                                <div class="custom-music-container">
+                                    <div class="relative group">
+                                        {{ form.custom_music }}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        {% if temp != 'firework_show' %}
+                        <div class="space-y-1.5">
+                            <div class="flex items-center justify-between ml-1">
+                                <label class="flex items-center gap-2 text-[10px] font-bold text-gray-400 uppercase tracking-wider">
+                                    <i class="fas fa-images text-pink-500 text-[8px]"></i> Photos
+                                </label>
+                                <span class="text-[8px] font-black text-pink-500/80 uppercase tracking-tighter italic">
+                                    {% if temp == 'heart_shape' %} 12-20 Photos Required
+                                    {% elif temp == 'matrix_rain' %} 1 Portrait Only
+                                    {% elif temp == 'space_odyssey' %} Best with 3 Photos
+                                    {% else %} Multiple Photos Allowed {% endif %}
+                                </span>
+                            </div>
+                            
+                            <div class="relative group h-[85px] md:h-[100px]">
+                                <input type="file" name="images" id="imageInput" {% if temp == 'matrix_rain' %}accept="image/*"{% else %}multiple{% endif %} 
+                                    class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-20" onchange="updateFileName(this)">
+                                <div id="imagesDisplay" class="h-full bg-black/40 border border-dashed border-white/20 rounded-xl flex flex-col items-center justify-center p-3 transition-all duration-300 group-hover:border-pink-500/50 group-hover:bg-pink-500/5">
+                                    <i class="fas fa-camera text-pink-400 mb-1.5 text-lg"></i>
+                                    <p id="fileLabel" class="text-[9px] text-gray-500 font-bold uppercase tracking-widest text-center">Tap to select photos</p>
+                                </div>
+                            </div>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="pt-4">
+                    <button type="submit" id="submitBtn"
+                        class="group relative w-full overflow-hidden py-4 rounded-2xl font-black text-xs tracking-[0.2em] text-white transition-all transform active:scale-[0.98] shadow-2xl
+                        {% if temp == 'matrix_rain' %} bg-green-600 text-black
+                        {% elif type == 'sorry' %} bg-gradient-to-r from-blue-700 to-indigo-800
+                        {% else %} bg-gradient-to-r from-pink-600 via-purple-600 to-violet-600 {% endif %}">
+                        
+                        <div class="absolute inset-0 bg-white/20 translate-y-[100%] group-hover:translate-y-0 transition-transform duration-300"></div>
+                        
+                        <span class="relative z-10 flex items-center justify-center gap-3">
+                            <span id="btnText">GENERATE MAGIC LINK</span>
+                            <i class="fas fa-wand-magic-sparkles" id="btnIcon"></i>
+                        </span>
+                    </button>
+                    <p class="text-center text-[9px] text-gray-500 mt-4 uppercase tracking-[0.1em] opacity-60">Crafted with love for your special someone</p>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<style>
+    /* Custom Input Styling */
+    .magic-input-wrapper input[type="text"], 
+    .magic-input-wrapper select,
+    .music-select-container select {
+        width: 100% !important;
+        background: rgba(15, 23, 42, 0.6) !important;
+        border: 1px solid rgba(255, 255, 255, 0.08) !important;
+        border-radius: 0.8rem !important;
+        padding: 0.75rem 1rem 0.75rem 2.5rem !important;
+        color: #e2e8f0 !important;
+        font-size: 0.8rem !important;
+        font-weight: 600 !important;
+        letter-spacing: 0.025em !important;
+        outline: none !important;
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    }
+
+    .magic-input-wrapper textarea {
+        width: 100% !important;
+        background: rgba(0, 0, 0, 0.5) !important;
+        border: 1px solid rgba(255, 255, 255, 0.1) !important;
+        border-radius: 0.8rem !important;
+        padding: 0.75rem 1rem !important;
+        color: white !important;
+        font-size: 0.85rem !important;
+        height: 150px !important;
+        resize: none !important;
+        outline: none !important;
+    }
+
+    /* Select Icon Fix */
+    .music-select-container select {
+        appearance: none !important;
+        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%2394a3b8' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e") !important;
+        background-position: right 0.75rem center !important;
+        background-repeat: no-repeat !important;
+        background-size: 1.2em 1.2em !important;
+    }
+
+    .magic-input-wrapper input:focus, .magic-input-wrapper textarea:focus {
+        border-color: rgba(236, 72, 153, 0.5) !important;
+        background: rgba(15, 23, 42, 0.8) !important;
+        box-shadow: 0 0 20px rgba(236, 72, 153, 0.1) !important;
+    }
+
+    .animate-spin-slow { animation: spin 4s linear infinite; }
+    @keyframes spin { from { transform: translateY(-50%) rotate(0deg); } to { transform: translateY(-50%) rotate(360deg); } }
+    
+    {% if temp == 'matrix_rain' %}
+    .magic-input-wrapper input, .magic-input-wrapper textarea, select { border-color: #16a34a !important; font-family: 'Courier New', monospace !important; color: #16a34a !important; }
+    {% endif %}
+</style>
+
+<script>
+    // File upload visual feedback
+    function updateFileName(input) {
+        const label = document.getElementById('fileLabel');
+        const count = input.files.length;
+        const tempId = "{{ temp }}";
+        
+        if (count > 0) {
+            let message = count + " " + (count > 1 ? "Photos" : "Photo") + " Added ✓";
+            if(tempId === 'heart_shape' && count < 12) { 
+                message = "Add " + (12 - count) + " more for Heart ❤️"; 
+            }
+            label.innerText = message;
+            label.className = "text-[9px] text-pink-400 font-black uppercase tracking-widest text-center animate-pulse";
+        }
+    }
+
+    // Submit animation
+    document.getElementById('wishForm').addEventListener('submit', function() {
+        const btn = document.getElementById('submitBtn');
+        btn.disabled = true;
+        btn.style.opacity = "0.7";
+        document.getElementById('btnText').innerText = "WEAVING MAGIC...";
+        document.getElementById('btnIcon').className = "fas fa-spinner fa-spin";
+    });
+</script>
+
+{% endwith %}
+{% endblock %}

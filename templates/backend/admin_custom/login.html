@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WishGen Admin | Login</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root { --primary-color: #4e73df; --bg-gradient: linear-gradient(135deg, #4e73df 0%, #224abe 100%); }
+        
+        body { 
+            background: #f8f9fa; 
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        .login-wrapper {
+            width: 100%;
+            padding: 20px;
+        }
+
+        .login-container { 
+            max-width: 420px; 
+            margin: auto;
+            background: white; 
+            padding: 40px; 
+            border-radius: 15px; 
+            box-shadow: 0px 10px 30px rgba(0,0,0,0.1); 
+            transition: transform 0.3s ease;
+        }
+
+        .brand-logo {
+            width: 60px;
+            height: 60px;
+            background: var(--bg-gradient);
+            color: white;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            margin: 0 auto 20px;
+            box-shadow: 0 4px 15px rgba(78, 115, 223, 0.3);
+        }
+
+        .form-control {
+            padding: 12px 15px;
+            border-radius: 8px;
+            border: 1px solid #d1d3e2;
+        }
+
+        .form-control:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 0.2rem rgba(78, 115, 223, 0.25);
+        }
+
+        .btn-primary { 
+            background: var(--bg-gradient); 
+            border: none; 
+            padding: 12px;
+            border-radius: 8px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            transition: all 0.3s;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 5px 15px rgba(78, 115, 223, 0.4);
+            opacity: 0.95;
+        }
+
+        .footer-text {
+            color: #858796;
+            font-size: 0.85rem;
+            margin-top: 25px;
+        }
+
+        /* Responsive Adjustments */
+        @media (max-width: 480px) {
+            .login-container {
+                padding: 30px 20px;
+            }
+            .brand-logo {
+                width: 50px;
+                height: 50px;
+                font-size: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="login-wrapper">
+        <div class="login-container">
+            <div class="brand-logo">
+                <i class="fas fa-magic"></i>
+            </div>
+            
+            <h3 class="text-center fw-bold mb-2" style="color: #3a3b45;">SURPRISE ME ADMIN</h3>
+            <p class="text-center text-muted mb-4 small">Welcome back! Please login to continue.</p>
+
+            <form method="post">
+                {% csrf_token %}
+                <div class="mb-3">
+                    <label class="form-label fw-semibold small text-secondary">Username</label>
+                    <div class="input-group">
+                        <span class="input-group-text bg-light border-end-0 text-muted"><i class="fas fa-user small"></i></span>
+                        <input type="text" name="username" class="form-control border-start-0 ps-0" placeholder="Enter username" required>
+                    </div>
+                </div>
+
+                <div class="mb-4">
+                    <div class="d-flex justify-content-between">
+                        <label class="form-label fw-semibold small text-secondary">Password</label>
+                    </div>
+                    <div class="input-group">
+                        <span class="input-group-text bg-light border-end-0 text-muted"><i class="fas fa-lock small"></i></span>
+                        <input type="password" name="password" class="form-control border-start-0 ps-0" placeholder="••••••••" required>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-primary w-100 shadow-sm">
+                    Enter To Login <i class="fas fa-arrow-right ms-2"></i>
+                </button>
+            </form>
+
+            <div class="text-center footer-text py-3">
+                <p class="mb-0 text-muted small">
+                    &copy; {% now "Y" %} Wish Generator Ltd. All Rights Reserved.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

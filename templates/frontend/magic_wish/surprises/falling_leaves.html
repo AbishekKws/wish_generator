@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <title>A Special Surprise for {{ wish.receiver_name }}! ✨</title>
+    <meta name="description" content="{{ wish.sender_name }} has sent you a magical {{ wish.wish_type }} surprise. Click to unlock the magic!">
+    
+    <meta property="og:title" content="A Special Surprise for {{ wish.receiver_name }}! ✨">
+    <meta property="og:description" content="Open the link to see a magical surprise from {{ wish.sender_name }}.">
+    <meta property="og:url" content="{{ request.build_absolute_uri }}">
+    
+    {% if wish.images.exists %}
+    <meta property="og:image" content="{{ request.scheme }}://{{ request.get_host }}{{ wish.images.first.image.url }}">
+    {% endif %}
+    
+    <meta property="og:type" content="website">
+    <title>Autumn Whisper | {{ wish.receiver_name }}</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@1,600&family=Montserrat:wght@300;500&family=Dancing+Script:wght@700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root { --autumn-gold: #e29a43; --leaf-red: #a33b20; --wood-dark: #1a0f0a; }
+        
+        body, html { 
+            margin: 0; padding: 0; background: var(--wood-dark); 
+            color: #f5ebe0; overflow: hidden;
+            font-family: 'Montserrat', sans-serif; height: 100vh; width: 100vw;
+        }
+
+        /* Ambient Forest Background */
+        .forest-bg { 
+            position: fixed; inset: 0; 
+            background: linear-gradient(to bottom, rgba(26, 15, 10, 0.7), rgba(26, 15, 10, 0.9)), 
+            url('https://images.unsplash.com/photo-1477414348463-c0eb7f1359b6?auto=format&fit=crop&q=80&w=1920'); 
+            background-size: cover; background-position: center; z-index: -1; 
+            filter: saturate(0.8);
+        }
+
+        #leaf-canvas { position: fixed; inset: 0; z-index: 20; pointer-events: none; }
+
+        /* Main Autumn Card Design */
+        .autumn-card { 
+            background: rgba(255, 255, 255, 0.03); 
+            backdrop-filter: blur(15px); 
+            border: 1px solid rgba(226, 154, 67, 0.15); 
+            border-radius: 40px 5px 40px 5px; 
+            padding: 2.5rem 1.5rem; 
+            width: 95%; max-width: 500px; 
+            z-index: 30;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
+            transform-style: preserve-3d;
+        }
+
+        .recipient-name { 
+            font-family: 'Cormorant Garamond', serif; 
+            color: var(--autumn-gold); 
+            font-size: clamp(2rem, 7vw, 3rem); 
+            line-height: 1.1; 
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .message-font { 
+            font-family: 'Dancing Script', cursive; 
+            color: #d4a373; 
+            font-size: clamp(1.3rem, 4.5vw, 1.9rem); 
+            margin-top: 1rem; 
+        }
+
+        /* Polaroid Memory Orbit */
+        .memory-orbit {
+            position: relative;
+            width: 100%;
+            height: 280px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 25;
+            perspective: 1000px;
+        }
+
+        .polaroid { 
+            position: absolute;
+            background: #fffdfa; 
+            padding: 10px 10px 30px 10px; 
+            box-shadow: 0 15px 35px rgba(0,0,0,0.5); 
+            width: 140px; 
+            opacity: 0; 
+            border: 1px solid #eee;
+            transition: transform 0.3s ease;
+        }
+
+        .polaroid img { width: 100%; aspect-ratio: 1/1; object-fit: cover; filter: sepia(0.2); }
+
+        .btn-autumn { 
+            background: var(--leaf-red); color: white; 
+            padding: 1.2rem 3rem; font-weight: 700; 
+            letter-spacing: 4px; border: 1px solid var(--autumn-gold); 
+            box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+            cursor: pointer;
+        }
+
+        .blast-text {
+            background: linear-gradient(to right, #e29a43, #f5ebe0, #e29a43);
+            background-size: 200% auto;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: shine 3s linear infinite;
+        }
+
+        @keyframes shine { to { background-position: 200% center; } }
+
+        @media (max-height: 600px) {
+            .autumn-card { padding: 1rem; margin-top: -10px; }
+            .memory-orbit { height: 180px; }
+            .polaroid { width: 110px; }
+        }
+    </style>
+</head>
+<body>
+
+    <audio id="bg-music" loop preload="auto">
+        {% if wish.custom_music or wish.selected_music %}
+            <source src="{% if wish.custom_music %}{{ wish.custom_music.url }}{% else %}{{ wish.selected_music.audio_file.url }}{% endif %}" type="audio/mpeg">
+        {% endif %}
+    </audio>
+
+    <div class="forest-bg"></div>
+    <canvas id="leaf-canvas"></canvas>
+
+    <div id="overlay" class="fixed inset-0 z-[500] flex items-center justify-center bg-[#1a0f0a]">
+        <div class="text-center">
+            <div id="leaf-icon" class="text-6xl mb-6">🍁</div>
+            <button id="openBtn" class="btn-autumn uppercase">Open Whisper</button>
+        </div>
+    </div>
+
+    <main id="scene" class="hidden h-screen w-screen flex flex-col items-center justify-center overflow-hidden">
+        
+        <div class="autumn-card text-center mb-8">
+            <div class="mb-3 text-[10px] tracking-[0.6em] text-orange-400/80 uppercase font-bold">
+                {% if wish.wish_type|lower == 'sorry' %} Deeply Sorry for Everything
+                {% elif wish.wish_type|lower == 'love' %} My Heart Belongs To You
+                {% elif wish.wish_type|lower == 'miss you' %} MISSING YOU A LOT 🥲
+                {% else %} For You {% endif %}
+            </div>
+
+            <h1 class="recipient-name">
+                {{ wish.receiver_name|upper }}
+            </h1>
+
+            <p id="message-text" class="message-font"></p>
+            
+            <div class="mt-6 flex justify-center items-center gap-5">
+                <div class="h-[1px] w-14 bg-orange-900/50"></div>
+                <span class="text-[10px] tracking-[0.4em] text-orange-200 uppercase font-medium">
+                   From {{ wish.sender_name }}
+                </span>
+                <div class="h-[1px] w-14 bg-orange-900/50"></div>
+            </div>
+        </div>
+
+        <div class="memory-orbit" id="orbit">
+            {% for img_obj in wish.images.all %}
+            <div class="polaroid">
+                <img src="{{ img_obj.image.url }}">
+                <div class="text-center mt-3 font-['Dancing_Script'] text-gray-700 text-sm">Memory #{{ forloop.counter }}</div>
+            </div>
+            {% endfor %}
+        </div>
+
+        <footer class="absolute bottom-8 w-full flex justify-center opacity-60 z-[40]">
+            <a href="{% url 'home' %}" class="flex flex-col items-center gap-1 group">
+                <span class="text-[8px] tracking-[0.4em] uppercase text-gray-500">Whispered by</span>
+                <span class="text-[12px] font-black tracking-[0.2em] blast-text">SURPRISE ME</span>
+            </a>
+        </footer>
+    </main>
+
+    <script>
+        const canvas = document.getElementById('leaf-canvas');
+        const ctx = canvas.getContext('2d');
+        let leaves = [];
+        const leafEmojis = ['🍂', '🍁', '🍃', '🤎'];
+
+        // Initializing Canvas
+        function resize() { 
+            canvas.width = window.innerWidth; 
+            canvas.height = window.innerHeight; 
+        }
+        window.addEventListener('resize', resize); 
+        resize();
+
+        class Leaf {
+            constructor() { 
+                this.reset(); 
+                this.y = Math.random() * canvas.height; 
+            }
+            reset() { 
+                this.x = Math.random() * canvas.width; 
+                this.y = -60; 
+                this.size = Math.random() * 20 + 15; 
+                this.speed = Math.random() * 1.2 + 0.6; 
+                this.angle = Math.random() * 360; 
+                this.spin = Math.random() * 2 - 1; 
+                this.emoji = leafEmojis[Math.floor(Math.random() * leafEmojis.length)]; 
+                this.wind = Math.random() * 2 - 1;
+            }
+            draw() { 
+                ctx.font = `${this.size}px serif`; 
+                ctx.save(); 
+                ctx.translate(this.x, this.y); 
+                ctx.rotate(this.angle * Math.PI / 180); 
+                ctx.fillText(this.emoji, 0, 0); 
+                ctx.restore(); 
+            }
+            update() { 
+                this.y += this.speed; 
+                this.x += Math.sin(this.y / 100) * 2 + this.wind; 
+                this.angle += this.spin; 
+                if (this.y > canvas.height + 60) this.reset(); 
+            }
+        }
+
+        // MAIN BUTTON CLICK
+        document.getElementById('openBtn').addEventListener('click', function() {
+            const btn = this;
+            const music = document.getElementById('bg-music');
+            
+            // Audio Logic with User Interaction
+            if (music) {
+                music.volume = 0;
+                music.play().then(() => {
+                    gsap.to(music, { volume: 0.5, duration: 5 });
+                }).catch(err => console.log("Audio play deferred"));
+            }
+
+            // Animation Timeline
+            const tl = gsap.timeline();
+
+            tl.to("#leaf-icon", { rotation: 360, scale: 0, duration: 0.5 })
+              .to(btn, { scale: 0, opacity: 0, duration: 0.4 }, "-=0.3")
+              .to("#overlay", { opacity: 0, duration: 1, onComplete: () => {
+                  document.getElementById('overlay').style.display = 'none';
+                  document.getElementById('scene').classList.remove('hidden');
+                  
+                  // Set text
+                  document.getElementById('message-text').innerText = "{{ wish.message|escapejs }}";
+
+                  // Reveal Elements
+                  gsap.from(".autumn-card", { 
+                      scale: 0.8, 
+                      opacity: 0, 
+                      y: 40, 
+                      duration: 1.5, 
+                      ease: "power4.out" 
+                  });
+
+                  // Polaroid Layout Logic
+                  const polaroids = document.querySelectorAll('.polaroid');
+                  polaroids.forEach((p, i) => {
+                      const spread = 50;
+                      const xOffset = (i - (polaroids.length - 1) / 2) * spread;
+                      const rotation = (i - (polaroids.length - 1) / 2) * 15;
+
+                      gsap.to(p, { 
+                          opacity: 1, 
+                          x: xOffset,
+                          y: Math.abs(xOffset / 2),
+                          rotation: rotation,
+                          duration: 1.5, 
+                          delay: 0.5 + (i * 0.15),
+                          ease: "back.out(1.5)"
+                      });
+
+                      // Floating Idle Animation
+                      gsap.to(p, {
+                          y: "+=12",
+                          rotation: "+=2",
+                          duration: 2.5 + Math.random(),
+                          repeat: -1,
+                          yoyo: true,
+                          ease: "sine.inOut",
+                          delay: Math.random()
+                      });
+                  });
+
+                  // Start Canvas Animation
+                  for (let i = 0; i < 25; i++) leaves.push(new Leaf());
+                  function animate() { 
+                      ctx.clearRect(0, 0, canvas.width, canvas.height); 
+                      leaves.forEach(l => { l.update(); l.draw(); }); 
+                      requestAnimationFrame(animate); 
+                  }
+                  animate();
+              }});
+        });
+
+        // Interactive Parallax for Card
+        document.addEventListener('mousemove', (e) => {
+            if(document.getElementById('scene').classList.contains('hidden')) return;
+            const x = (window.innerWidth / 2 - e.pageX) / 30;
+            const y = (window.innerHeight / 2 - e.pageY) / 30;
+            gsap.to(".autumn-card", { 
+                rotationY: x/2, 
+                rotationX: -y/2, 
+                x: x, 
+                y: y, 
+                duration: 1 
+            });
+        });
+    </script>
+</body>
+</html>

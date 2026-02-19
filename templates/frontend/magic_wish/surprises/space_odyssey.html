@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <title>A Special Surprise for {{ wish.receiver_name }}! ✨</title>
+    <meta name="description" content="{{ wish.sender_name }} has sent you a magical {{ wish.wish_type }} surprise. Click to unlock the magic!">
+    
+    <meta property="og:title" content="A Special Surprise for {{ wish.receiver_name }}! ✨">
+    <meta property="og:description" content="Open the link to see a magical surprise from {{ wish.sender_name }}.">
+    <meta property="og:url" content="{{ request.build_absolute_uri }}">
+    
+    {% if wish.images.exists %}
+    <meta property="og:image" content="{{ request.scheme }}://{{ request.get_host }}{{ wish.images.first.image.url }}">
+    {% endif %}
+    
+    <meta property="og:type" content="website">
+    <title>Space Odyssey | {{ wish.receiver_name }}</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Exo+2:wght@200;400;600&display=swap" rel="stylesheet">
+    
+    <style>
+        :root { 
+            --neon-blue: #00f3ff; 
+            --neon-purple: #bc13fe; 
+            --space-black: #020205; 
+            --glass-border: rgba(0, 243, 255, 0.3);
+        }
+
+        body, html { 
+            margin: 0; padding: 0; background: var(--space-black);
+            color: white; overflow: hidden; font-family: 'Exo 2', sans-serif;
+            height: 100dvh; width: 100%; position: fixed;
+        }
+
+        .stars-container {
+            position: fixed; inset: 0;
+            background: radial-gradient(circle at 50% 50%, rgba(188, 19, 254, 0.1) 0%, transparent 80%), #020205;
+            z-index: -1;
+        }
+
+        .star { position: absolute; background: white; border-radius: 50%; opacity: 0.5; }
+
+        #magic-ui {
+            height: 100dvh;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 1.5rem 0;
+            z-index: 10;
+            position: relative;
+        }
+
+        .glass-panel {
+            background: rgba(0, 10, 20, 0.6);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border);
+            position: relative;
+        }
+
+        .neon-text {
+            font-family: 'Orbitron', sans-serif;
+            color: var(--neon-blue);
+            text-shadow: 0 0 10px rgba(0, 243, 255, 0.5);
+            letter-spacing: 2px;
+        }
+
+        .cosmic-card {
+            position: relative; 
+            aspect-ratio: 1/1;
+            width: 80px; 
+            clip-path: polygon(10% 0, 100% 0, 100% 90%, 90% 100%, 0 100%, 0 10%);
+            border: 1px solid var(--neon-purple);
+            background: #000;
+        }
+        @media (min-width: 768px) { .cosmic-card { width: 140px; } }
+
+        .btn-launch {
+            padding: 15px 30px;
+            font-family: 'Orbitron', sans-serif;
+            border: 1px solid var(--neon-blue);
+            color: var(--neon-blue);
+            background: transparent;
+            letter-spacing: 2px;
+            cursor: pointer;
+            overflow: hidden;
+        }
+
+        .scanner-line {
+            position: absolute; width: 100%; height: 1px;
+            background: var(--neon-blue);
+            box-shadow: 0 0 10px var(--neon-blue);
+            animation: scan 3s linear infinite;
+        }
+        @keyframes scan { 0% { top: 0%; } 100% { top: 100%; } }
+
+        .astronaut {
+            position: fixed; bottom: 5%; right: 5%;
+            width: 50px; filter: drop-shadow(0 0 10px var(--neon-blue));
+            z-index: 100; pointer-events: none; opacity: 0.6;
+        }
+
+        .hyperspace-flash {
+            position: fixed; inset: 0;
+            background: white; z-index: 2000; pointer-events: none;
+        }
+    </style>
+</head>
+<body>
+
+    <audio id="bg-music" loop>
+        {% if wish.custom_music or wish.selected_music %}
+            <source src="{% if wish.custom_music %}{{ wish.custom_music.url }}{% else %}{{ wish.selected_music.audio_file.url }}{% endif %}" type="audio/mpeg">
+        {% endif %}
+    </audio>
+
+    <div class="stars-container" id="stars"></div>
+    <img src="https://i.postimg.cc/85m6m6P7/astronaut.png" class="astronaut" alt="explorer">
+
+    <div id="overlay" class="fixed inset-0 z-[1000] flex items-center justify-center bg-[#020205] overflow-hidden">
+        <div class="absolute w-[300px] h-[300px] border border-cyan-500/10 rounded-full animate-[ping_3s_linear_infinite]"></div>
+        <div class="absolute w-[500px] h-[500px] border border-purple-500/5 rounded-full animate-[ping_4s_linear_infinite] delay-700"></div>
+
+        <div class="text-center px-6 z-10">
+            <div class="flex items-center justify-center gap-3 mb-6">
+                <span class="w-2 h-2 bg-cyan-500 rounded-full animate-pulse"></span>
+                <div class="neon-text text-[10px] uppercase tracking-[0.5em] text-cyan-400">
+                    Transmission Detected
+                </div>
+                <span class="w-2 h-2 bg-cyan-500 rounded-full animate-pulse"></span>
+            </div>
+
+            <div class="relative group">
+                <div class="absolute -inset-1 bg-gradient-to-r from-cyan-600 to-purple-600 rounded blur opacity-25 group-hover:opacity-75 transition duration-1000"></div>
+                <button onclick="launchScene()" class="btn-launch relative bg-black/80 px-10 py-5 border border-cyan-500 text-cyan-400 hover:text-white transition-all duration-300">
+                    RECEIVE SIGNAL
+                </button>
+            </div>
+
+            <div class="mt-12 text-center">
+                <p class="text-[9px] text-gray-500 tracking-[0.6em] uppercase mb-2">Signal Encrypted by</p>
+                <div class="text-xs font-bold text-white tracking-widest uppercase">{{ wish.sender_name }}</div>
+            </div>
+        </div>
+    </div>
+
+    <main id="magic-ui" class="hidden opacity-0">
+        <div class="px-6 text-center">
+            <p class="text-[10px] tracking-[0.5em] text-cyan-400 font-black mb-1 uppercase">
+                {% with w_type=wish.wish_type|lower %}
+                    {% if w_type == 'birthday' %}Happy Birthday
+                    {% elif w_type == 'anniversary' %}Happyy Anniversary
+                    {% elif w_type == 'love' %} Love You Endlessly❤️!
+                    {% elif w_type == 'miss you' %}Missing You A Lot 
+                    {% elif w_type == 'sorry' %} Sorry From Depth Of My Heart
+                    {% elif w_type == 'good luck' %}Best Of Luck Your Hard Work is About to Pay Off!
+                    {% elif w_type == 'friendship' %}Best Friend Forever!
+                    {% else %}Interstellar Greeting{% endif %}
+                {% endwith %}
+            </p>
+            <h1 class="neon-text text-2xl md:text-5xl font-black">{{ wish.receiver_name }}</h1>
+        </div>
+
+        <div class="flex flex-col items-center justify-center px-4 gap-6">
+            <div class="glass-panel p-6 md:p-10 w-full max-w-2xl rounded-sm border-l-4 border-cyan-500 shadow-[0_0_20px_rgba(0,243,255,0.1)]">
+                <div class="scanner-line"></div>
+                <p class="text-base md:text-xl font-light text-cyan-50 leading-relaxed text-center italic">
+                    "{{ wish.message }}"
+                </p>
+                <div class="mt-6 flex justify-between items-center opacity-70 border-t border-cyan-500/20 pt-4">
+                    <div class="flex flex-col">
+                        <span class="text-[8px] tracking-[0.2em] text-cyan-500 uppercase">Origin</span>
+                        <span class="text-xs font-bold text-white">{{ wish.sender_name }}</span>
+                    </div>
+                    <div class="flex flex-col text-right">
+                        <span class="text-[8px] tracking-[0.2em] text-purple-500 uppercase">Sector</span>
+                        <span class="text-xs font-bold text-white">{{ wish.wish_type|upper }}</span>
+                    </div>
+                </div>
+            </div>
+
+            {% if wish.images.exists %}
+            <div class="flex gap-3 justify-center">
+                {% for img_obj in wish.images.all|slice:":3" %}
+                <div class="cosmic-card-wrapper">
+                    <div class="cosmic-card border border-cyan-500/40 hover:border-cyan-400 transition-colors">
+                        <img src="{{ img_obj.image.url }}" class="w-full h-full object-cover grayscale hover:grayscale-0 transition-all duration-700">
+                        <div class="absolute inset-0 bg-cyan-500/10 pointer-events-none"></div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="flex gap-2 opacity-20">
+                <div class="w-2 h-2 bg-cyan-500 rounded-full animate-bounce"></div>
+                <div class="w-2 h-2 bg-cyan-500 rounded-full animate-bounce delay-100"></div>
+                <div class="w-2 h-2 bg-cyan-500 rounded-full animate-bounce delay-200"></div>
+            </div>
+            {% endif %}
+        </div>
+
+        <div class="text-center pb-6">
+            <a href="{% url 'home' %}" class="inline-flex items-center gap-2 text-[9px] text-cyan-400 tracking-[0.5em] uppercase border border-cyan-500/20 px-8 py-3 rounded-full hover:bg-cyan-500/10 hover:border-cyan-500 transition-all">
+                Broadcast Your Own
+            </a>
+        </div>
+    </main>
+
+    <script>
+        // Star Generation
+        const starsContainer = document.getElementById('stars');
+        const fragment = document.createDocumentFragment();
+        for (let i = 0; i < 80; i++) {
+            const star = document.createElement('div');
+            star.className = 'star';
+            const size = Math.random() * 2 + 1 + 'px';
+            star.style.width = size; star.style.height = size;
+            star.style.top = Math.random() * 100 + '%';
+            star.style.left = Math.random() * 100 + '%';
+            star.style.animation = `pulse ${Math.random() * 3 + 2}s infinite`;
+            fragment.appendChild(star);
+        }
+        starsContainer.appendChild(fragment);
+
+        function launchScene() {
+            const music = document.getElementById('bg-music');
+            if (music) {
+                music.volume = 0;
+                music.play().catch(e => console.log("Audio deferred"));
+                gsap.to(music, { volume: 0.6, duration: 3 });
+            }
+
+            const flash = document.createElement('div');
+            flash.className = 'hyperspace-flash opacity-0';
+            document.body.appendChild(flash);
+
+            const tl = gsap.timeline();
+            tl.to(flash, { opacity: 1, duration: 0.2 })
+              .to("#overlay", { scale: 1.5, opacity: 0, duration: 0.5, ease: "power2.in" }, 0)
+              .to(flash, { opacity: 0, duration: 1, onComplete: () => {
+                  document.getElementById('overlay').style.display = 'none';
+                  flash.remove();
+              }})
+              .set("#magic-ui", { display: "flex" })
+              .to("#magic-ui", { opacity: 1, duration: 1.2 })
+              .from(".cosmic-card-wrapper", { 
+                  y: 50, 
+                  opacity: 0, 
+                  stagger: 0.2, 
+                  duration: 0.8, 
+                  ease: "power3.out" 
+              }, "-=0.8");
+        }
+
+        document.addEventListener('mousemove', (e) => {
+            const x = (e.clientX / window.innerWidth - 0.5);
+            const y = (e.clientY / window.innerHeight - 0.5);
+            gsap.to(".stars-container", { x: x * 30, y: y * 30, duration: 3 });
+            gsap.to(".astronaut", { x: -x * 60, y: -y * 60, rotation: x * 15, duration: 2 });
+            if (!document.getElementById('magic-ui').classList.contains('hidden')) {
+                gsap.to(".glass-panel", { rotationY: x * 15, rotationX: -y * 15, duration: 1.5 });
+            }
+        });
+    </script>
+</body>
+</html>

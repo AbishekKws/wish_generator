@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <title>A Special Surprise for {{ wish.receiver_name }}! ✨</title>
+    <meta name="description" content="{{ wish.sender_name }} has sent you a magical {{ wish.wish_type }} surprise. Click to unlock the magic!">
+    
+    <meta property="og:title" content="A Special Surprise for {{ wish.receiver_name }}! ✨">
+    <meta property="og:description" content="Open the link to see a magical surprise from {{ wish.sender_name }}.">
+    <meta property="og:url" content="{{ request.build_absolute_uri }}">
+    
+    {% if wish.images.exists %}
+    <meta property="og:image" content="{{ request.scheme }}://{{ request.get_host }}{{ wish.images.first.image.url }}">
+    {% endif %}
+    
+    <meta property="og:type" content="website">
+    <title>Festival of Lights | {{ wish.receiver_name }}</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Marcellus&family=Pinyon+Script&family=Montserrat:wght@300;600&display=swap" rel="stylesheet">
+    
+    <style>
+        :root { --gold: #ffd700; --deep-maroon: #2d0a0a; --glow: #ff9e00; }
+
+        body, html { 
+            margin: 0; padding: 0; background: var(--deep-maroon);
+            color: #fff; overflow: hidden;
+            font-family: 'Montserrat', sans-serif;
+            height: 100vh; width: 100vw;
+        }
+
+        .festive-bg {
+            position: fixed; inset: 0;
+            background: radial-gradient(circle at center, #4a0e0e 0%, #1a0505 100%);
+            z-index: -1;
+        }
+
+        .lantern-container {
+            position: fixed; top: -10px; width: 100%;
+            display: flex; justify-content: space-around;
+            pointer-events: none; z-index: 5;
+        }
+
+        .lantern {
+            width: 25px; height: 40px;
+            background: var(--glow);
+            border-radius: 8px;
+            box-shadow: 0 0 20px var(--glow);
+            animation: swing 4s infinite ease-in-out;
+        }
+
+        @keyframes swing {
+            0%, 100% { transform: rotate(-5deg); transform-origin: top; }
+            50% { transform: rotate(5deg); transform-origin: top; }
+        }
+
+        .wish-card {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 215, 0, 0.2);
+            border-radius: 40px 0 40px 0;
+            padding: 1.2rem;
+            width: 90%;
+            max-width: 550px;
+            max-height: 55vh; 
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            box-shadow: 0 0 40px rgba(0,0,0,0.5);
+            z-index: 20;
+            overflow: hidden;
+        }
+
+        .receiver-name {
+            font-family: 'Marcellus', serif;
+            color: var(--gold);
+            text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+            letter-spacing: 2px;
+            font-size: clamp(1.5rem, 5vh, 2.5rem);
+        }
+
+        .message-font {
+            font-family: 'Pinyon Script', cursive;
+            color: #fceabb;
+            line-height: 1.1;
+            font-size: clamp(1.2rem, 4vh, 2rem);
+            overflow-y: auto;
+            padding: 5px;
+        }
+
+        #sparkle-canvas { position: fixed; inset: 0; z-index: 10; pointer-events: none; }
+
+        .memory-container {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            width: 100%;
+            max-height: 25vh;
+            margin-top: 15px;
+            padding-bottom: 20px;
+        }
+
+        .memory-frame {
+            width: clamp(70px, 15vh, 120px);
+            background: #fff;
+            padding: 4px 4px 12px 4px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+            border: 1.2px solid var(--gold);
+            opacity: 0;
+            flex-shrink: 0;
+        }
+
+        .memory-frame img { width: 100%; aspect-ratio: 1/1; object-fit: cover; }
+
+        .btn-light {
+            background: linear-gradient(45deg, #bf953f, #fcf6ba, #b38728, #fbf5b7, #aa771c);
+            color: #2d0a0a;
+            padding: 0.7rem 1.8rem;
+            border-radius: 5px;
+            font-weight: 800;
+            letter-spacing: 2px;
+            cursor: pointer;
+            border: none;
+        }
+    </style>
+</head>
+<body>
+
+    <audio id="bg-music" loop>
+        {% if wish.custom_music or wish.selected_music %}
+            <source src="{% if wish.custom_music %}{{ wish.custom_music.url }}{% else %}{{ wish.selected_music.audio_file.url }}{% endif %}" type="audio/mpeg">
+        {% endif %}
+    </audio>
+
+    <div class="festive-bg"></div>
+    <div class="lantern-container">
+        <div class="lantern" style="animation-delay: 0s"></div>
+        <div class="lantern" style="animation-delay: 1.5s"></div>
+        <div class="lantern" style="animation-delay: 0.8s"></div>
+        <div class="lantern" style="animation-delay: 2.2s"></div>
+        <div class="lantern" style="animation-delay: 1.2s"></div>
+    </div>
+    <canvas id="sparkle-canvas"></canvas>
+
+    <div id="overlay" class="fixed inset-0 z-[500] flex items-center justify-center bg-[#1a0505]">
+        <div class="text-center px-4">
+            <div class="mb-4 text-5xl text-yellow-500 animate-bounce">🪔</div>
+            <button id="lightBtn" class="btn-light uppercase text-sm">Illuminate the Wish</button>
+            <p class="mt-4 text-[8px] text-yellow-700 tracking-[0.4em] font-bold uppercase">Specially For {{ wish.receiver_name }}</p>
+        </div>
+    </div>
+
+    <main id="scene" class="hidden h-screen flex flex-col items-center justify-between py-10 px-4 relative">
+        <div class="h-10"></div>
+
+        <div class="wish-card text-center">
+            <span class="text-[10px] tracking-[0.5em] text-yellow-500 uppercase block mb-2 opacity-80">
+            May your days be bright and your heart be light. Happy Celebrations! ✨
+            </span>
+            <h1 id="receiver-name" class="receiver-name mb-2"></h1>
+            <div id="message-text" class="message-font"></div>
+            
+            <div class="mt-4 border-t border-yellow-900/30 pt-3">
+                <span class="text-[8px] tracking-[0.3em] text-yellow-600 uppercase block">With Wish From</span>
+                <span class="font-bold text-white text-md">{{ wish.sender_name }}</span>
+            </div>
+        </div>
+
+        <div class="memory-container">
+            {% for img_obj in wish.images.all|slice:":3" %}
+            <div class="memory-frame" style="transform: rotate({% cycle '-3deg' '3deg' %}) translateY(20px)">
+                <img src="{{ img_obj.image.url }}" onerror="this.src='https://images.unsplash.com/photo-1514222139-b7b6bb8d3a6f?auto=format&fit=crop&w=400'">
+            </div>
+            {% endfor %}
+        </div>
+
+        <footer>
+            <a href="{% url 'home' %}" class="flex flex-col items-center gap-1 group">
+                <span class="text-[7px] tracking-[0.3em] uppercase text-gray-500">Crafted with Love</span>
+                <span class="text-[9px] font-black tracking-widest text-gray-400">SURPRISE ME</span>
+            </a>
+        </footer>
+    </main>
+
+    <script>
+        const canvas = document.getElementById('sparkle-canvas');
+        const ctx = canvas.getContext('2d');
+        let sparkles = [];
+
+        function resize() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+        window.addEventListener('resize', resize); resize();
+
+        class Sparkle {
+            constructor() { this.reset(); }
+            reset() {
+                this.x = Math.random() * canvas.width;
+                this.y = canvas.height + 10;
+                this.size = Math.random() * 2 + 0.5;
+                this.speedY = Math.random() * 1 + 0.5;
+                this.opacity = Math.random();
+            }
+            draw() {
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fillStyle = `rgba(255, 215, 0, ${this.opacity})`;
+                ctx.fill();
+            }
+            update() {
+                this.y -= this.speedY;
+                if (this.y < -10) this.reset();
+            }
+        }
+
+        document.getElementById('lightBtn').addEventListener('click', () => {
+            // 1. Audio Logic
+            const music = document.getElementById('bg-music');
+            if (music) {
+                music.volume = 0;
+                music.play().catch(e => console.log("Audio interaction required"));
+                gsap.to(music, { volume: 0.5, duration: 3 });
+            }
+
+            // 2. Scene Transition
+            gsap.to("#overlay", { opacity: 0, duration: 1, onComplete: () => {
+                document.getElementById('overlay').style.display = 'none';
+                document.getElementById('scene').classList.remove('hidden');
+
+                document.getElementById('receiver-name').innerText = "{{ wish.receiver_name|escapejs }}";
+                document.getElementById('message-text').innerText = "{{ wish.message|escapejs }}";
+
+                const tl = gsap.timeline();
+                tl.from(".wish-card", { y: 30, opacity: 0, duration: 1, ease: "power3.out" })
+                  .to(".memory-frame", { opacity: 1, y: 0, duration: 0.8, stagger: 0.2, ease: "back.out(1.7)" }, "-=0.4");
+
+                for (let i = 0; i < 60; i++) sparkles.push(new Sparkle());
+                function animate() {
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                    sparkles.forEach(s => { s.update(); s.draw(); });
+                    requestAnimationFrame(animate);
+                }
+                animate();
+            }});
+        });
+
+        // Parallax Move
+        document.addEventListener('mousemove', (e) => {
+            const x = (window.innerWidth / 2 - e.pageX) / 80;
+            const y = (window.innerHeight / 2 - e.pageY) / 80;
+            gsap.to(".festive-bg", { x: x, y: y, duration: 1 });
+        });
+    </script>
+</body>
+</html>

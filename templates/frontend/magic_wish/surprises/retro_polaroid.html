@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <title>A Special Surprise for {{ wish.receiver_name }}! ✨</title>
+    <meta name="description" content="{{ wish.sender_name }} has sent you a magical {{ wish.wish_type }} surprise. Click to unlock the magic!">
+    
+    <meta property="og:title" content="A Special Surprise for {{ wish.receiver_name }}! ✨">
+    <meta property="og:description" content="Open the link to see a magical surprise from {{ wish.sender_name }}.">
+    <meta property="og:url" content="{{ request.build_absolute_uri }}">
+    
+    {% if wish.images.exists %}
+    <meta property="og:image" content="{{ request.scheme }}://{{ request.get_host }}{{ wish.images.first.image.url }}">
+    {% endif %}
+    
+    <meta property="og:type" content="website">
+    <title>Retro 3D Loop | {{ wish.receiver_name }}</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Bungee+Shade&family=Special+Elite&family=Permanent+Marker&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            /* Python Logic सँग सिंक गरिएको Neon Colors */
+            {% with w_type=wish.wish_type|lower %}
+                {% if w_type == 'love' or w_type == 'proposal' or w_type == 'anniversary' %}
+                    --neon-primary: #ff0055; --neon-secondary: #ff77aa;
+                {% elif w_type == 'friendship' or w_type == 'good luck' %}
+                    --neon-primary: #00ffff; --neon-secondary: #0088ff;
+                {% elif w_type == 'birthday' or w_type == 'new year' %}
+                    --neon-primary: #ff00ff; --neon-secondary: #00ffff;
+                {% elif w_type == 'sorry' or w_type == 'miss you' %}
+                    --neon-primary: #7d5fff; --neon-secondary: #7158e2;
+                {% else %}
+                    --neon-primary: #f9ca24; --neon-secondary: #f0932b;
+                {% endif %}
+            {% endwith %}
+            --retro-bg: #0d0221;
+        }
+
+        body, html { 
+            margin: 0; padding: 0; width: 100vw; height: 100vh;
+            background: var(--retro-bg); color: white;
+            font-family: 'Special Elite', cursive;
+            overflow: hidden; perspective: 1200px;
+        }
+
+        /* 80s Grid Animation */
+        .retro-grid {
+            position: fixed; inset: 0;
+            background-image: 
+                linear-gradient(0deg, transparent 24%, rgba(0, 255, 255, .05) 25%, rgba(0, 255, 255, .05) 26%, transparent 27%, transparent 74%, rgba(0, 255, 255, .05) 75%, rgba(0, 255, 255, .05) 76%, transparent 77%, transparent),
+                linear-gradient(90deg, transparent 24%, rgba(0, 255, 255, .05) 25%, rgba(0, 255, 255, .05) 26%, transparent 27%, transparent 74%, rgba(0, 255, 255, .05) 75%, rgba(0, 255, 255, .05) 76%, transparent 77%, transparent);
+            background-size: 40px 40px;
+            transform: rotateX(60deg) translateY(-100px);
+            z-index: -1; opacity: 0.4;
+        }
+
+        .scene-container {
+            display: flex; flex-direction: column;
+            justify-content: space-between;
+            height: 100vh; width: 100%;
+            padding: 1rem 0;
+            transform-style: preserve-3d;
+        }
+
+        .neon-title {
+            font-family: 'Bungee Shade', cursive;
+            font-size: clamp(1.8rem, 8vw, 4rem);
+            color: #fff;
+            text-shadow: 0 0 10px var(--neon-primary), 0 0 20px var(--neon-primary);
+            line-height: 1.1; text-align: center;
+        }
+
+        .photo-flow-wrapper {
+            position: relative; width: 100vw; 
+            height: clamp(200px, 35vh, 300px);
+            overflow: hidden; display: flex; align-items: center;
+        }
+
+        .photo-track {
+            display: flex; 
+            gap: clamp(15px, 3vw, 40px); 
+            position: absolute;
+            white-space: nowrap; will-change: transform;
+        }
+
+        .polaroid-3d {
+            flex: 0 0 auto; position: relative; background: #fff;
+            padding: 6px 6px 30px 6px; 
+            width: clamp(140px, 18vw, 200px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+            transform: rotateY(-10deg);
+        }
+
+        .polaroid-3d img { width: 100%; aspect-ratio: 1/1; object-fit: cover; }
+
+        .handwritten {
+            position: absolute; bottom: 6px; left: 0; width: 100%;
+            font-family: 'Permanent Marker', cursive;
+            color: #333; font-size: 0.8rem; text-align: center;
+        }
+
+        .btn-retro {
+            background: transparent; border: 2px solid white;
+            color: white; padding: 0.8rem 2rem; border-radius: 50px;
+            box-shadow: 0 0 15px var(--neon-secondary);
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="retro-grid"></div>
+
+    {% if wish.custom_music or wish.selected_music %}
+        <audio id="bgMusic" src="{% if wish.custom_music %}{{ wish.custom_music.url }}{% else %}{{ wish.selected_music.audio_file.url }}{% endif %}" loop></audio>
+    {% endif %}
+
+    <div id="overlay" class="fixed inset-0 z-[1000] flex items-center justify-center bg-black">
+        <div class="text-center">
+            <h2 class="mb-6 text-cyan-400 tracking-[0.4em] text-[10px] uppercase animate-pulse">Establishing Connection...</h2>
+            <button id="startBtn" class="btn-retro uppercase tracking-widest font-bold">REPLAY MEMORIES</button>
+            <p class="mt-4 text-[7px] text-gray-500 tracking-widest">FOR {{ wish.receiver_name|upper }}</p>
+        </div>
+    </div>
+
+    <main id="scene" class="hidden opacity-0">
+        <div class="scene-container">
+            <header class="mt-4 text-center">
+                <span class="text-[var(--neon-secondary)] text-[10px] tracking-[0.5em] uppercase font-bold block mb-1">
+                    {% with w_type=wish.wish_type|lower %}
+                        {% if w_type == 'birthday' %} A Special Birthday Rewind
+                        {% elif w_type == 'anniversary' %} Still the Best Decision, Happy Anniversary!
+                        {% elif w_type == 'love' %} Heartbeat Chronicles
+                        {% elif wish.wish_type|lower == 'friendship' %} A Friend for Life
+                        {% elif w_type == 'sorry' %} A Sincere Apology
+                        {% elif w_type == 'thank you' %} A Million Thanks for Being You! ❤️
+                        {% else %} A Special Vibe For {% endif %}
+                    {% endwith %}
+                </span>
+                
+                <h1 class="neon-title uppercase">{{ wish.receiver_name }}</h1>
+                
+                <div class="flex items-center justify-center gap-3 mt-2">
+                    <span class="h-[1px] w-8 bg-[var(--neon-primary)] opacity-40"></span>
+                    <span class="text-[var(--neon-primary)] text-[8px] tracking-[0.3em] uppercase font-black">All The Love For You</span>
+                    <span class="h-[1px] w-8 bg-[var(--neon-primary)] opacity-40"></span>
+                </div>
+            </header>
+
+            <div class="px-8 text-center">
+                <p class="text-cyan-50 font-light italic text-sm md:text-base max-w-xl mx-auto leading-relaxed">
+                    "{{ wish.message }}"
+                </p>
+            </div>
+
+            <div class="photo-flow-wrapper">
+                <div class="photo-track" id="track">
+                    {% for img_obj in wish.images.all %}
+                    <div class="polaroid-3d">
+                        <img src="{{ img_obj.image.url }}">
+                        <div class="handwritten">
+                            {% with w_type=wish.wish_type|lower %}
+                                {% if w_type == 'anniversary' %} {% cycle 'ETERNAL' 'FOREVER' 'US' %}
+                                {% elif w_type == 'friendship' %} {% cycle 'BESTIES' 'VIBES' 'BROS' %}
+                                {% else %} {% cycle 'MOMENT' 'GOLDEN' 'CLASSIC' %}
+                                {% endif %}
+                            {% endwith %}
+                        </div>
+                    </div>
+                    {% endfor %}
+                    {% for img_obj in wish.images.all %}
+                    <div class="polaroid-3d">
+                        <img src="{{ img_obj.image.url }}">
+                        <div class="handwritten">REWIND</div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <footer class="pb-6 text-center">
+                <div class="text-[var(--neon-primary)] text-[9px] font-black tracking-[0.4em] uppercase">MESSAGED BY: {{ wish.sender_name }}</div>
+                <div class="mt-4 opacity-30">
+                    <a href="{% url 'home' %}" class="text-[7px] uppercase tracking-[0.2em] border border-white/30 px-4 py-1.5 rounded-full">Surprise Me Project</a>
+                </div>
+            </footer>
+        </div>
+    </main>
+
+    <script>
+        document.getElementById('startBtn').addEventListener('click', () => {
+            const music = document.getElementById('bgMusic');
+            if(music) {
+                music.volume = 0.5;
+                music.play().catch(() => {});
+            }
+
+            gsap.to("#overlay", { 
+                opacity: 0, scale: 1.1, duration: 0.8, ease: "power2.inOut", onComplete: () => {
+                    document.getElementById('overlay').style.display = 'none';
+                    document.getElementById('scene').classList.remove('hidden');
+                    gsap.to("#scene", { opacity: 1, duration: 1 });
+                    startInfiniteFlow();
+                }
+            });
+        });
+
+        function startInfiniteFlow() {
+            const track = document.getElementById('track');
+            const cards = track.querySelectorAll('.polaroid-3d');
+            if(cards.length === 0) return;
+            
+            const cardWidth = cards[0].offsetWidth;
+            const gap = parseInt(window.getComputedStyle(track).gap);
+            const moveDistance = (cardWidth + gap) * (cards.length / 2);
+
+            gsap.to(track, {
+                x: -moveDistance,
+                duration: 15, 
+                ease: "none",
+                repeat: -1
+            });
+        }
+
+        // Parallax Effect
+        window.addEventListener('mousemove', (e) => {
+            const x = (window.innerWidth / 2 - e.pageX) / 60;
+            const y = (window.innerHeight / 2 - e.pageY) / 60;
+            gsap.to(".scene-container", { rotationY: x, rotationX: -y, duration: 1 });
+        });
+    </script>
+</body>
+</html>

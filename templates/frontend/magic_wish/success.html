@@ -1,0 +1,170 @@
+{% extends 'frontend/base.html' %}
+{% load static %}
+
+{% block title %}Magic Link Ready! ✨ | Surprise Me{% endblock %}
+
+{% block content %}
+<div class="min-h-[calc(100vh-80px)] flex items-center justify-center p-4 relative overflow-hidden my-2 lg:my-6">
+    
+    <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 lg:w-96 lg:h-96 bg-pink-500/10 rounded-full blur-[100px] pointer-events-none animate-pulse"></div>
+
+    <div class="w-full max-w-lg z-10 transition-all duration-500">
+        <div class="transition-all duration-500 mx-auto text-center
+            lg:bg-white/5 lg:backdrop-blur-2xl lg:border lg:border-white/10 lg:p-8 lg:rounded-[2.5rem] lg:shadow-2xl 
+            p-6 rounded-none bg-transparent border-none shadow-none">
+            
+            <div class="relative inline-block mb-4">
+                <div class="text-6xl lg:text-7xl animate-bounce">🎉</div>
+                <div class="absolute -top-1 -right-1 w-6 h-6 bg-green-500 rounded-full border-4 border-slate-900 flex items-center justify-center shadow-lg">
+                    <i class="fas fa-check text-[8px] text-white"></i>
+                </div>
+            </div>
+
+            <h1 class="text-2xl md:text-3xl font-black bg-gradient-to-r from-yellow-400 via-orange-500 to-pink-500 bg-clip-text text-transparent mb-2">
+                Success! Your Magic is Ready
+            </h1>
+            <p class="text-gray-400 mb-6 text-xs md:text-sm leading-relaxed max-w-xs mx-auto">
+                Copy the link below and send it to <span class="text-pink-400 font-bold">{{ wish.receiver_name }}</span> for a massive surprise.
+            </p>
+
+            <p id="wishLink" class="hidden">
+                {{ request.scheme }}://{{ request.get_host }}{% url 'wish_detail' wish.slug %}
+            </p>
+
+            <div class="space-y-6">
+                <button onclick="copyLink()" id="copyBtn" 
+                        class="w-full py-4 rounded-2xl bg-white text-black font-extrabold text-sm hover:scale-[1.02] active:scale-[0.95] transition-all duration-300 flex flex-col items-center justify-center gap-1 shadow-xl relative overflow-hidden group">
+                    
+                    <div class="flex items-center gap-2 relative z-10">
+                        <i class="fas fa-copy" id="copyIcon"></i>
+                        <span id="copyBtnText">Copy Magic Link</span>
+                    </div>
+                    
+                    <p id="copyHint" class="text-[9px] text-gray-400 uppercase tracking-widest font-bold group-hover:text-pink-500 transition-colors">
+                        Click to copy
+                    </p>
+                </button>
+
+                <div class="flex flex-col items-center gap-2">
+                    <div class="flex items-center justify-center gap-5">
+                        <button onclick="sharePlatform('whatsapp')" title="Share on WhatsApp"
+                                class="w-11 h-11 rounded-full bg-[#25D366] text-white flex items-center justify-center shadow-lg shadow-green-500/20 hover:scale-110 active:scale-90 transition-all">
+                            <i class="fab fa-whatsapp text-lg"></i>
+                        </button>
+                        
+                        <button onclick="sharePlatform('messenger')" title="Share on Messenger"
+                                class="w-11 h-11 rounded-full bg-[#0084FF] text-white flex items-center justify-center shadow-lg shadow-blue-500/20 hover:scale-110 active:scale-90 transition-all">
+                            <i class="fab fa-facebook-messenger text-lg"></i>
+                        </button>
+
+                        <button onclick="sharePlatform('instagram')" title="Share on Instagram"
+                                class="w-11 h-11 rounded-full bg-gradient-to-tr from-[#f9ce34] via-[#ee2a7b] to-[#6228d7] text-white flex items-center justify-center shadow-lg shadow-purple-500/20 hover:scale-110 active:scale-90 transition-all">
+                            <i class="fab fa-instagram text-lg"></i>
+                        </button>
+                    </div>
+                    <p class="text-[7px] text-gray-500 uppercase font-bold tracking-widest">Tap to share with social Media</p>
+                </div>
+
+                <a href="{% url 'wish_detail' wish.slug %}" target="_blank"
+                class="w-full py-3 rounded-xl bg-white/5 border border-white/10 text-white font-bold hover:bg-white/10 active:scale-95 transition-all text-center text-xs flex items-center justify-center gap-2 mt-2">
+                    <i class="fas fa-eye text-pink-400"></i> View Before Send
+                </a>
+            </div>
+
+            <div class="mt-8 pt-4 border-t border-white/5">
+                <p class="text-[10px] text-gray-500 italic">
+                    <i class="fas fa-magic mr-1 text-pink-500"></i> The link is unique and safe to share with anyone! 🚀
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+<script>
+    // 1. Confetti effect (Same as original)
+    window.onload = function() {
+        const duration = 3 * 1000;
+        const end = Date.now() + duration;
+
+        (function frame() {
+            confetti({
+                particleCount: 3,
+                angle: 60,
+                spread: 55,
+                origin: { x: 0, y: 0.8 },
+                colors: ['#ec4899', '#8b5cf6', '#00f2ff']
+            });
+            confetti({
+                particleCount: 3,
+                angle: 120,
+                spread: 55,
+                origin: { x: 1, y: 0.8 },
+                colors: ['#ec4899', '#8b5cf6', '#00f2ff']
+            });
+
+            if (Date.now() < end) {
+                requestAnimationFrame(frame);
+            }
+        }());
+    };
+
+    // Copy Function (Same as original)
+    function copyLink() {
+        const linkText = document.getElementById('wishLink').innerText.trim();
+        navigator.clipboard.writeText(linkText).then(() => {
+            const btn = document.getElementById('copyBtn');
+            const btnText = document.getElementById('copyBtnText');
+            
+            const originalContent = btnText.innerText;
+            btnText.innerText = 'Copied to Clipboard! ✨';
+            btn.classList.add('bg-pink-600', 'text-white');
+            btn.classList.remove('bg-white', 'text-black');
+            
+            confetti({
+                particleCount: 40,
+                spread: 70,
+                origin: { y: 0.8 },
+                colors: ['#ec4899', '#ffffff']
+            });
+
+            setTimeout(() => {
+                btnText.innerText = originalContent;
+                btn.classList.remove('bg-pink-600', 'text-white');
+                btn.classList.add('bg-white', 'text-black');
+            }, 2000);
+        });
+    }
+
+    // Share Function (Same as original)
+    function sharePlatform(platform) {
+        const linkText = document.getElementById('wishLink').innerText.trim();
+        const shareMessage = "I've created a magical surprise for you! ✨ Click to open: ";
+        const fullMessage = shareMessage + linkText;
+
+        if (navigator.share && /Android|iPhone|iPad|iPod/i.test(navigator.userAgent)) {
+            navigator.share({
+                title: 'A Magic Surprise for You! ✨',
+                text: shareMessage,
+                url: linkText,
+            }).catch((err) => console.log("Share failed"));
+        } 
+        else {
+            if (platform === 'whatsapp') {
+                window.open("https://api.whatsapp.com/send?text=" + encodeURIComponent(fullMessage), "_blank");
+            } 
+            else if (platform === 'messenger') {
+                const messengerUrl = "https://www.facebook.com/sharer/sharer.php?u=" + encodeURIComponent(linkText);
+                window.open(messengerUrl, "_blank", "width=600,height=400");
+            } 
+            else if (platform === 'instagram') {
+                copyLink();
+                alert("Link Copied! Please paste it in Instagram DMs. 🚀");
+                window.open("https://www.instagram.com/direct/inbox/", "_blank");
+            }
+        }
+    }
+</script>
+{% endblock %}

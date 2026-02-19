@@ -1,0 +1,193 @@
+{% extends 'backend/base.html' %}
+
+{% block content %}
+<div class="container-fluid py-3">
+    <div class="row align-items-center mb-4 g-3">
+        <div class="col-12 col-md-6 text-center text-md-start">
+            <h3 class="fw-bold m-0 text-dark">Master Magic Wish</h3>
+        </div>
+    </div>
+
+    <div class="card border-0 shadow-sm mb-4">
+        <div class="card-body p-3">
+            <form method="GET" class="row g-2">
+                <div class="col-12 col-md-10">
+                    <div class="input-group shadow-sm rounded">
+                        <span class="input-group-text bg-white border-end-0 text-muted">
+                            <i class="fas fa-search"></i>
+                        </span>
+                        <input type="text" name="q" class="form-control border-start-0 ps-0" 
+                               placeholder="Search by Sender, Receiver or Slug..." value="{{ query }}">
+                    </div>
+                </div>
+                <div class="col-12 col-md-2">
+                    <button type="submit" class="btn btn-dark w-100 fw-bold shadow-sm">Search</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="card border-0 shadow-sm overflow-hidden">
+        <div class="card-body p-0">
+            <div class="table-responsive d-none d-md-block">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="bg-light">
+                        <tr>
+                            <th class="ps-4 py-3 text-uppercase small fw-bold text-secondary border-0">Sender / Receiver</th>
+                            <th class="py-3 text-uppercase small fw-bold text-secondary border-0">Music</th> 
+                            <th class="py-3 text-uppercase small fw-bold text-secondary border-0">Gallery</th>
+                            <th class="py-3 text-uppercase small fw-bold text-secondary border-0">Created</th>
+                            <th class="py-3 text-uppercase small fw-bold text-secondary border-0 text-center">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for wish in wishes %}
+                        <tr>
+                            <td class="ps-4 py-3">
+                                <div class="d-flex flex-column">
+                                    <span class="fw-bold text-dark text-truncate" style="max-width: 250px;">
+                                        {{ wish.sender_name }} <i class="fas fa-arrow-right mx-1 small text-muted opacity-50"></i> {{ wish.receiver_name }}
+                                    </span>
+                                    <small class="text-muted">{{ wish.message|truncatechars:45 }}</small>
+                                </div>
+                            </td>
+                            <td class="py-3">
+                                {% if wish.music %}
+                                    <span class="badge rounded-pill bg-primary-subtle text-primary border border-primary-subtle px-2">
+                                        <i class="fas fa-music me-1"></i> {{ wish.music.title|truncatechars:12 }}
+                                    </span>
+                                {% else %}
+                                    <span class="text-muted small fst-italic">No music</span>
+                                {% endif %}
+                            </td>
+                            <td class="py-3">
+                                <div class="d-flex align-items-center gap-1">
+                                    {% for img in wish.images.all|slice:":3" %}
+                                        <img src="{{ img.image.url }}" class="rounded shadow-sm border border-white" 
+                                             style="width: 30px; height: 30px; object-fit: cover;">
+                                    {% endfor %}
+                                    {% if wish.images.count > 3 %}
+                                        <span class="badge bg-light text-dark border small d-flex align-items-center justify-content-center" 
+                                              style="width: 30px; height: 30px; border-radius: 6px;">+{{ wish.images.count|add:"-3" }}</span>
+                                    {% endif %}
+                                </div>
+                            </td>
+                            <td class="py-3">
+                                <span class="small text-muted fw-medium">{{ wish.created_at|date:"M d, Y" }}</span>
+                            </td>
+                            <td class="py-3 text-center">
+                                <button class="btn btn-sm btn-outline-danger border-0 rounded-circle" 
+                                        onclick="confirmDelete('{{ wish.slug }}', '{{ wish.sender_name }}')" 
+                                        style="width: 35px; height: 35px;">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="d-md-none">
+                {% for wish in wishes %}
+                <div class="p-3 border-bottom">
+                    <div class="d-flex justify-content-between align-items-start mb-2">
+                        <div class="pe-2">
+                            <div class="fw-bold text-dark mb-0" style="line-height: 1.2;">
+                                {{ wish.sender_name }} <i class="fas fa-heart text-danger small mx-1"></i> {{ wish.receiver_name }}
+                            </div>
+                            <small class="text-muted" style="font-size: 0.75rem;">Created: {{ wish.created_at|date:"M d, Y" }}</small>
+                        </div>
+                        <button class="btn btn-light text-danger btn-sm rounded-circle shadow-sm" 
+                                onclick="confirmDelete('{{ wish.slug }}', '{{ wish.sender_name }}')"
+                                style="width: 32px; height: 32px;">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                    
+                    <p class="small text-secondary mb-3 bg-light p-2 rounded">{{ wish.message|truncatechars:80 }}</p>
+
+                    <div class="d-flex align-items-center justify-content-between">
+                        <div>
+                            {% if wish.music %}
+                                <span class="badge rounded-pill bg-info-subtle text-info border border-info-subtle px-2 py-1" style="font-size: 0.7rem;">
+                                    <i class="fas fa-music me-1"></i> {{ wish.music.title|truncatechars:15 }}
+                                </span>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="d-flex align-items-center gap-1">
+                            {% for img in wish.images.all|slice:":4" %}
+                                <img src="{{ img.image.url }}" class="rounded shadow-sm border border-white" 
+                                     style="width: 28px; height: 28px; object-fit: cover;">
+                            {% endfor %}
+                            {% if wish.images.count > 4 %}
+                                <span class="small text-muted fw-bold" style="font-size: 0.7rem;">+{{ wish.images.count|add:"-4" }}</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                {% empty %}
+                <div class="text-center py-5">
+                    <i class="fas fa-folder-open fa-3x text-light mb-3"></i>
+                    <p class="text-muted small">No matching wishes found.</p>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    {% if wishes.has_other_pages %}
+    <nav class="mt-4 mb-5">
+        <ul class="pagination pagination-sm justify-content-center flex-wrap gap-1">
+            {% if wishes.has_previous %}
+                <li class="page-item"><a class="page-link rounded border-0 text-dark shadow-sm" href="?page=1&q={{ query }}"><i class="fas fa-angle-double-left"></i></a></li>
+                <li class="page-item"><a class="page-link rounded border-0 text-dark shadow-sm px-3" href="?page={{ wishes.previous_page_number }}&q={{ query }}">Prev</a></li>
+            {% endif %}
+
+            <li class="page-item active"><span class="page-link rounded border-0 bg-dark shadow px-3">{{ wishes.number }}</span></li>
+
+            {% if wishes.has_next %}
+                <li class="page-item"><a class="page-link rounded border-0 text-dark shadow-sm px-3" href="?page={{ wishes.next_page_number }}&q={{ query }}">Next</a></li>
+                <li class="page-item"><a class="page-link rounded border-0 text-dark shadow-sm" href="?page={{ wishes.paginator.num_pages }}&q={{ query }}"><i class="fas fa-angle-double-right"></i></a></li>
+            {% endif %}
+        </ul>
+    </nav>
+    {% endif %}
+</div>
+
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" style="max-width: 320px;">
+        <div class="modal-content border-0 shadow-lg rounded-4">
+            <div class="modal-body text-center p-4">
+                <i class="fas fa-exclamation-triangle fa-4x text-danger opacity-75 mb-3"></i>
+                <h5 class="fw-bold mb-2">Remove Wish?</h5>
+                <p class="text-muted small px-2">Wish from <strong id="del_sender" class="text-dark"></strong> will be permanently deleted.</p>
+                <div class="d-grid gap-2 mt-4">
+                    <a id="del_btn" href="#" class="btn btn-danger py-2 fw-bold shadow">Confirm Delete</a>
+                    <button type="button" class="btn btn-light py-2 text-secondary" data-bs-dismiss="modal">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .table td { white-space: nowrap; }
+    .page-link:hover { background-color: #f8f9fa; }
+    
+    @media (max-width: 768px) {
+        .container-fluid { padding-bottom: 80px; }
+    }
+</style>
+
+<script>
+function confirmDelete(slug, sender) {
+    document.getElementById('del_sender').innerText = sender;
+    // Note: Ensure the URL pattern name matches your urls.py
+    let url = "{% url 'admin_interactive_delete' 'PLACEHOLDER' %}".replace('PLACEHOLDER', slug);
+    document.getElementById('del_btn').setAttribute('href', url);
+    new bootstrap.Modal(document.getElementById('deleteModal')).show();
+}
+</script>
+{% endblock %}

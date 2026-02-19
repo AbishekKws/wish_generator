@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <title>A Special Surprise for {{ wish.receiver_name }}! ✨</title>
+    <meta name="description" content="{{ wish.sender_name }} has sent you a magical {{ wish.wish_type }} surprise. Click to unlock the magic!">
+    
+    <meta property="og:title" content="A Special Surprise for {{ wish.receiver_name }}! ✨">
+    <meta property="og:description" content="Open the link to see a magical surprise from {{ wish.sender_name }}.">
+    <meta property="og:url" content="{{ request.build_absolute_uri }}">
+    
+    {% if wish.images.exists %}
+    <meta property="og:image" content="{{ request.scheme }}://{{ request.get_host }}{{ wish.images.first.image.url }}">
+    {% endif %}
+    
+    <meta property="og:type" content="website">
+    <title>{{ wish.receiver_name }} | Royal {{ wish.wish_type|title }}</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700;900&family=Great+Vibes&family=Montserrat:wght@100;300;600&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            {% if wish.wish_type|lower == 'love' or wish.wish_type|lower == 'proposal' or wish.wish_type|lower == 'anniversary' %}
+                --primary: #ff3366; --primary-light: #ff80ab;
+            {% elif wish.wish_type|lower == 'graduation' %}
+                --primary: #00c8ff; --primary-light: #80e5ff;
+            {% else %}
+                --primary: #d4af37; --primary-light: #f9e29c;
+            {% endif %}
+            --glass: rgba(255, 255, 255, 0.03);
+        }
+
+        body, html { 
+            margin: 0; padding: 0; width: 100%; height: 100dvh; 
+            background: #000; color: var(--primary);
+            font-family: 'Montserrat', sans-serif;
+            overflow: hidden; position: fixed;
+        }
+
+        .royal-bg {
+            position: fixed; inset: 0;
+            background: radial-gradient(circle at 50% 50%, rgba(212, 175, 55, 0.05) 0%, transparent 70%), #050505;
+            z-index: -1;
+        }
+
+        #particles-js { position: fixed; inset: 0; z-index: 1; pointer-events: none; }
+
+        .premium-title {
+            font-family: 'Cinzel Decorative', cursive;
+            background: linear-gradient(75deg, #8a6d3b 0%, var(--primary-light) 50%, #8a6d3b 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-size: 200% auto;
+            animation: shine 5s infinite linear;
+        }
+        @keyframes shine { to { background-position: 200% center; } }
+
+        .luxury-card {
+            background: var(--glass);
+            border: 1px solid rgba(212, 175, 55, 0.1);
+            padding: 5px; border-radius: 10px;
+            width: 80px; height: 80px; opacity: 0;
+        }
+        @media (min-width: 768px) { .luxury-card { width: 140px; height: 140px; } }
+
+        .luxury-card img {
+            width: 100%; height: 100%; object-fit: cover; border-radius: 8px;
+        }
+
+        .btn-unlock {
+            padding: 15px 35px; font-family: 'Cinzel Decorative', cursive;
+            border: 1px solid var(--primary); color: var(--primary);
+            background: transparent; letter-spacing: 3px; font-size: 0.8rem;
+        }
+
+        #scene {
+            height: 100dvh; display: flex; flex-direction: column;
+            justify-content: space-around; align-items: center;
+            padding: 1rem 0; z-index: 10; position: relative;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="royal-bg"></div>
+    <div id="particles-js"></div>
+
+    {% if wish.custom_music or wish.selected_music %}
+        <audio id="bgMusic" src="{% if wish.custom_music %}{{ wish.custom_music.url }}{% else %}{{ wish.selected_music.audio_file.url }}{% endif %}" loop preload="auto"></audio>
+    {% endif %}
+
+    <div id="overlay" class="fixed inset-0 z-[1000] flex items-center justify-center bg-[#000]">
+        <div class="text-center px-6">
+            <div class="mb-6 text-5xl text-white/20">
+                <i class="fa-solid fa-crown animate-pulse"></i>
+            </div>
+            <button id="startBtn" class="btn-unlock uppercase font-bold hover:bg-white/5 transition-all">
+                Reveal Surprise
+            </button>
+            <p class="mt-6 text-[8px] tracking-[0.6em] text-white/30 uppercase">Especially for You</p>
+        </div>
+    </div>
+
+    <main id="scene" class="hidden opacity-0 w-full">
+        <header class="text-center px-6">
+            <div class="uppercase tracking-[0.6em] text-[9px] mb-4 opacity-60">
+                {% with w_type=wish.wish_type|lower %}
+                    {% if w_type == 'anniversary' %} A Beautiful Milestone
+                    {% elif w_type == 'graduation' %} A Remarkable Success
+                    {% elif w_type == 'proposal' %} A Promise of Forever
+                    {% else %} A Royal Celebration {% endif %}
+                {% endwith %}
+            </div>
+
+            <h1 class="premium-title text-3xl md:text-6xl font-black uppercase mb-4">
+                {% with w_type=wish.wish_type|lower %}
+                    {% if w_type == 'anniversary' %} Happy Anniversary
+                    {% elif w_type == 'graduation' %} Congratulations
+                    {% elif w_type == 'proposal' %} Marry Me?
+                    {% else %} Happy Birthday {% endif %}
+                {% endwith %}
+                <br>
+                <span class="text-white drop-shadow-lg">{{ wish.receiver_name }}</span>
+            </h1>
+
+            <div class="h-[1px] w-24 bg-gradient-to-r from-transparent via-primary to-transparent mx-auto mb-6"></div>
+
+            <p class="font-['Great_Vibes'] text-3xl md:text-5xl text-white/95 italic px-4 leading-snug">
+                "{{ wish.message }}"
+            </p>
+        </header>
+
+        {% if wish.images.exists %}
+        <div class="flex justify-center gap-3 md:gap-6">
+            {% for img_obj in wish.images.all|slice:":3" %}
+            <div class="luxury-card shadow-2xl">
+                <img src="{{ img_obj.image.url }}" alt="Memory">
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <footer class="flex flex-col items-center gap-4">
+            <p class="text-[10px] tracking-[0.8em] opacity-50 uppercase text-white">From {{ wish.sender_name }}</p>
+            <a href="{% url 'home' %}" class="text-[9px] text-primary/80 hover:text-primary transition-all tracking-widest border-b border-primary/20 pb-1">
+                CREATE YOUR OWN SURPRISE
+            </a>
+        </footer>
+    </main>
+
+    <script>
+        function initExperience() {
+            const music = document.getElementById('bgMusic');
+            if(music) music.play().catch(e => console.log("Audio play blocked"));
+
+            const tl = gsap.timeline();
+
+            tl.to("#overlay", { 
+                opacity: 0, scale: 1.5, filter: "blur(20px)", duration: 1, 
+                onComplete: () => {
+                    document.getElementById('overlay').style.display = 'none';
+                    document.getElementById('scene').classList.remove('hidden');
+                }
+            })
+            .to("#scene", { opacity: 1, duration: 0.5 })
+            .from(".premium-title", { scale: 0.9, opacity: 0, duration: 1.2, ease: "expo.out" })
+            .from("p.italic", { y: 20, opacity: 0, duration: 1 }, "-=0.5")
+            .to(".luxury-card", {
+                opacity: 1, scale: 1, y: 0, stagger: 0.2, duration: 1,
+                ease: "power2.out"
+            }, "-=0.8");
+        }
+
+        document.getElementById('startBtn').addEventListener('click', initExperience);
+
+        // Particle System
+        let pColor = "#d4af37";
+        {% if wish.wish_type|lower == 'love' or wish.wish_type|lower == 'anniversary' %} pColor = "#ff3366";
+        {% elif wish.wish_type|lower == 'graduation' %} pColor = "#00c8ff"; {% endif %}
+
+        particlesJS("particles-js", {
+            "particles": {
+                "number": { "value": 40, "density": { "enable": true, "value_area": 800 } },
+                "color": { "value": pColor },
+                "opacity": { "value": 0.3 },
+                "size": { "value": 2 },
+                "move": { "enable": true, "speed": 1, "direction": "top", "random": true }
+            }
+        });
+    </script>
+</body>
+</html>

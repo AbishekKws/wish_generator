@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <title>A Special Surprise for {{ wish.receiver_name }}! ✨</title>
+    <meta name="description" content="{{ wish.sender_name }} has sent you a magical {{ wish.wish_type }} surprise. Click to unlock the magic!">
+    
+    <meta property="og:title" content="A Special Surprise for {{ wish.receiver_name }}! ✨">
+    <meta property="og:description" content="Open the link to see a magical surprise from {{ wish.sender_name }}.">
+    <meta property="og:url" content="{{ request.build_absolute_uri }}">
+    
+    {% if wish.images.exists %}
+    <meta property="og:image" content="{{ request.scheme }}://{{ request.get_host }}{{ wish.images.first.image.url }}">
+    {% endif %}
+    
+    <meta property="og:type" content="website">
+    <title>Surprise for {{ wish.receiver_name }}</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        body, html {
+            margin: 0; padding: 0;
+            width: 100%; height: 100%;
+            overflow: hidden;
+            background: #0f172a;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .balloon {
+            position: absolute;
+            bottom: -200px;
+            width: 80px;
+            height: 100px;
+            border-radius: 50% 50% 50% 50% / 40% 40% 60% 60%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: inset -5px -5px 15px rgba(0,0,0,0.2);
+            animation: float-up var(--duration) linear infinite;
+            z-index: 10;
+        }
+
+        @media (min-width: 768px) {
+            .balloon { width: 110px; height: 135px; }
+        }
+
+        .balloon::after {
+            content: "";
+            position: absolute;
+            bottom: -10px;
+            border-left: 5px solid transparent;
+            border-right: 5px solid transparent;
+            border-bottom: 10px solid inherit;
+        }
+
+        .balloon-string {
+            position: absolute;
+            bottom: -50px;
+            width: 1px;
+            height: 50px;
+            background: rgba(255,255,255,0.2);
+        }
+
+        .balloon-img {
+            width: 75%;
+            height: 70%;
+            object-fit: cover;
+            border-radius: 50%;
+            border: 2px solid white;
+        }
+
+        @keyframes float-up {
+            0% { transform: translateY(0) rotate(0deg); left: var(--left); }
+            100% { transform: translateY(-130vh) rotate(var(--rotation)); left: var(--left); }
+        }
+
+        /* FULL TRANSPARENCY APPLIED HERE */
+        .message-card {
+            background: transparent !important;
+            backdrop-filter: none !important;
+            border: none !important;
+            box-shadow: none !important;
+        }
+
+        /* Text readability against moving balloons */
+        .text-glow {
+            text-shadow: 0 0 20px rgba(0,0,0,0.8), 0 0 40px rgba(0,0,0,0.4);
+        }
+
+        .home-brand {
+            font-size: 10px;
+            letter-spacing: 3px;
+            color: rgba(255,255,255,0.6);
+            text-transform: uppercase;
+        }
+    </style>
+</head>
+<body>
+
+    {% if wish.custom_music or wish.selected_music %}
+        <audio id="bgMusic" src="{% if wish.custom_music %}{{ wish.custom_music.url }}{% else %}{{ wish.selected_music.audio_file.url }}{% endif %}" loop></audio>
+    {% endif %}
+
+    <div id="overlay" class="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-slate-950 transition-opacity duration-1000">
+        <div class="text-6xl mb-6 animate-bounce">🎈</div>
+        <button onclick="startParade()" class="bg-gradient-to-r from-pink-600 to-purple-600 text-white px-10 py-4 rounded-full font-black text-xl shadow-2xl hover:scale-105 transition-transform">
+            RELEASE MAGIC 🎈
+        </button>
+        <p class="mt-4 text-gray-500 animate-pulse text-[10px] tracking-widest uppercase">Tap to begin</p>
+    </div>
+
+    <div id="balloon-container" class="absolute inset-0 pointer-events-none"></div>
+
+    <div id="main-content" class="relative z-20 h-full w-full flex flex-col items-center justify-center px-4 hidden">
+        <div class="message-card p-8 md:p-12 text-center">
+            <h1 class="text-4xl md:text-7xl font-black mb-6 bg-clip-text text-transparent bg-gradient-to-r from-yellow-400 via-pink-500 to-purple-500 leading-tight text-glow">
+                Happy {{ wish.wish_type|title }}! {{ wish.receiver_name }}
+            </h1>
+
+            
+            <div class="max-h-[40vh] overflow-y-auto mb-8 px-2">
+                <p class="text-xl md:text-3xl text-white font-bold leading-relaxed text-glow">
+                    "{{ wish.message }}"
+                </p>
+            </div>
+
+            <div class="inline-block px-6 py-2 rounded-full bg-white/10 backdrop-blur-md border border-white/20 mb-10">
+                <p class="text-pink-300 text-sm font-black tracking-widest uppercase">From: {{ wish.sender_name }}</p>
+            </div>
+
+            <div class="pt-6 border-t border-white/10">
+                <p class="home-brand mb-3">Created with Magic ✨</p>
+                <a href="{% url 'home' %}" class="text-[11px] text-white/50 hover:text-white transition-all underline decoration-pink-500 underline-offset-8">
+                    CREATE YOUR OWN SURPRISE
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const balloonContainer = document.getElementById('balloon-container');
+        const colors = ['#FF6B6B', '#4ECDC4', '#FFE66D', '#FF9F43', '#A29BFE', '#FD79A8'];
+        
+        const images = [
+            {% for img_obj in wish.images.all|slice:":6" %}
+                "{{ img_obj.image.url }}",
+            {% endfor %}
+        ];
+
+        function createBalloon(imageUrl) {
+            const balloon = document.createElement('div');
+            balloon.className = 'balloon';
+            
+            const color = colors[Math.floor(Math.random() * colors.length)];
+            const left = Math.random() * 90 + 5 + '%';
+            const duration = Math.random() * 4 + 7 + 's'; 
+            const rotation = Math.random() * 40 - 20 + 'deg';
+            
+            balloon.style.setProperty('--left', left);
+            balloon.style.setProperty('--duration', duration);
+            balloon.style.setProperty('--rotation', rotation);
+            balloon.style.backgroundColor = color;
+            balloon.style.color = color;
+
+            if (imageUrl) {
+                const img = document.createElement('img');
+                img.src = imageUrl;
+                img.className = 'balloon-img';
+                balloon.appendChild(img);
+            }
+
+            const string = document.createElement('div');
+            string.className = 'balloon-string';
+            balloon.appendChild(string);
+
+            balloonContainer.appendChild(balloon);
+
+            setTimeout(() => balloon.remove(), parseFloat(duration) * 1000);
+        }
+
+        function startParade() {
+            const music = document.getElementById('bgMusic');
+            if(music) music.play().catch(e => console.log("Audio play blocked"));
+
+            document.getElementById('overlay').classList.add('opacity-0');
+            setTimeout(() => {
+                document.getElementById('overlay').style.display = 'none';
+                document.getElementById('main-content').classList.remove('hidden');
+                document.getElementById('main-content').style.display = 'flex';
+            }, 1000);
+
+            let imgIndex = 0;
+            setInterval(() => {
+                const currentImg = images.length > 0 ? images[imgIndex % images.length] : null;
+                createBalloon(currentImg);
+                imgIndex++;
+            }, 800); // Slightly more balloons for better effect
+        }
+    </script>
+</body>
+</html>

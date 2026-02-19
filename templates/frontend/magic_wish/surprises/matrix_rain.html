@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <title>A Special Surprise for {{ wish.receiver_name }}! ✨</title>
+    <meta name="description" content="{{ wish.sender_name }} has sent you a magical {{ wish.wish_type }} surprise. Click to unlock the magic!">
+    
+    <meta property="og:title" content="A Special Surprise for {{ wish.receiver_name }}! ✨">
+    <meta property="og:description" content="Open the link to see a magical surprise from {{ wish.sender_name }}.">
+    <meta property="og:url" content="{{ request.build_absolute_uri }}">
+    
+    {% if wish.images.exists %}
+    <meta property="og:image" content="{{ request.scheme }}://{{ request.get_host }}{{ wish.images.first.image.url }}">
+    {% endif %}
+    
+    <meta property="og:type" content="website">
+    <title>Matrix Wish | {{ wish.receiver_name }}</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@300;500;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root { --matrix-green: #00ff41; --deep-black: #0d0208; }
+
+        body, html { 
+            margin: 0; padding: 0; background: var(--deep-black);
+            color: var(--matrix-green); overflow: hidden; 
+            font-family: 'Fira Code', monospace; height: 100dvh; width: 100%;
+            position: fixed;
+        }
+
+        canvas#matrix-canvas {
+            position: fixed; inset: 0; z-index: -1; opacity: 0.3;
+        }
+
+        .terminal-box {
+            background: rgba(0, 5, 0, 0.95);
+            border: 1px solid var(--matrix-green);
+            box-shadow: 0 0 20px rgba(0, 255, 65, 0.2);
+            width: 92%; max-width: 450px;
+            position: relative; z-index: 10;
+            padding: 1.2rem;
+        }
+
+        .terminal-header {
+            position: absolute; top: 0; left: 0; right: 0;
+            background: var(--matrix-green); color: black;
+            font-size: 8px; font-weight: bold; padding: 1px 6px;
+            display: flex; justify-content: space-between;
+        }
+
+        .cursor {
+            display: inline-block; width: 8px; height: 1.1em;
+            background: var(--matrix-green); margin-left: 4px;
+            animation: blink 1s infinite; vertical-align: middle;
+        }
+        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+
+        /* Images Grid Fix */
+        .image-container {
+            display: flex; justify-content: center; gap: 8px;
+            width: 100%; margin-top: 10px;
+        }
+
+        .data-card {
+            width: 80px; height: 100px;
+            border: 1px solid var(--matrix-green);
+            background: #000; overflow: hidden;
+            position: relative; opacity: 0; transform: translateY(20px);
+        }
+        @media (min-width: 768px) { .data-card { width: 130px; height: 160px; } }
+
+        .data-card img {
+            width: 100%; height: 100%; object-fit: cover;
+            filter: sepia(1) hue-rotate(90deg) brightness(0.8) contrast(1.2);
+        }
+
+        .data-card::after {
+            content: ""; position: absolute; inset: 0;
+            background: linear-gradient(rgba(0, 255, 65, 0.1) 50%, transparent 50%);
+            background-size: 100% 4px; pointer-events: none;
+        }
+
+        #scene {
+            height: 100dvh; display: flex; flex-direction: column;
+            justify-content: center; align-items: center; gap: 1.5rem;
+            padding: 1rem 0;
+        }
+
+        .btn-connect {
+            border: 1px solid var(--matrix-green); color: var(--matrix-green);
+            padding: 12px 24px; background: transparent;
+            font-size: 11px; letter-spacing: 4px; font-weight: bold;
+            text-transform: uppercase; transition: all 0.3s;
+        }
+        .btn-connect:hover { background: var(--matrix-green); color: black; box-shadow: 0 0 20px var(--matrix-green); }
+    </style>
+</head>
+<body>
+
+    <canvas id="matrix-canvas"></canvas>
+
+    <div id="overlay" class="fixed inset-0 z-[100] flex items-center justify-center bg-black">
+        <div class="text-center">
+            <div id="loading-text" class="mb-6 font-mono text-[10px] tracking-[0.5em] text-green-500 h-6"></div>
+            <button id="connectBtn" class="btn-connect">Execute Bypass</button>
+        </div>
+    </div>
+
+    <main id="scene" class="hidden opacity-0">
+        
+        <div class="w-full flex flex-col items-center">
+            <div class="text-[9px] mb-2 tracking-[0.5em] text-green-400 font-bold uppercase">
+                {% with w_type=wish.wish_type|lower %}
+                    {% if w_type == 'graduation' %}
+                        >> STATUS: SUCCESS_DIPLOMA_DECRYPTED
+                    {% elif w_type == 'new year' %}
+                        >> STATUS: SYSTEM_REBOOT_SUCCESS_2026
+                    {% else %}
+                        >> STATUS: DATA_DECRYPT_COMPLETE
+                    {% endif %}
+                {% endwith %}
+            </div>
+            
+            <div class="terminal-box">
+                <div class="terminal-header">
+                    <span>ROOT@DECRYPTOR:~ MEMORY_STRM</span>
+                    <span>[V 3.0]</span>
+                </div>
+                
+                <div class="mt-2 text-[9px] opacity-40 leading-tight">
+                    > TARGET_ID: {{ wish.receiver_name|upper }}<br>
+                    > ENCRYPTION: 256-BIT_AES<br>
+                    > STATUS: ACCESS_GRANTED
+                </div>
+                
+                <div class="mt-4">
+                    <h2 class="text-green-500 text-[10px] tracking-widest uppercase opacity-70 mb-1">
+                        {% if wish.wish_type|lower == 'graduation' %}
+                            Executing_Congratulations...
+                        {% elif wish.wish_type|lower == 'new year' %}
+                            Initiating_New_Year_Wish...
+                        {% else %}
+                            Displaying_Message...
+                        {% endif %}
+                    </h2>
+                    <h1 id="receiver-name" class="text-xl md:text-3xl font-black tracking-tighter text-white leading-none">
+                        {% if wish.wish_type|lower == 'graduation' %}
+                            CONGRATULATIONS,
+                        {% elif wish.wish_type|lower == 'new year' %}
+                            HAPPY NEW YEAR,<span class="block text-xl md:text-2xl mb-2 font-medium opacity-90 tracking-[0.2em] uppercase">
+                            <span id="year-display"></span>
+                        {% endif %}
+                        <br>
+                        <span class="text-green-400">{{ wish.receiver_name }}</span>
+                    </h1>
+                </div>
+                
+                <div class="h-[1px] w-full bg-green-500/30 my-3"></div>
+                
+                <p id="message-text" class="text-xs md:text-sm leading-relaxed text-green-100/90 font-medium italic">
+                    "{{ wish.message }}"
+                </p>
+                
+                <div class="mt-4 text-[9px] font-bold">
+                    <span class="opacity-40 text-white">UPLOADED_BY:</span> {{ wish.sender_name }}<span class="cursor"></span>
+                </div>
+            </div>
+
+            {% if wish.images.exists %}
+            <div class="image-container">
+                {% for img_obj in wish.images.all|slice:":3" %}
+                <div class="data-card shadow-lg shadow-green-900/20">
+                    <img src="{{ img_obj.image.url }}" alt="Decrypted Memory">
+                    <div class="absolute bottom-0 left-0 bg-green-600 text-black text-[7px] px-1 font-bold">BYTE_{{ forloop.counter }}</div>
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+        </div>
+
+        <div class="text-center mt-3">
+            <a href="{% url 'home' %}" class="text-[9px] border border-green-500/40 px-6 py-2 hover:bg-green-500/20 transition-all uppercase tracking-[0.3em] font-bold">
+                Create New One
+            </a>
+            <p class="mt-3 text-[7px] opacity-20 tracking-[0.5em] text-white">THE_MATRIX_SURPRISE_V3</p>
+        </div>
+    </main>
+
+    <script>
+        // Matrix Rain Logic
+        const canvas = document.getElementById('matrix-canvas');
+        const ctx = canvas.getContext('2d');
+        let width = canvas.width = window.innerWidth;
+        let height = canvas.height = window.innerHeight;
+        const characters = "0101010101ABCDEF";
+        const fontSize = 14;
+        const columns = width / fontSize;
+        const drops = Array(Math.floor(columns)).fill(1);
+
+        function drawMatrix() {
+            ctx.fillStyle = "rgba(0, 0, 0, 0.1)";
+            ctx.fillRect(0, 0, width, height);
+            ctx.fillStyle = "#00ff41";
+            ctx.font = fontSize + "px monospace";
+            for (let i = 0; i < drops.length; i++) {
+                const text = characters.charAt(Math.floor(Math.random() * characters.length));
+                ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+                if (drops[i] * fontSize > height && Math.random() > 0.98) drops[i] = 0;
+                drops[i]++;
+            }
+        }
+        setInterval(drawMatrix, 45);
+
+        // Loading Text
+        const phrases = ["GATHERING FRAGMENTS...", "DECRYPTING HASH...", "BYPASSING PROTOCOLS...", "READY."];
+        let pIndex = 0;
+        function cycleText() {
+            if(pIndex < phrases.length) {
+                document.getElementById('loading-text').innerText = phrases[pIndex++];
+                setTimeout(cycleText, 500);
+            }
+        }
+        cycleText();
+
+        // Reveal Sequence
+        document.getElementById('connectBtn').addEventListener('click', () => {
+            const tl = gsap.timeline();
+            
+            tl.to("#overlay", { 
+                scale: 1.2, opacity: 0, duration: 0.6, ease: "power4.in",
+                onComplete: () => {
+                    document.getElementById('overlay').style.display = 'none';
+                    document.getElementById('scene').classList.remove('hidden');
+                }
+            })
+            .to("#scene", { opacity: 1, duration: 0.4 })
+            .from(".terminal-box", { 
+                y: 30, opacity: 0, duration: 0.8, ease: "back.out(1.7)" 
+            })
+            .to(".data-card", { 
+                opacity: 1, y: 0, stagger: 0.15, duration: 0.6, ease: "power2.out" 
+            }, "-=0.4");
+        });
+
+        window.addEventListener('resize', () => {
+            width = canvas.width = window.innerWidth;
+            height = canvas.height = window.innerHeight;
+        });
+        const year = new Date().getFullYear();
+            if(document.getElementById('year-display')) {
+                document.getElementById('year-display').textContent = year;
+        }
+    </script>
+</body>
+</html>

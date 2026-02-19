@@ -1,0 +1,234 @@
+{% extends 'frontend/base.html' %}
+{% load static %}
+
+{% block title %}Create a Magical Surprise ✨{% endblock %}
+
+{% block content %}
+<div class="min-h-0 flex items-start justify-center p-4 relative overflow-hidden mt-0 pt-2 lg:mt-6">
+    
+    <div class="absolute top-1/4 -left-20 w-96 h-96 bg-pink-600/5 rounded-full blur-[120px] pointer-events-none"></div>
+    <div class="absolute bottom-1/4 -right-20 w-96 h-96 bg-violet-600/5 rounded-full blur-[120px] pointer-events-none"></div>
+
+    <div class="w-full max-w-4xl z-10 transition-all duration-500">
+        
+        <div id="infoSection" class="transition-all duration-500 mx-auto text-center space-y-6 bg-transparent border-none shadow-none p-4 md:p-12">
+            
+            <div class="inline-block px-4 py-1 mb-2 rounded-full bg-pink-500/10 border border-pink-500/20 backdrop-blur-md">
+                <span class="text-pink-400 text-xs font-bold uppercase tracking-[0.2em]">Welcome to Surprise Me ✨</span>
+            </div>
+            
+            <h1 class="text-4xl md:text-6xl font-black bg-gradient-to-r from-pink-500 via-purple-400 to-violet-500 bg-clip-text text-transparent leading-tight">
+                Ready to make <br class="md:hidden"> someone smile?
+            </h1>
+            
+            <p class="text-gray-400 text-sm md:text-xl max-w-2xl mx-auto leading-relaxed">
+                Create a personalized magical link for 
+                <span class="text-pink-500 font-bold border-b border-pink-500/30">Birthdays 🎂</span>, 
+                <span class="text-purple-500 font-bold border-b border-purple-500/30">Anniversaries 💍</span>, 
+                <span class="text-blue-500 font-bold border-b border-blue-500/30">Valentines ❤️</span>. 
+                <br class="hidden md:block">
+                Complete with a <span class="italic text-white">balloon game</span>, 
+                <span class="italic text-white">favorite music</span>, and 
+                <span class="italic text-white">precious memories</span>.
+            </p>
+
+            <div class="flex flex-wrap justify-center gap-3 mt-6 text-[10px] md:text-xs font-bold uppercase tracking-widest text-gray-500">
+                <div class="flex items-center gap-2 bg-white/5 px-4 py-2 rounded-full border border-white/5 backdrop-blur-sm">
+                    <i class="fas fa-birthday-cake text-pink-500"></i> Birthday
+                </div>
+                <div class="flex items-center gap-2 bg-white/5 px-4 py-2 rounded-full border border-white/5 backdrop-blur-sm">
+                    <i class="fas fa-heart text-red-500"></i> Anniversary
+                </div>
+                <div class="flex items-center gap-2 bg-white/5 px-4 py-2 rounded-full border border-white/5 backdrop-blur-sm">
+                    <i class="fas fa-hand-holding-heart text-purple-500"></i> Just Because
+                </div>
+            </div>
+
+            <div class="flex flex-col sm:flex-row items-center justify-center gap-4 pt-8">
+                <button onclick="openDemoModal()" class="w-full sm:w-auto px-8 py-4 rounded-2xl bg-white/5 border border-white/10 text-white font-bold hover:bg-white/10 transition-all flex items-center justify-center gap-3 backdrop-blur-md">
+                    <i class="fas fa-play-circle text-pink-500 text-xl"></i>
+                    Watch Demo
+                </button>
+                
+                <button onclick="showForm()" class="w-full sm:w-auto px-10 py-4 rounded-2xl bg-gradient-to-r from-pink-600 to-purple-600 text-white font-extrabold shadow-2xl shadow-pink-500/20 hover:scale-105 active:scale-95 transition-all flex items-center justify-center gap-3">
+                    Start Creating
+                </button>
+            </div>
+        </div>
+
+        <div id="formSection" class="hidden opacity-0 transform translate-y-10 transition-all duration-700">
+            <div class="transition-all duration-500 mx-auto
+                md:bg-white/5 md:backdrop-blur-2xl md:border md:border-white/10 md:p-8 md:rounded-[2.5rem] md:shadow-2xl 
+                p-4 rounded-none bg-transparent border-none shadow-none">
+
+                <div class="text-center mb-6">
+                    <h1 class="text-2xl md:text-4xl font-black bg-gradient-to-r from-pink-500 via-purple-400 to-violet-500 bg-clip-text text-transparent">
+                        Create Your Magic
+                    </h1>
+                </div>
+
+                <form method="POST" enctype="multipart/form-data" class="space-y-4" id="wishForm">
+                    {% csrf_token %}
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        <div class="space-y-4">
+                            <div class="grid grid-cols-2 gap-4">
+                                <div class="space-y-2">
+                                    <label class="text-[10px] font-bold text-gray-400 uppercase ml-1">Your Name</label>
+                                    <input type="text" name="sender_name" required placeholder="(Your Name)" class="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white focus:border-pink-500 transition-all outline-none text-sm">
+                                </div>
+                                <div class="space-y-2">
+                                    <label class="text-[10px] font-bold text-gray-400 uppercase ml-1">For Whom?</label>
+                                    <input type="text" name="receiver_name" required placeholder="(Receiver Name)" class="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white focus:border-pink-500 transition-all outline-none text-sm">
+                                </div>
+                            </div>
+                            <div class="space-y-2">
+                                <label class="text-[10px] font-bold text-gray-400 uppercase ml-1">Heartfelt Message</label>
+                                <textarea name="message" rows="4" required placeholder="Write your feelings here..." class="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white focus:border-pink-500 transition-all outline-none resize-none text-sm"></textarea>
+                            </div>
+                        </div>
+
+                        <div class="space-y-4">
+                            <div class="space-y-2">
+                                <label class="text-[10px] font-bold text-gray-400 uppercase ml-1">Music / Voice Note</label>
+                                <div class="relative group" id="musicContainer">
+                                    <input type="file" name="music" id="musicInput" accept="audio/*" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-20">
+                                    <div id="musicDisplay" class="bg-black/20 border-2 border-dashed border-white/10 rounded-xl p-6 text-center transition-all">
+                                        <i id="musicIcon" class="fas fa-music text-violet-400 mb-2 text-xl"></i>
+                                        <p id="musicLabel" class="text-[10px] text-gray-500 font-bold uppercase text-wrap">Upload Favorite Music</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="space-y-2">
+                                <label class="text-[10px] font-bold text-gray-400 uppercase ml-1">Memories (3-6 Photos)</label>
+                                <div class="relative group" id="imagesContainer">
+                                    <input type="file" name="images" id="imagesInput" multiple accept="image/*" required class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-20">
+                                    <div id="imagesDisplay" class="bg-black/20 border-2 border-dashed border-white/10 rounded-xl p-6 text-center transition-all">
+                                        <i id="imagesIcon" class="fas fa-images text-pink-400 mb-2 text-xl"></i>
+                                        <p id="imagesLabel" class="text-[10px] text-gray-500 font-bold uppercase">Select Photos (3-6 ONLY)</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="px-1 sm:px-0 pt-6 space-y-4">
+                        <button type="submit" id="submitBtn" class="w-full py-4 rounded-2xl bg-gradient-to-r from-pink-600 via-purple-600 to-violet-600 text-white font-black text-xl shadow-[0_10px_30px_rgba(219,39,119,0.3)] hover:-translate-y-1.5 hover:shadow-[0_15px_45px_rgba(219,39,119,0.4)] active:scale-95 transition-all duration-300 flex items-center justify-center gap-3 border border-white/10">
+                            <span id="btnText">GENERATE MAGIC LINK</span>
+                            <i class="fas fa-wand-magic-sparkles text-2xl" id="btnIcon"></i>
+                        </button>
+
+                        <div class="flex justify-center pt-2">
+                            <button type="button" onclick="hideForm()" 
+                                class="group relative px-8 py-3 rounded-xl border border-white/5 bg-white/5 backdrop-blur-sm text-gray-500 hover:text-white hover:bg-white/10 hover:border-white/20 transition-all duration-500 overflow-hidden">
+                                
+                                <div class="absolute inset-0 bg-gradient-to-r from-pink-500/10 to-violet-500/10 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                                
+                                <div class="relative flex items-center gap-3">
+                                    <i class="fas fa-chevron-left text-[10px] group-hover:-translate-x-1 transition-transform duration-300"></i>
+                                    <span class="text-[10px] font-bold uppercase tracking-[0.25em]">Change Mind? Go Back</span>
+                                </div>
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="demoModal" class="fixed inset-0 z-[100] hidden items-center justify-center p-4 bg-black/90 backdrop-blur-sm">
+    <div class="relative w-full max-w-3xl aspect-video bg-black rounded-3xl overflow-hidden border border-white/10 shadow-2xl">
+        <button onclick="closeDemoModal()" class="absolute top-4 right-4 z-50 bg-white/10 hover:bg-white/20 w-10 h-10 rounded-full flex items-center justify-center text-white">
+            <i class="fas fa-times"></i>
+        </button>
+        <video id="demoVideo" controls class="w-full h-full">
+            <source src="{% static 'videos/demo.mp4' %}" type="video/mp4">
+            Your browser does not support the video tag.
+        </video>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // URL Hash logic - Bina animation direct form dekhauna
+    window.addEventListener('DOMContentLoaded', () => {
+        if (window.location.hash === '#create') {
+            document.getElementById('infoSection').classList.add('hidden');
+            const form = document.getElementById('formSection');
+            form.classList.remove('hidden');
+            form.style.opacity = '1';
+            form.style.transform = 'translateY(0)';
+        }
+    });
+
+    function showForm() {
+        const info = document.getElementById('infoSection');
+        const form = document.getElementById('formSection');
+        window.location.hash = 'create';
+        info.style.opacity = '0';
+        info.style.transform = 'scale(0.95)';
+        setTimeout(() => {
+            info.classList.add('hidden');
+            form.classList.remove('hidden');
+            setTimeout(() => {
+                form.style.opacity = '1';
+                form.style.transform = 'translateY(0)';
+            }, 50);
+        }, 400);
+    }
+
+    function hideForm() {
+        const info = document.getElementById('infoSection');
+        const form = document.getElementById('formSection');
+        history.replaceState(null, null, ' '); 
+        form.style.opacity = '0';
+        form.style.transform = 'translateY(10px)';
+        setTimeout(() => {
+            form.classList.add('hidden');
+            info.classList.remove('hidden');
+            setTimeout(() => {
+                info.style.opacity = '1';
+                info.style.transform = 'scale(1)';
+            }, 50);
+        }, 400);
+    }
+
+    function openDemoModal() {
+        document.getElementById('demoModal').classList.remove('hidden');
+        document.getElementById('demoModal').classList.add('flex');
+    }
+
+    function closeDemoModal() {
+        const modal = document.getElementById('demoModal');
+        const video = document.getElementById('demoVideo');
+        video.pause();
+        modal.classList.remove('flex');
+        modal.classList.add('hidden');
+    }
+
+    // File UI feedback
+    function updateFileUI(inputId, displayId, labelId, iconId, colorClass) {
+        const input = document.getElementById(inputId);
+        input.addEventListener('change', function() {
+            if (this.files && this.files.length > 0) {
+                const name = this.files.length > 1 ? `${this.files.length} files selected` : this.files[0].name;
+                document.getElementById(labelId).innerText = name;
+                document.getElementById(displayId).classList.add('border-' + colorClass + '-500/50', 'bg-' + colorClass + '-500/10');
+                document.getElementById(iconId).className = `fas fa-check-circle text-${colorClass}-400 mb-2 text-xl`;
+            }
+        });
+    }
+
+    updateFileUI('musicInput', 'musicDisplay', 'musicLabel', 'musicIcon', 'violet');
+    updateFileUI('imagesInput', 'imagesDisplay', 'imagesLabel', 'imagesIcon', 'pink');
+
+    // Submit Loading Logic
+    document.getElementById('wishForm').addEventListener('submit', function() {
+        const btn = document.getElementById('submitBtn');
+        btn.disabled = true;
+        document.getElementById('btnText').innerText = "Working Our Magic...";
+        document.getElementById('btnIcon').className = "fas fa-spinner fa-spin";
+    });
+</script>
+{% endblock %}

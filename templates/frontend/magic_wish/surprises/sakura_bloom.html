@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <title>A Special Surprise for {{ wish.receiver_name }}! ✨</title>
+    <meta name="description" content="{{ wish.sender_name }} has sent you a magical {{ wish.wish_type }} surprise. Click to unlock the magic!">
+    
+    <meta property="og:title" content="A Special Surprise for {{ wish.receiver_name }}! ✨">
+    <meta property="og:description" content="Open the link to see a magical surprise from {{ wish.sender_name }}.">
+    <meta property="og:url" content="{{ request.build_absolute_uri }}">
+    
+    {% if wish.images.exists %}
+    <meta property="og:image" content="{{ request.scheme }}://{{ request.get_host }}{{ wish.images.first.image.url }}">
+    {% endif %}
+    
+    <meta property="og:type" content="website">
+    <title>Sakura Bliss | {{ wish.receiver_name }}</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Zeyada&family=Quicksand:wght@300;500;700&family=Playfair+Display:italic,wght@700;900&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            /* Python Logic सँग म्याच हुने गरी Dynamic Colors */
+            {% with w_type=wish.wish_type|lower %}
+                {% if w_type == 'love' or w_type == 'proposal' or w_type == 'anniversary' %}
+                    --sakura: #ff9a9e; --accent: #ff0844; --bg: #fff1f1;
+                {% elif w_type == 'birthday' or w_type == 'festival' or w_type == 'new year' %}
+                    --sakura: #ffd1dc; --accent: #ff477e; --bg: #fff0f5;
+                {% elif w_type == 'sorry' or w_type == 'miss you' %}
+                    --sakura: #a1c4fd; --accent: #4a90e2; --bg: #f0f7ff;
+                {% else %}
+                    --sakura: #ffb7c5; --accent: #d63384; --bg: #fff5f7;
+                {% endif %}
+            {% endwith %}
+        }
+
+        body, html { 
+            margin: 0; padding: 0; background: var(--bg); 
+            font-family: 'Quicksand', sans-serif;
+            height: 100vh; width: 100vw; overflow: hidden;
+        }
+
+        #sakura-canvas { position: fixed; inset: 0; z-index: 5; pointer-events: none; }
+
+        #scene {
+            height: 100vh; width: 100%; display: flex; flex-direction: column;
+            align-items: center; justify-content: space-evenly;
+            padding: 1rem; position: relative; z-index: 10;
+        }
+
+        .glass-card {
+            background: rgba(255, 255, 255, 0.94);
+            backdrop-filter: blur(15px);
+            border: 1px solid white;
+            border-radius: 20px;
+            padding: 1.5rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+            width: 90%;
+            max-width: 400px;
+            text-align: center;
+            opacity: 0;
+            transform: translateY(20px);
+        }
+
+        .bloom-title {
+            font-family: 'Playfair Display', serif;
+            color: var(--accent);
+            font-size: clamp(1.1rem, 5vw, 1.6rem);
+            line-height: 1.2;
+            margin-bottom: 0.5rem;
+        }
+
+        .message-container {
+            width: 100%;
+            margin: 10px 0;
+            max-height: 25vh; 
+            overflow-y: auto;
+        }
+
+        .message-text {
+            font-family: 'Zeyada', cursive;
+            font-size: clamp(1.3rem, 5.5vw, 1.8rem); 
+            color: #444;
+            line-height: 1.2;
+            font-weight: 700;
+        }
+
+        .hanging-container {
+            display: flex; justify-content: center; gap: 15px;
+            width: 100%; flex-shrink: 0;
+        }
+
+        .photo-frame {
+            width: clamp(70px, 20vw, 100px); 
+            background: white; padding: 5px 5px 12px 5px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            border-radius: 2px; transform-origin: top center;
+            animation: swing 4s infinite ease-in-out;
+            opacity: 0;
+        }
+
+        .photo-frame img { width: 100%; aspect-ratio: 1/1; object-fit: cover; }
+
+        @keyframes swing {
+            0%, 100% { transform: rotate(-3deg); }
+            50% { transform: rotate(3deg); }
+        }
+
+        .btn-bloom {
+            background: var(--accent); color: white;
+            padding: 12px 30px; border-radius: 50px;
+            font-weight: 800; letter-spacing: 2px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+    {% if wish.custom_music or wish.selected_music %}
+        <audio id="bgMusic" src="{% if wish.custom_music %}{{ wish.custom_music.url }}{% else %}{{ wish.selected_music.audio_file.url }}{% endif %}" loop></audio>
+    {% endif %}
+
+    <canvas id="sakura-canvas"></canvas>
+
+    <div id="overlay" class="fixed inset-0 z-[500] flex items-center justify-center bg-white">
+        <div class="text-center">
+            <div class="mb-4 text-5xl animate-bounce">🌸</div>
+            <button id="bloomBtn" class="btn-bloom uppercase">Open Surprise</button>
+            <p class="mt-4 text-[9px] text-pink-400 tracking-[0.5em] font-black uppercase">Specially For {{ wish.receiver_name }}</p>
+        </div>
+    </div>
+
+    <main id="scene" class="hidden">
+        <div class="glass-card" id="mainCard">
+            <div class="text-[8px] tracking-[0.4em] text-pink-500 font-black uppercase mb-2">
+                {% with w_type=wish.wish_type|lower %}
+                    {% if w_type == 'love' or w_type == 'proposal' %} — Eternal Love — 
+                    {% elif w_type == 'birthday' %} — Birthday Joy — 
+                    {% elif w_type == 'anniversary' %} — Milestone —
+                    {% elif w_type == 'sorry' %} — Heartfelt Sorry —
+                    {% elif w_type == 'festival' %} — Festive Glow —
+                    {% elif w_type == 'graduation' %} — New Beginning —
+                    {% else %} — A Message For You — {% endif %}
+                {% endwith %}
+            </div>
+
+            <h1 class="bloom-title italic">
+                {% with w_type=wish.wish_type|lower %}
+                    {% if w_type == 'birthday' %} Happy Birthday,
+                    {% elif w_type == 'anniversary' %} Happy Anniversary,
+                    {% elif w_type == 'love' %} You Mean the World 💕,
+                    {% elif w_type == 'sorry' %} Please Forgive Me,
+                    {% elif w_type == 'proposal' %} "Will You Make Me the Luckiest Person Alive 💍
+                    {% elif w_type == 'miss you' %} Thinking of You,
+                    {% elif w_type == 'thank you' %} A Big Thank You for Everything ❤️
+                    {% elif w_type == 'good luck' %} Best of Luck,
+                    {% else %} Dear, {% endif %}
+                {% endwith %}
+                <br>
+                <span class="not-italic font-black text-gray-900">{{ wish.receiver_name }}</span>
+            </h1>
+            
+            <div class="message-container">
+                <p class="message-text">"{{ wish.message }}"</p>
+            </div>
+            
+            <div class="mt-3 flex justify-center items-center gap-3">
+                <div class="h-[1px] w-8 bg-pink-200"></div>
+                <span class="text-[9px] font-bold text-pink-600 uppercase tracking-widest">From {{ wish.sender_name }}</span>
+                <div class="h-[1px] w-8 bg-pink-200"></div>
+            </div>
+        </div>
+
+        <div class="hanging-container">
+            {% for img_obj in wish.images.all|slice:":3" %}
+            <div class="photo-frame" style="animation-delay: {{ forloop.counter0 }}s;">
+                <img src="{{ img_obj.image.url }}">
+                <div class="mt-1 text-[6px] text-gray-400 font-bold uppercase">Our Memories</div>
+            </div>
+            {% endfor %}
+        </div>
+
+        <footer class="absolute bottom-6 w-full flex justify-center opacity-60">
+            <a href="{% url 'home' %}" class="flex flex-col items-center gap-1 group">
+                <span class="text-[7px] tracking-[0.3em] uppercase text-gray-400">Created with Love</span>
+                <span class="text-[10px] font-black tracking-widest text-pink-400">SURPRISE ME</span>
+            </a>
+        </footer>
+    </main>
+
+    <script>
+        const canvas = document.getElementById('sakura-canvas');
+        const ctx = canvas.getContext('2d');
+        let petals = [];
+
+        function resize() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+        window.addEventListener('resize', resize); resize();
+
+        class Petal {
+            constructor() {
+                this.x = Math.random() * canvas.width;
+                this.y = Math.random() * canvas.height - canvas.height;
+                this.size = Math.random() * 4 + 2;
+                this.speed = Math.random() * 0.8 + 0.3;
+                this.angle = Math.random() * 360;
+                this.spin = Math.random() * 0.2 - 0.1;
+            }
+            draw() {
+                ctx.save(); ctx.translate(this.x, this.y); ctx.rotate(this.angle * Math.PI / 180);
+                ctx.beginPath(); ctx.ellipse(0, 0, this.size, this.size/1.5, 0, 0, 2 * Math.PI);
+                ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--accent');
+                ctx.globalAlpha = 0.4; ctx.fill(); ctx.restore();
+            }
+            update() {
+                this.y += this.speed; this.x += Math.sin(this.y / 60); this.angle += this.spin;
+                if (this.y > canvas.height) this.y = -20;
+            }
+        }
+
+        document.getElementById('bloomBtn').addEventListener('click', () => {
+            const music = document.getElementById('bgMusic');
+            if(music) {
+                music.volume = 0;
+                music.play().catch(e => console.log("Blocked"));
+                gsap.to(music, { volume: 0.5, duration: 4 });
+            }
+
+            const tl = gsap.timeline();
+            tl.to("#overlay", { y: "-100%", duration: 0.8, ease: "power2.inOut", onComplete: () => {
+                document.getElementById('overlay').style.display = 'none';
+                document.getElementById('scene').classList.remove('hidden');
+            }});
+            
+            tl.to("#mainCard", { opacity: 1, y: 0, duration: 0.8, ease: "back.out(1.2)" });
+            tl.to(".photo-frame", { opacity: 1, y: 0, duration: 0.8, stagger: 0.2, ease: "power2.out" }, "-=0.4");
+
+            // Start Sakura Fall
+            for (let i = 0; i < 30; i++) petals.push(new Petal());
+            function animate() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                petals.forEach(p => { p.update(); p.draw(); });
+                requestAnimationFrame(animate);
+            }
+            animate();
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,1653 @@
+[
+    {
+        "label": "django.contrib.auth.models",
+        "kind": 6,
+        "isExtraImport": true,
+        "importPath": "django.contrib.auth.models",
+        "description": "django.contrib.auth.models",
+        "detail": "django.contrib.auth.models",
+        "documentation": {}
+    },
+    {
+        "label": "AbstractUser",
+        "importPath": "django.contrib.auth.models",
+        "description": "django.contrib.auth.models",
+        "isExtraImport": true,
+        "detail": "django.contrib.auth.models",
+        "documentation": {}
+    },
+    {
+        "label": "django.contrib.auth.validators",
+        "kind": 6,
+        "isExtraImport": true,
+        "importPath": "django.contrib.auth.validators",
+        "description": "django.contrib.auth.validators",
+        "detail": "django.contrib.auth.validators",
+        "documentation": {}
+    },
+    {
+        "label": "django.utils.timezone",
+        "kind": 6,
+        "isExtraImport": true,
+        "importPath": "django.utils.timezone",
+        "description": "django.utils.timezone",
+        "detail": "django.utils.timezone",
+        "documentation": {}
+    },
+    {
+        "label": "migrations",
+        "importPath": "django.db",
+        "description": "django.db",
+        "isExtraImport": true,
+        "detail": "django.db",
+        "documentation": {}
+    },
+    {
+        "label": "models",
+        "importPath": "django.db",
+        "description": "django.db",
+        "isExtraImport": true,
+        "detail": "django.db",
+        "documentation": {}
+    },
+    {
+        "label": "models",
+        "importPath": "django.db",
+        "description": "django.db",
+        "isExtraImport": true,
+        "detail": "django.db",
+        "documentation": {}
+    },
+    {
+        "label": "migrations",
+        "importPath": "django.db",
+        "description": "django.db",
+        "isExtraImport": true,
+        "detail": "django.db",
+        "documentation": {}
+    },
+    {
+        "label": "models",
+        "importPath": "django.db",
+        "description": "django.db",
+        "isExtraImport": true,
+        "detail": "django.db",
+        "documentation": {}
+    },
+    {
+        "label": "migrations",
+        "importPath": "django.db",
+        "description": "django.db",
+        "isExtraImport": true,
+        "detail": "django.db",
+        "documentation": {}
+    },
+    {
+        "label": "models",
+        "importPath": "django.db",
+        "description": "django.db",
+        "isExtraImport": true,
+        "detail": "django.db",
+        "documentation": {}
+    },
+    {
+        "label": "models",
+        "importPath": "django.db",
+        "description": "django.db",
+        "isExtraImport": true,
+        "detail": "django.db",
+        "documentation": {}
+    },
+    {
+        "label": "migrations",
+        "importPath": "django.db",
+        "description": "django.db",
+        "isExtraImport": true,
+        "detail": "django.db",
+        "documentation": {}
+    },
+    {
+        "label": "models",
+        "importPath": "django.db",
+        "description": "django.db",
+        "isExtraImport": true,
+        "detail": "django.db",
+        "documentation": {}
+    },
+    {
+        "label": "migrations",
+        "importPath": "django.db",
+        "description": "django.db",
+        "isExtraImport": true,
+        "detail": "django.db",
+        "documentation": {}
+    },
+    {
+        "label": "models",
+        "importPath": "django.db",
+        "description": "django.db",
+        "isExtraImport": true,
+        "detail": "django.db",
+        "documentation": {}
+    },
+    {
+        "label": "models",
+        "importPath": "django.db",
+        "description": "django.db",
+        "isExtraImport": true,
+        "detail": "django.db",
+        "documentation": {}
+    },
+    {
+        "label": "migrations",
+        "importPath": "django.db",
+        "description": "django.db",
+        "isExtraImport": true,
+        "detail": "django.db",
+        "documentation": {}
+    },
+    {
+        "label": "models",
+        "importPath": "django.db",
+        "description": "django.db",
+        "isExtraImport": true,
+        "detail": "django.db",
+        "documentation": {}
+    },
+    {
+        "label": "models",
+        "importPath": "django.db",
+        "description": "django.db",
+        "isExtraImport": true,
+        "detail": "django.db",
+        "documentation": {}
+    },
+    {
+        "label": "admin",
+        "importPath": "django.contrib",
+        "description": "django.contrib",
+        "isExtraImport": true,
+        "detail": "django.contrib",
+        "documentation": {}
+    },
+    {
+        "label": "admin",
+        "importPath": "django.contrib",
+        "description": "django.contrib",
+        "isExtraImport": true,
+        "detail": "django.contrib",
+        "documentation": {}
+    },
+    {
+        "label": "admin",
+        "importPath": "django.contrib",
+        "description": "django.contrib",
+        "isExtraImport": true,
+        "detail": "django.contrib",
+        "documentation": {}
+    },
+    {
+        "label": "messages",
+        "importPath": "django.contrib",
+        "description": "django.contrib",
+        "isExtraImport": true,
+        "detail": "django.contrib",
+        "documentation": {}
+    },
+    {
+        "label": "admin",
+        "importPath": "django.contrib",
+        "description": "django.contrib",
+        "isExtraImport": true,
+        "detail": "django.contrib",
+        "documentation": {}
+    },
+    {
+        "label": "messages",
+        "importPath": "django.contrib",
+        "description": "django.contrib",
+        "isExtraImport": true,
+        "detail": "django.contrib",
+        "documentation": {}
+    },
+    {
+        "label": "admin",
+        "importPath": "django.contrib",
+        "description": "django.contrib",
+        "isExtraImport": true,
+        "detail": "django.contrib",
+        "documentation": {}
+    },
+    {
+        "label": "AppConfig",
+        "importPath": "django.apps",
+        "description": "django.apps",
+        "isExtraImport": true,
+        "detail": "django.apps",
+        "documentation": {}
+    },
+    {
+        "label": "AppConfig",
+        "importPath": "django.apps",
+        "description": "django.apps",
+        "isExtraImport": true,
+        "detail": "django.apps",
+        "documentation": {}
+    },
+    {
+        "label": "AppConfig",
+        "importPath": "django.apps",
+        "description": "django.apps",
+        "isExtraImport": true,
+        "detail": "django.apps",
+        "documentation": {}
+    },
+    {
+        "label": "AppConfig",
+        "importPath": "django.apps",
+        "description": "django.apps",
+        "isExtraImport": true,
+        "detail": "django.apps",
+        "documentation": {}
+    },
+    {
+        "label": "TestCase",
+        "importPath": "django.test",
+        "description": "django.test",
+        "isExtraImport": true,
+        "detail": "django.test",
+        "documentation": {}
+    },
+    {
+        "label": "TestCase",
+        "importPath": "django.test",
+        "description": "django.test",
+        "isExtraImport": true,
+        "detail": "django.test",
+        "documentation": {}
+    },
+    {
+        "label": "TestCase",
+        "importPath": "django.test",
+        "description": "django.test",
+        "isExtraImport": true,
+        "detail": "django.test",
+        "documentation": {}
+    },
+    {
+        "label": "TestCase",
+        "importPath": "django.test",
+        "description": "django.test",
+        "isExtraImport": true,
+        "detail": "django.test",
+        "documentation": {}
+    },
+    {
+        "label": "path",
+        "importPath": "django.urls",
+        "description": "django.urls",
+        "isExtraImport": true,
+        "detail": "django.urls",
+        "documentation": {}
+    },
+    {
+        "label": "path",
+        "importPath": "django.urls",
+        "description": "django.urls",
+        "isExtraImport": true,
+        "detail": "django.urls",
+        "documentation": {}
+    },
+    {
+        "label": "path",
+        "importPath": "django.urls",
+        "description": "django.urls",
+        "isExtraImport": true,
+        "detail": "django.urls",
+        "documentation": {}
+    },
+    {
+        "label": "path",
+        "importPath": "django.urls",
+        "description": "django.urls",
+        "isExtraImport": true,
+        "detail": "django.urls",
+        "documentation": {}
+    },
+    {
+        "label": "path",
+        "importPath": "django.urls",
+        "description": "django.urls",
+        "isExtraImport": true,
+        "detail": "django.urls",
+        "documentation": {}
+    },
+    {
+        "label": "include",
+        "importPath": "django.urls",
+        "description": "django.urls",
+        "isExtraImport": true,
+        "detail": "django.urls",
+        "documentation": {}
+    },
+    {
+        "label": "Wish",
+        "importPath": "magic_wish.models",
+        "description": "magic_wish.models",
+        "isExtraImport": true,
+        "detail": "magic_wish.models",
+        "documentation": {}
+    },
+    {
+        "label": "VisitorCount",
+        "importPath": "magic_wish.models",
+        "description": "magic_wish.models",
+        "isExtraImport": true,
+        "detail": "magic_wish.models",
+        "documentation": {}
+    },
+    {
+        "label": "Rating",
+        "importPath": "magic_wish.models",
+        "description": "magic_wish.models",
+        "isExtraImport": true,
+        "detail": "magic_wish.models",
+        "documentation": {}
+    },
+    {
+        "label": "CelebrationTemplate",
+        "importPath": "magic_wish.models",
+        "description": "magic_wish.models",
+        "isExtraImport": true,
+        "detail": "magic_wish.models",
+        "documentation": {}
+    },
+    {
+        "label": "MusicLibrary",
+        "importPath": "magic_wish.models",
+        "description": "magic_wish.models",
+        "isExtraImport": true,
+        "detail": "magic_wish.models",
+        "documentation": {}
+    },
+    {
+        "label": "staff_member_required",
+        "importPath": "django.contrib.admin.views.decorators",
+        "description": "django.contrib.admin.views.decorators",
+        "isExtraImport": true,
+        "detail": "django.contrib.admin.views.decorators",
+        "documentation": {}
+    },
+    {
+        "label": "staff_member_required",
+        "importPath": "django.contrib.admin.views.decorators",
+        "description": "django.contrib.admin.views.decorators",
+        "isExtraImport": true,
+        "detail": "django.contrib.admin.views.decorators",
+        "documentation": {}
+    },
+    {
+        "label": "staff_member_required",
+        "importPath": "django.contrib.admin.views.decorators",
+        "description": "django.contrib.admin.views.decorators",
+        "isExtraImport": true,
+        "detail": "django.contrib.admin.views.decorators",
+        "documentation": {}
+    },
+    {
+        "label": "staff_member_required",
+        "importPath": "django.contrib.admin.views.decorators",
+        "description": "django.contrib.admin.views.decorators",
+        "isExtraImport": true,
+        "detail": "django.contrib.admin.views.decorators",
+        "documentation": {}
+    },
+    {
+        "label": "authenticate",
+        "importPath": "django.contrib.auth",
+        "description": "django.contrib.auth",
+        "isExtraImport": true,
+        "detail": "django.contrib.auth",
+        "documentation": {}
+    },
+    {
+        "label": "login",
+        "importPath": "django.contrib.auth",
+        "description": "django.contrib.auth",
+        "isExtraImport": true,
+        "detail": "django.contrib.auth",
+        "documentation": {}
+    },
+    {
+        "label": "logout",
+        "importPath": "django.contrib.auth",
+        "description": "django.contrib.auth",
+        "isExtraImport": true,
+        "detail": "django.contrib.auth",
+        "documentation": {}
+    },
+    {
+        "label": "AuthenticationForm",
+        "importPath": "django.contrib.auth.forms",
+        "description": "django.contrib.auth.forms",
+        "isExtraImport": true,
+        "detail": "django.contrib.auth.forms",
+        "documentation": {}
+    },
+    {
+        "label": "InteractiveWish",
+        "importPath": "magical_wishes.models",
+        "description": "magical_wishes.models",
+        "isExtraImport": true,
+        "detail": "magical_wishes.models",
+        "documentation": {}
+    },
+    {
+        "label": "InteractiveWish",
+        "importPath": "magical_wishes.models",
+        "description": "magical_wishes.models",
+        "isExtraImport": true,
+        "detail": "magical_wishes.models",
+        "documentation": {}
+    },
+    {
+        "label": "render",
+        "importPath": "django.shortcuts",
+        "description": "django.shortcuts",
+        "isExtraImport": true,
+        "detail": "django.shortcuts",
+        "documentation": {}
+    },
+    {
+        "label": "redirect",
+        "importPath": "django.shortcuts",
+        "description": "django.shortcuts",
+        "isExtraImport": true,
+        "detail": "django.shortcuts",
+        "documentation": {}
+    },
+    {
+        "label": "render",
+        "importPath": "django.shortcuts",
+        "description": "django.shortcuts",
+        "isExtraImport": true,
+        "detail": "django.shortcuts",
+        "documentation": {}
+    },
+    {
+        "label": "redirect",
+        "importPath": "django.shortcuts",
+        "description": "django.shortcuts",
+        "isExtraImport": true,
+        "detail": "django.shortcuts",
+        "documentation": {}
+    },
+    {
+        "label": "get_object_or_404",
+        "importPath": "django.shortcuts",
+        "description": "django.shortcuts",
+        "isExtraImport": true,
+        "detail": "django.shortcuts",
+        "documentation": {}
+    },
+    {
+        "label": "render",
+        "importPath": "django.shortcuts",
+        "description": "django.shortcuts",
+        "isExtraImport": true,
+        "detail": "django.shortcuts",
+        "documentation": {}
+    },
+    {
+        "label": "redirect",
+        "importPath": "django.shortcuts",
+        "description": "django.shortcuts",
+        "isExtraImport": true,
+        "detail": "django.shortcuts",
+        "documentation": {}
+    },
+    {
+        "label": "get_object_or_404",
+        "importPath": "django.shortcuts",
+        "description": "django.shortcuts",
+        "isExtraImport": true,
+        "detail": "django.shortcuts",
+        "documentation": {}
+    },
+    {
+        "label": "render",
+        "importPath": "django.shortcuts",
+        "description": "django.shortcuts",
+        "isExtraImport": true,
+        "detail": "django.shortcuts",
+        "documentation": {}
+    },
+    {
+        "label": "redirect",
+        "importPath": "django.shortcuts",
+        "description": "django.shortcuts",
+        "isExtraImport": true,
+        "detail": "django.shortcuts",
+        "documentation": {}
+    },
+    {
+        "label": "get_object_or_404",
+        "importPath": "django.shortcuts",
+        "description": "django.shortcuts",
+        "isExtraImport": true,
+        "detail": "django.shortcuts",
+        "documentation": {}
+    },
+    {
+        "label": "BirthdayWish",
+        "importPath": "birthdaywish.models",
+        "description": "birthdaywish.models",
+        "isExtraImport": true,
+        "detail": "birthdaywish.models",
+        "documentation": {}
+    },
+    {
+        "label": "BirthdayWish",
+        "importPath": "birthdaywish.models",
+        "description": "birthdaywish.models",
+        "isExtraImport": true,
+        "detail": "birthdaywish.models",
+        "documentation": {}
+    },
+    {
+        "label": "Avg",
+        "importPath": "django.db.models",
+        "description": "django.db.models",
+        "isExtraImport": true,
+        "detail": "django.db.models",
+        "documentation": {}
+    },
+    {
+        "label": "F",
+        "importPath": "django.db.models",
+        "description": "django.db.models",
+        "isExtraImport": true,
+        "detail": "django.db.models",
+        "documentation": {}
+    },
+    {
+        "label": "Q",
+        "importPath": "django.db.models",
+        "description": "django.db.models",
+        "isExtraImport": true,
+        "detail": "django.db.models",
+        "documentation": {}
+    },
+    {
+        "label": "F",
+        "importPath": "django.db.models",
+        "description": "django.db.models",
+        "isExtraImport": true,
+        "detail": "django.db.models",
+        "documentation": {}
+    },
+    {
+        "label": "Avg",
+        "importPath": "django.db.models",
+        "description": "django.db.models",
+        "isExtraImport": true,
+        "detail": "django.db.models",
+        "documentation": {}
+    },
+    {
+        "label": "Q",
+        "importPath": "django.db.models",
+        "description": "django.db.models",
+        "isExtraImport": true,
+        "detail": "django.db.models",
+        "documentation": {}
+    },
+    {
+        "label": "django.db.models.deletion",
+        "kind": 6,
+        "isExtraImport": true,
+        "importPath": "django.db.models.deletion",
+        "description": "django.db.models.deletion",
+        "detail": "django.db.models.deletion",
+        "documentation": {}
+    },
+    {
+        "label": "uuid",
+        "kind": 6,
+        "isExtraImport": true,
+        "importPath": "uuid",
+        "description": "uuid",
+        "detail": "uuid",
+        "documentation": {}
+    },
+    {
+        "label": "forms",
+        "importPath": "django",
+        "description": "django",
+        "isExtraImport": true,
+        "detail": "django",
+        "documentation": {}
+    },
+    {
+        "label": "forms",
+        "importPath": "django",
+        "description": "django",
+        "isExtraImport": true,
+        "detail": "django",
+        "documentation": {}
+    },
+    {
+        "label": "forms",
+        "importPath": "django",
+        "description": "django",
+        "isExtraImport": true,
+        "detail": "django",
+        "documentation": {}
+    },
+    {
+        "label": "forms",
+        "importPath": "django",
+        "description": "django",
+        "isExtraImport": true,
+        "detail": "django",
+        "documentation": {}
+    },
+    {
+        "label": "Paginator",
+        "importPath": "django.core.paginator",
+        "description": "django.core.paginator",
+        "isExtraImport": true,
+        "detail": "django.core.paginator",
+        "documentation": {}
+    },
+    {
+        "label": "Paginator",
+        "importPath": "django.core.paginator",
+        "description": "django.core.paginator",
+        "isExtraImport": true,
+        "detail": "django.core.paginator",
+        "documentation": {}
+    },
+    {
+        "label": "format_html",
+        "importPath": "django.utils.html",
+        "description": "django.utils.html",
+        "isExtraImport": true,
+        "detail": "django.utils.html",
+        "documentation": {}
+    },
+    {
+        "label": "slugify",
+        "importPath": "django.utils.text",
+        "description": "django.utils.text",
+        "isExtraImport": true,
+        "detail": "django.utils.text",
+        "documentation": {}
+    },
+    {
+        "label": "JsonResponse",
+        "importPath": "django.http",
+        "description": "django.http",
+        "isExtraImport": true,
+        "detail": "django.http",
+        "documentation": {}
+    },
+    {
+        "label": "os",
+        "kind": 6,
+        "isExtraImport": true,
+        "importPath": "os",
+        "description": "os",
+        "detail": "os",
+        "documentation": {}
+    },
+    {
+        "label": "get_asgi_application",
+        "importPath": "django.core.asgi",
+        "description": "django.core.asgi",
+        "isExtraImport": true,
+        "detail": "django.core.asgi",
+        "documentation": {}
+    },
+    {
+        "label": "Path",
+        "importPath": "pathlib",
+        "description": "pathlib",
+        "isExtraImport": true,
+        "detail": "pathlib",
+        "documentation": {}
+    },
+    {
+        "label": "settings",
+        "importPath": "django.conf",
+        "description": "django.conf",
+        "isExtraImport": true,
+        "detail": "django.conf",
+        "documentation": {}
+    },
+    {
+        "label": "static",
+        "importPath": "django.conf.urls.static",
+        "description": "django.conf.urls.static",
+        "isExtraImport": true,
+        "detail": "django.conf.urls.static",
+        "documentation": {}
+    },
+    {
+        "label": "get_wsgi_application",
+        "importPath": "django.core.wsgi",
+        "description": "django.core.wsgi",
+        "isExtraImport": true,
+        "detail": "django.core.wsgi",
+        "documentation": {}
+    },
+    {
+        "label": "sys",
+        "kind": 6,
+        "isExtraImport": true,
+        "importPath": "sys",
+        "description": "sys",
+        "detail": "sys",
+        "documentation": {}
+    },
+    {
+        "label": "Migration",
+        "kind": 6,
+        "importPath": "accounts.migrations.0001_initial",
+        "description": "accounts.migrations.0001_initial",
+        "peekOfCode": "class Migration(migrations.Migration):\n    initial = True\n    dependencies = [\n        ('auth', '0012_alter_user_first_name_max_length'),\n    ]\n    operations = [\n        migrations.CreateModel(\n            name='CustomUser',\n            fields=[\n                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),",
+        "detail": "accounts.migrations.0001_initial",
+        "documentation": {}
+    },
+    {
+        "label": "AccountsConfig",
+        "kind": 6,
+        "importPath": "accounts.apps",
+        "description": "accounts.apps",
+        "peekOfCode": "class AccountsConfig(AppConfig):\n    default_auto_field = 'django.db.models.BigAutoField'\n    name = 'accounts'",
+        "detail": "accounts.apps",
+        "documentation": {}
+    },
+    {
+        "label": "CustomUser",
+        "kind": 6,
+        "importPath": "accounts.models",
+        "description": "accounts.models",
+        "peekOfCode": "class CustomUser(AbstractUser):\n    profile_picture = models.ImageField(upload_to='profile_pics/', null=True, blank=True)\n    def __str__(self):\n        return self.username",
+        "detail": "accounts.models",
+        "documentation": {}
+    },
+    {
+        "label": "urlpatterns",
+        "kind": 5,
+        "importPath": "accounts.urls",
+        "description": "accounts.urls",
+        "peekOfCode": "urlpatterns = [\n    path('login/', views.admin_login, name='admin_login'),\n    path('dashboard/', views.admin_dashboard, name='admin_dashboard'),\n    path('logout/', views.admin_logout, name='admin_logout'),\n]",
+        "detail": "accounts.urls",
+        "documentation": {}
+    },
+    {
+        "label": "admin_login",
+        "kind": 2,
+        "importPath": "accounts.views",
+        "description": "accounts.views",
+        "peekOfCode": "def admin_login(request):\n    if request.method == 'POST':\n        form = AuthenticationForm(request, data=request.POST)\n        if form.is_valid():\n            user = form.get_user()\n            if user.is_staff:\n                login(request, user)\n                return redirect('admin_dashboard')\n    else:\n        form = AuthenticationForm()",
+        "detail": "accounts.views",
+        "documentation": {}
+    },
+    {
+        "label": "admin_logout",
+        "kind": 2,
+        "importPath": "accounts.views",
+        "description": "accounts.views",
+        "peekOfCode": "def admin_logout(request):\n    logout(request)\n    return redirect('admin_login')\n@staff_member_required\ndef admin_dashboard(request):\n    # 1. Basic Stats\n    total_standard_wishes = Wish.objects.count()\n    total_birthday_wishes = BirthdayWish.objects.count()\n    total_interactive_wishes = InteractiveWish.objects.count()\n    # 2. Traffic & Engagement",
+        "detail": "accounts.views",
+        "documentation": {}
+    },
+    {
+        "label": "admin_dashboard",
+        "kind": 2,
+        "importPath": "accounts.views",
+        "description": "accounts.views",
+        "peekOfCode": "def admin_dashboard(request):\n    # 1. Basic Stats\n    total_standard_wishes = Wish.objects.count()\n    total_birthday_wishes = BirthdayWish.objects.count()\n    total_interactive_wishes = InteractiveWish.objects.count()\n    # 2. Traffic & Engagement\n    visitor_stats, _ = VisitorCount.objects.get_or_create(id=1)\n    avg_rating = Rating.objects.aggregate(Avg('score'))['score__avg'] or 0\n    # 3. Library Stats\n    total_templates = CelebrationTemplate.objects.count()",
+        "detail": "accounts.views",
+        "documentation": {}
+    },
+    {
+        "label": "Migration",
+        "kind": 6,
+        "importPath": "birthdaywish.migrations.0001_initial",
+        "description": "birthdaywish.migrations.0001_initial",
+        "peekOfCode": "class Migration(migrations.Migration):\n    initial = True\n    dependencies = [\n    ]\n    operations = [\n        migrations.CreateModel(\n            name='BirthdayWish',\n            fields=[\n                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),\n                ('slug', models.SlugField(default=uuid.uuid4, editable=False, unique=True)),",
+        "detail": "birthdaywish.migrations.0001_initial",
+        "documentation": {}
+    },
+    {
+        "label": "Migration",
+        "kind": 6,
+        "importPath": "birthdaywish.migrations.0002_birthdaywish_template_name_birthdaywish_views_and_more",
+        "description": "birthdaywish.migrations.0002_birthdaywish_template_name_birthdaywish_views_and_more",
+        "peekOfCode": "class Migration(migrations.Migration):\n    dependencies = [\n        ('birthdaywish', '0001_initial'),\n    ]\n    operations = [\n        migrations.AddField(\n            model_name='birthdaywish',\n            name='template_name',\n            field=models.CharField(default='default', max_length=50),\n        ),",
+        "detail": "birthdaywish.migrations.0002_birthdaywish_template_name_birthdaywish_views_and_more",
+        "documentation": {}
+    },
+    {
+        "label": "BirthdaywishConfig",
+        "kind": 6,
+        "importPath": "birthdaywish.apps",
+        "description": "birthdaywish.apps",
+        "peekOfCode": "class BirthdaywishConfig(AppConfig):\n    default_auto_field = 'django.db.models.BigAutoField'\n    name = 'birthdaywish'",
+        "detail": "birthdaywish.apps",
+        "documentation": {}
+    },
+    {
+        "label": "MultipleFileInput",
+        "kind": 6,
+        "importPath": "birthdaywish.forms",
+        "description": "birthdaywish.forms",
+        "peekOfCode": "class MultipleFileInput(forms.ClearableFileInput):\n    allow_multiple_selected = True\nclass MultipleFileField(forms.FileField):\n    def __init__(self, *args, **kwargs):\n        kwargs.setdefault(\"widget\", MultipleFileInput())\n        super().__init__(*args, **kwargs)\n    def clean(self, data, initial=None):\n        single_file_clean = super().clean\n        if isinstance(data, (list, tuple)):\n            result = [single_file_clean(d, initial) for d in data]",
+        "detail": "birthdaywish.forms",
+        "documentation": {}
+    },
+    {
+        "label": "MultipleFileField",
+        "kind": 6,
+        "importPath": "birthdaywish.forms",
+        "description": "birthdaywish.forms",
+        "peekOfCode": "class MultipleFileField(forms.FileField):\n    def __init__(self, *args, **kwargs):\n        kwargs.setdefault(\"widget\", MultipleFileInput())\n        super().__init__(*args, **kwargs)\n    def clean(self, data, initial=None):\n        single_file_clean = super().clean\n        if isinstance(data, (list, tuple)):\n            result = [single_file_clean(d, initial) for d in data]\n        else:\n            result = single_file_clean(data, initial)",
+        "detail": "birthdaywish.forms",
+        "documentation": {}
+    },
+    {
+        "label": "WishCreationForm",
+        "kind": 6,
+        "importPath": "birthdaywish.forms",
+        "description": "birthdaywish.forms",
+        "peekOfCode": "class WishCreationForm(forms.ModelForm):\n    images = MultipleFileField(required=False, label=\"Select Multiple Memories\")\n    class Meta:\n        model = BirthdayWish\n        fields = ['sender_name', 'receiver_name', 'message']",
+        "detail": "birthdaywish.forms",
+        "documentation": {}
+    },
+    {
+        "label": "BirthdayWish",
+        "kind": 6,
+        "importPath": "birthdaywish.models",
+        "description": "birthdaywish.models",
+        "peekOfCode": "class BirthdayWish(models.Model):\n    # Unique slug for sharing \n    slug = models.SlugField(unique=True, default=uuid.uuid4, editable=False)\n    sender_name = models.CharField(max_length=100)\n    receiver_name = models.CharField(max_length=100)\n    message = models.TextField()\n    music = models.FileField(upload_to='birthday_music/', null=True, blank=True)\n    # --- SEO/Social Sharing ---\n    template_name = models.CharField(max_length=50, default=\"default\")\n    views = models.PositiveIntegerField(default=0)",
+        "detail": "birthdaywish.models",
+        "documentation": {}
+    },
+    {
+        "label": "WishImage",
+        "kind": 6,
+        "importPath": "birthdaywish.models",
+        "description": "birthdaywish.models",
+        "peekOfCode": "class WishImage(models.Model):\n    wish = models.ForeignKey(BirthdayWish, related_name='images', on_delete=models.CASCADE)\n    image = models.ImageField(upload_to='birthday_memories/')\n    created_at = models.DateTimeField(auto_now_add=True)\n    def __str__(self):\n        return f\"Image for {self.wish.receiver_name}\"",
+        "detail": "birthdaywish.models",
+        "documentation": {}
+    },
+    {
+        "label": "app_name",
+        "kind": 5,
+        "importPath": "birthdaywish.urls",
+        "description": "birthdaywish.urls",
+        "peekOfCode": "app_name = 'birthday'\nurlpatterns = [\n    # -- FRONTEND URLs -- #\n    path('create/', views.create_wish, name='create_wish'),\n    path('success/<slug:slug>/', views.wish_success, name='wish_success'),\n    path('view/<slug:slug>/', views.surprise_page, name='surprise_page'),\n    # -- BACKEND URLs -- #\n    path('admin-panel/wishes/', views.admin_wish_list, name='admin_wish_list'),\n    path('admin-panel/wishes/delete/<int:pk>/', views.admin_wish_delete, name='admin_wish_delete'),\n]",
+        "detail": "birthdaywish.urls",
+        "documentation": {}
+    },
+    {
+        "label": "urlpatterns",
+        "kind": 5,
+        "importPath": "birthdaywish.urls",
+        "description": "birthdaywish.urls",
+        "peekOfCode": "urlpatterns = [\n    # -- FRONTEND URLs -- #\n    path('create/', views.create_wish, name='create_wish'),\n    path('success/<slug:slug>/', views.wish_success, name='wish_success'),\n    path('view/<slug:slug>/', views.surprise_page, name='surprise_page'),\n    # -- BACKEND URLs -- #\n    path('admin-panel/wishes/', views.admin_wish_list, name='admin_wish_list'),\n    path('admin-panel/wishes/delete/<int:pk>/', views.admin_wish_delete, name='admin_wish_delete'),\n]",
+        "detail": "birthdaywish.urls",
+        "documentation": {}
+    },
+    {
+        "label": "create_wish",
+        "kind": 2,
+        "importPath": "birthdaywish.views",
+        "description": "birthdaywish.views",
+        "peekOfCode": "def create_wish(request):\n    if request.method == \"POST\":\n        sender = request.POST.get('sender_name')\n        receiver = request.POST.get('receiver_name')\n        msg = request.POST.get('message')\n        music_file = request.FILES.get('music') \n        wish = BirthdayWish.objects.create(\n            sender_name=sender,\n            receiver_name=receiver,\n            message=msg,",
+        "detail": "birthdaywish.views",
+        "documentation": {}
+    },
+    {
+        "label": "wish_success",
+        "kind": 2,
+        "importPath": "birthdaywish.views",
+        "description": "birthdaywish.views",
+        "peekOfCode": "def wish_success(request, slug):\n    wish = get_object_or_404(BirthdayWish, slug=slug)\n    full_url = request.build_absolute_uri(f'/wish/{wish.slug}/') \n    context = {\n        'wish': wish,\n        'full_url': full_url,\n    }\n    return render(request, 'frontend/birthdaywish/wish_success.html', context)\ndef surprise_page(request, slug):\n    wish = get_object_or_404(BirthdayWish, slug=slug)",
+        "detail": "birthdaywish.views",
+        "documentation": {}
+    },
+    {
+        "label": "surprise_page",
+        "kind": 2,
+        "importPath": "birthdaywish.views",
+        "description": "birthdaywish.views",
+        "peekOfCode": "def surprise_page(request, slug):\n    wish = get_object_or_404(BirthdayWish, slug=slug)\n    # --- SEO & Stats Logic ---\n    BirthdayWish.objects.filter(slug=slug).update(views=F('views') + 1)\n    images = wish.images.all() \n    context = {\n        'wish': wish,\n        'images': images,\n        'thumbnail': images.first().image.url if images.exists() else None\n    }",
+        "detail": "birthdaywish.views",
+        "documentation": {}
+    },
+    {
+        "label": "admin_wish_list",
+        "kind": 2,
+        "importPath": "birthdaywish.views",
+        "description": "birthdaywish.views",
+        "peekOfCode": "def admin_wish_list(request):\n    wishes = BirthdayWish.objects.all().order_by('-created_at')\n    return render(request, 'backend/birthdaywish/wishes_list.html', {'wishes': wishes})\n@staff_member_required\ndef admin_wish_delete(request, pk):\n    wish = get_object_or_404(BirthdayWish, pk=pk)\n    wish.delete()\n    return redirect('birthday:admin_wish_list')",
+        "detail": "birthdaywish.views",
+        "documentation": {}
+    },
+    {
+        "label": "admin_wish_delete",
+        "kind": 2,
+        "importPath": "birthdaywish.views",
+        "description": "birthdaywish.views",
+        "peekOfCode": "def admin_wish_delete(request, pk):\n    wish = get_object_or_404(BirthdayWish, pk=pk)\n    wish.delete()\n    return redirect('birthday:admin_wish_list')",
+        "detail": "birthdaywish.views",
+        "documentation": {}
+    },
+    {
+        "label": "Migration",
+        "kind": 6,
+        "importPath": "magical_wishes.migrations.0001_initial",
+        "description": "magical_wishes.migrations.0001_initial",
+        "peekOfCode": "class Migration(migrations.Migration):\n    initial = True\n    dependencies = [\n    ]\n    operations = [\n        migrations.CreateModel(\n            name='InteractiveWish',\n            fields=[\n                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),\n                ('slug', models.SlugField(default=uuid.uuid4, editable=False, unique=True)),",
+        "detail": "magical_wishes.migrations.0001_initial",
+        "documentation": {}
+    },
+    {
+        "label": "Migration",
+        "kind": 6,
+        "importPath": "magical_wishes.migrations.0002_interactivewish_views_count",
+        "description": "magical_wishes.migrations.0002_interactivewish_views_count",
+        "peekOfCode": "class Migration(migrations.Migration):\n    dependencies = [\n        ('magical_wishes', '0001_initial'),\n    ]\n    operations = [\n        migrations.AddField(\n            model_name='interactivewish',\n            name='views_count',\n            field=models.PositiveIntegerField(default=0),\n        ),",
+        "detail": "magical_wishes.migrations.0002_interactivewish_views_count",
+        "documentation": {}
+    },
+    {
+        "label": "WishImageInline",
+        "kind": 6,
+        "importPath": "magical_wishes.admin",
+        "description": "magical_wishes.admin",
+        "peekOfCode": "class WishImageInline(admin.TabularInline):\n    model = WishImage\n    extra = 1 \n@admin.register(InteractiveWish)\nclass InteractiveWishAdmin(admin.ModelAdmin):\n    list_display = ('sender_name', 'receiver_name', 'slug', 'created_at')\n    search_fields = ('sender_name', 'receiver_name', 'message')\n    list_filter = ('created_at',)\n    inlines = [WishImageInline]\n    readonly_fields = ('slug', 'created_at')",
+        "detail": "magical_wishes.admin",
+        "documentation": {}
+    },
+    {
+        "label": "InteractiveWishAdmin",
+        "kind": 6,
+        "importPath": "magical_wishes.admin",
+        "description": "magical_wishes.admin",
+        "peekOfCode": "class InteractiveWishAdmin(admin.ModelAdmin):\n    list_display = ('sender_name', 'receiver_name', 'slug', 'created_at')\n    search_fields = ('sender_name', 'receiver_name', 'message')\n    list_filter = ('created_at',)\n    inlines = [WishImageInline]\n    readonly_fields = ('slug', 'created_at')",
+        "detail": "magical_wishes.admin",
+        "documentation": {}
+    },
+    {
+        "label": "MagicalWishesConfig",
+        "kind": 6,
+        "importPath": "magical_wishes.apps",
+        "description": "magical_wishes.apps",
+        "peekOfCode": "class MagicalWishesConfig(AppConfig):\n    default_auto_field = 'django.db.models.BigAutoField'\n    name = 'magical_wishes'",
+        "detail": "magical_wishes.apps",
+        "documentation": {}
+    },
+    {
+        "label": "MultipleFileInput",
+        "kind": 6,
+        "importPath": "magical_wishes.forms",
+        "description": "magical_wishes.forms",
+        "peekOfCode": "class MultipleFileInput(forms.ClearableFileInput):\n    allow_multiple_selected = True\nclass MultipleFileField(forms.FileField):\n    def __init__(self, *args, **kwargs):\n        kwargs.setdefault(\"widget\", MultipleFileInput())\n        super().__init__(*args, **kwargs)\n    def clean(self, data, initial=None):\n        single_file_clean = super().clean\n        if isinstance(data, (list, tuple)):\n            result = [single_file_clean(d, initial) for d in data]",
+        "detail": "magical_wishes.forms",
+        "documentation": {}
+    },
+    {
+        "label": "MultipleFileField",
+        "kind": 6,
+        "importPath": "magical_wishes.forms",
+        "description": "magical_wishes.forms",
+        "peekOfCode": "class MultipleFileField(forms.FileField):\n    def __init__(self, *args, **kwargs):\n        kwargs.setdefault(\"widget\", MultipleFileInput())\n        super().__init__(*args, **kwargs)\n    def clean(self, data, initial=None):\n        single_file_clean = super().clean\n        if isinstance(data, (list, tuple)):\n            result = [single_file_clean(d, initial) for d in data]\n        else:\n            result = single_file_clean(data, initial)",
+        "detail": "magical_wishes.forms",
+        "documentation": {}
+    },
+    {
+        "label": "WishCreateForm",
+        "kind": 6,
+        "importPath": "magical_wishes.forms",
+        "description": "magical_wishes.forms",
+        "peekOfCode": "class WishCreateForm(forms.ModelForm):\n    images = MultipleFileField(\n        label=\"Upload 3-6 Memories\",\n        required=True,\n        widget=MultipleFileInput(attrs={'multiple': True, 'class': 'form-control'})\n    )\n    class Meta:\n        model = InteractiveWish\n        fields = ['sender_name', 'receiver_name', 'message', 'music']",
+        "detail": "magical_wishes.forms",
+        "documentation": {}
+    },
+    {
+        "label": "InteractiveWish",
+        "kind": 6,
+        "importPath": "magical_wishes.models",
+        "description": "magical_wishes.models",
+        "peekOfCode": "class InteractiveWish(models.Model):\n    # Unique slug for private sharing\n    slug = models.SlugField(unique=True, default=uuid.uuid4, editable=False)\n    sender_name = models.CharField(max_length=100)\n    receiver_name = models.CharField(max_length=100)\n    message = models.TextField()\n    music = models.FileField(upload_to='wish_music/', blank=True, null=True)\n    # --- SEO & Analytics Fields ---\n    views_count = models.PositiveIntegerField(default=0)\n    created_at = models.DateTimeField(auto_now_add=True)",
+        "detail": "magical_wishes.models",
+        "documentation": {}
+    },
+    {
+        "label": "WishImage",
+        "kind": 6,
+        "importPath": "magical_wishes.models",
+        "description": "magical_wishes.models",
+        "peekOfCode": "class WishImage(models.Model):\n    wish = models.ForeignKey(InteractiveWish, related_name='images', on_delete=models.CASCADE)\n    image = models.ImageField(upload_to='wish_photos/')\n    def __str__(self):\n        return f\"Image for {self.wish.receiver_name}\"",
+        "detail": "magical_wishes.models",
+        "documentation": {}
+    },
+    {
+        "label": "urlpatterns",
+        "kind": 5,
+        "importPath": "magical_wishes.urls",
+        "description": "magical_wishes.urls",
+        "peekOfCode": "urlpatterns = [\n    # -- FRONTEND URLs -- #\n    path('create/', views.create_wish, name='create_wish'),\n    path('surprise/<slug:slug>/', views.surprise_view, name='surprise_view'),\n    # -- BACKEND URLs -- #\n    path('backend/interactive-wishes/', views.admin_interactive_wish_list, name='admin_interactive_list'),\n    path('backend/interactive-wishes/delete/<path:slug>/', views.admin_interactive_delete, name='admin_interactive_delete'),\n]",
+        "detail": "magical_wishes.urls",
+        "documentation": {}
+    },
+    {
+        "label": "create_wish",
+        "kind": 2,
+        "importPath": "magical_wishes.views",
+        "description": "magical_wishes.views",
+        "peekOfCode": "def create_wish(request):\n    if request.method == 'POST':\n        form = WishCreateForm(request.POST, request.FILES)\n        files = request.FILES.getlist('images')\n        if form.is_valid():\n            if 3 <= len(files) <= 6:\n                wish = form.save()\n                for f in files:\n                    WishImage.objects.create(wish=wish, image=f)\n                return render(request, 'frontend/magical_wishes/wish_success.html', {'wish': wish})",
+        "detail": "magical_wishes.views",
+        "documentation": {}
+    },
+    {
+        "label": "surprise_view",
+        "kind": 2,
+        "importPath": "magical_wishes.views",
+        "description": "magical_wishes.views",
+        "peekOfCode": "def surprise_view(request, slug):\n    wish = get_object_or_404(InteractiveWish, slug=slug)\n    # --- SEO Logic ---\n    images = wish.images.all()\n    first_image_url = None\n    if images.exists():\n        first_image_url = request.build_absolute_uri(images.first().image.url)\n    context = {\n        'wish': wish,\n        'images': images,",
+        "detail": "magical_wishes.views",
+        "documentation": {}
+    },
+    {
+        "label": "admin_interactive_wish_list",
+        "kind": 2,
+        "importPath": "magical_wishes.views",
+        "description": "magical_wishes.views",
+        "peekOfCode": "def admin_interactive_wish_list(request):\n    query = request.GET.get('q', '')\n    wishes_list = InteractiveWish.objects.prefetch_related('images').all().order_by('-created_at')\n    if query:\n        wishes_list = wishes_list.filter(\n            Q(sender_name__icontains=query) | \n            Q(receiver_name__icontains=query) |\n            Q(slug__icontains=query)\n        )\n    paginator = Paginator(wishes_list, 10)",
+        "detail": "magical_wishes.views",
+        "documentation": {}
+    },
+    {
+        "label": "admin_interactive_delete",
+        "kind": 2,
+        "importPath": "magical_wishes.views",
+        "description": "magical_wishes.views",
+        "peekOfCode": "def admin_interactive_delete(request, slug):\n    wish = get_object_or_404(InteractiveWish, slug=slug)\n    sender = wish.sender_name\n    wish.delete()\n    messages.success(request, f\"Interactive wish from {sender} deleted successfully.\")\n    return redirect('admin_interactive_list')",
+        "detail": "magical_wishes.views",
+        "documentation": {}
+    },
+    {
+        "label": "Migration",
+        "kind": 6,
+        "importPath": "magic_wish.migrations.0001_initial",
+        "description": "magic_wish.migrations.0001_initial",
+        "peekOfCode": "class Migration(migrations.Migration):\n    initial = True\n    dependencies = [\n    ]\n    operations = [\n        migrations.CreateModel(\n            name='CelebrationTemplate',\n            fields=[\n                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),\n                ('template_id', models.CharField(max_length=50, unique=True)),",
+        "detail": "magic_wish.migrations.0001_initial",
+        "documentation": {}
+    },
+    {
+        "label": "CelebrationTemplateAdminForm",
+        "kind": 6,
+        "importPath": "magic_wish.admin",
+        "description": "magic_wish.admin",
+        "peekOfCode": "class CelebrationTemplateAdminForm(forms.ModelForm):\n    template_id = forms.ChoiceField(choices=TEMPLATE_CHOICES, label=\"Template ID\")\n    class Meta:\n        model = CelebrationTemplate\n        fields = '__all__'\n@admin.register(CelebrationTemplate)\nclass CelebrationTemplateAdmin(admin.ModelAdmin):\n    form = CelebrationTemplateAdminForm \n    list_display = ('name', 'template_id', 'display_preview')\n    search_fields = ('name', 'template_id')",
+        "detail": "magic_wish.admin",
+        "documentation": {}
+    },
+    {
+        "label": "CelebrationTemplateAdmin",
+        "kind": 6,
+        "importPath": "magic_wish.admin",
+        "description": "magic_wish.admin",
+        "peekOfCode": "class CelebrationTemplateAdmin(admin.ModelAdmin):\n    form = CelebrationTemplateAdminForm \n    list_display = ('name', 'template_id', 'display_preview')\n    search_fields = ('name', 'template_id')\n    list_filter = ('template_id',)\n    def display_preview(self, obj):\n        if obj.preview_image:\n            return format_html('<img src=\"{}\" style=\"width: 50px; height: 50px; border-radius: 8px; object-fit: cover;\" />', obj.preview_image.url)\n        return \"No Image\"\n    display_preview.short_description = 'Preview'",
+        "detail": "magic_wish.admin",
+        "documentation": {}
+    },
+    {
+        "label": "WishImageInline",
+        "kind": 6,
+        "importPath": "magic_wish.admin",
+        "description": "magic_wish.admin",
+        "peekOfCode": "class WishImageInline(admin.TabularInline):\n    model = WishImage\n    extra = 1 \n@admin.register(MusicCategory)\nclass MusicCategoryAdmin(admin.ModelAdmin):\n    list_display = ('name',)\n    search_fields = ('name',)\n@admin.register(MusicLibrary)\nclass MusicLibraryAdmin(admin.ModelAdmin):\n    list_display = ('title', 'category')",
+        "detail": "magic_wish.admin",
+        "documentation": {}
+    },
+    {
+        "label": "MusicCategoryAdmin",
+        "kind": 6,
+        "importPath": "magic_wish.admin",
+        "description": "magic_wish.admin",
+        "peekOfCode": "class MusicCategoryAdmin(admin.ModelAdmin):\n    list_display = ('name',)\n    search_fields = ('name',)\n@admin.register(MusicLibrary)\nclass MusicLibraryAdmin(admin.ModelAdmin):\n    list_display = ('title', 'category')\n    list_filter = ('category',)\n    search_fields = ('title',)\n@admin.register(Wish)\nclass WishAdmin(admin.ModelAdmin):",
+        "detail": "magic_wish.admin",
+        "documentation": {}
+    },
+    {
+        "label": "MusicLibraryAdmin",
+        "kind": 6,
+        "importPath": "magic_wish.admin",
+        "description": "magic_wish.admin",
+        "peekOfCode": "class MusicLibraryAdmin(admin.ModelAdmin):\n    list_display = ('title', 'category')\n    list_filter = ('category',)\n    search_fields = ('title',)\n@admin.register(Wish)\nclass WishAdmin(admin.ModelAdmin):\n    list_display = ('receiver_name', 'sender_name', 'wish_type', 'created_at')\n    list_filter = ('wish_type', 'created_at')\n    search_fields = ('sender_name', 'receiver_name', 'message')\n    inlines = [WishImageInline]",
+        "detail": "magic_wish.admin",
+        "documentation": {}
+    },
+    {
+        "label": "WishAdmin",
+        "kind": 6,
+        "importPath": "magic_wish.admin",
+        "description": "magic_wish.admin",
+        "peekOfCode": "class WishAdmin(admin.ModelAdmin):\n    list_display = ('receiver_name', 'sender_name', 'wish_type', 'created_at')\n    list_filter = ('wish_type', 'created_at')\n    search_fields = ('sender_name', 'receiver_name', 'message')\n    inlines = [WishImageInline]\n    fieldsets = (\n        ('Basic Information', {\n            'fields': ('wish_type', 'template_name')\n        }),\n        ('Personal Details', {",
+        "detail": "magic_wish.admin",
+        "documentation": {}
+    },
+    {
+        "label": "TEMPLATE_CHOICES",
+        "kind": 5,
+        "importPath": "magic_wish.admin",
+        "description": "magic_wish.admin",
+        "peekOfCode": "TEMPLATE_CHOICES = [\n    ('heart_shape', 'Romantic Heart'),\n    ('floating_photos', 'Floating Memories'),\n    ('colorful_magic', 'Color Blast'),\n    ('balloon_parade', 'Balloon Parade'),\n    ('falling_leaves', 'Autumn Whisper'),\n    ('matrix_rain', 'Matrix Digital'),\n    ('snowy_winter', 'Snowy Winter'),\n    ('firework_show', 'Firework Show'),\n    ('sakura_bloom', 'Sakura Bloom'),",
+        "detail": "magic_wish.admin",
+        "documentation": {}
+    },
+    {
+        "label": "MagicWishConfig",
+        "kind": 6,
+        "importPath": "magic_wish.apps",
+        "description": "magic_wish.apps",
+        "peekOfCode": "class MagicWishConfig(AppConfig):\n    default_auto_field = 'django.db.models.BigAutoField'\n    name = 'magic_wish'",
+        "detail": "magic_wish.apps",
+        "documentation": {}
+    },
+    {
+        "label": "WishForm",
+        "kind": 6,
+        "importPath": "magic_wish.forms",
+        "description": "magic_wish.forms",
+        "peekOfCode": "class WishForm(forms.ModelForm):\n    images = forms.FileField(\n        required=False,\n        widget=forms.FileInput()\n    )\n    class Meta:\n        model = Wish\n        fields = ['sender_name', 'receiver_name', 'message', 'selected_music', 'custom_music']\n        widgets = {\n            'message': forms.Textarea(attrs={'rows': 4, 'placeholder': 'Write your sweet message...'}),",
+        "detail": "magic_wish.forms",
+        "documentation": {}
+    },
+    {
+        "label": "MusicLibraryForm",
+        "kind": 6,
+        "importPath": "magic_wish.forms",
+        "description": "magic_wish.forms",
+        "peekOfCode": "class MusicLibraryForm(forms.ModelForm):\n    class Meta:\n        model = MusicLibrary\n        fields = ['title', 'category', 'audio_file']\n        widgets = {\n            'title': forms.TextInput(attrs={'class': 'form-control'}),\n            'category': forms.Select(attrs={'class': 'form-select'}),\n            'audio_file': forms.FileInput(attrs={'class': 'form-control'}),\n        }\nclass TemplateForm(forms.ModelForm):",
+        "detail": "magic_wish.forms",
+        "documentation": {}
+    },
+    {
+        "label": "TemplateForm",
+        "kind": 6,
+        "importPath": "magic_wish.forms",
+        "description": "magic_wish.forms",
+        "peekOfCode": "class TemplateForm(forms.ModelForm):\n    class Meta:\n        model = CelebrationTemplate\n        fields = ['template_id', 'name', 'preview_image']\n        widgets = {\n            'template_id': forms.TextInput(attrs={'class': 'form-control'}),\n            'name': forms.TextInput(attrs={'class': 'form-control'}),\n            'preview_image': forms.FileInput(attrs={'class': 'form-control'}),\n        }",
+        "detail": "magic_wish.forms",
+        "documentation": {}
+    },
+    {
+        "label": "MusicCategory",
+        "kind": 6,
+        "importPath": "magic_wish.models",
+        "description": "magic_wish.models",
+        "peekOfCode": "class MusicCategory(models.Model):\n    name = models.CharField(max_length=50)\n    slug = models.SlugField(max_length=100, unique=True, blank=True)\n    class Meta:\n        verbose_name_plural = \"Music Categories\"\n    def save(self, *args, **kwargs):\n        if not self.slug:\n            self.slug = slugify(self.name)\n        super().save(*args, **kwargs)\n    def __str__(self):",
+        "detail": "magic_wish.models",
+        "documentation": {}
+    },
+    {
+        "label": "MusicLibrary",
+        "kind": 6,
+        "importPath": "magic_wish.models",
+        "description": "magic_wish.models",
+        "peekOfCode": "class MusicLibrary(models.Model):\n    title = models.CharField(max_length=100)\n    category = models.ForeignKey(MusicCategory, on_delete=models.CASCADE, related_name='musics')\n    audio_file = models.FileField(upload_to='music_collection/')\n    def __str__(self):\n        return f\"{self.title} - ({self.category.name})\"\n# The Main Wish Model (Dynamic Version)\nclass Wish(models.Model):\n    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)\n    # SEO Friendly URL (Slug)",
+        "detail": "magic_wish.models",
+        "documentation": {}
+    },
+    {
+        "label": "Wish",
+        "kind": 6,
+        "importPath": "magic_wish.models",
+        "description": "magic_wish.models",
+        "peekOfCode": "class Wish(models.Model):\n    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)\n    # SEO Friendly URL (Slug)\n    slug = models.SlugField(max_length=255, unique=True, blank=True, null=True, db_index=True)\n    # Platform Logic\n    wish_type = models.CharField(max_length=50, default='birthday') \n    template_name = models.CharField(max_length=50, default='heart_shape')\n    # User Details\n    sender_name = models.CharField(max_length=100)\n    receiver_name = models.CharField(max_length=100)",
+        "detail": "magic_wish.models",
+        "documentation": {}
+    },
+    {
+        "label": "CelebrationTemplate",
+        "kind": 6,
+        "importPath": "magic_wish.models",
+        "description": "magic_wish.models",
+        "peekOfCode": "class CelebrationTemplate(models.Model):\n    template_id = models.CharField(max_length=50, unique=True) # e.g., 'heart_shape'\n    name = models.CharField(max_length=100)\n    preview_image = models.ImageField(upload_to='template_previews/', null=True, blank=True)\n    def __str__(self):\n        return self.name\n# Multiple Images for the Wish\nclass WishImage(models.Model):\n    wish = models.ForeignKey(Wish, related_name='images', on_delete=models.CASCADE)\n    image = models.ImageField(upload_to='wish_images/')",
+        "detail": "magic_wish.models",
+        "documentation": {}
+    },
+    {
+        "label": "WishImage",
+        "kind": 6,
+        "importPath": "magic_wish.models",
+        "description": "magic_wish.models",
+        "peekOfCode": "class WishImage(models.Model):\n    wish = models.ForeignKey(Wish, related_name='images', on_delete=models.CASCADE)\n    image = models.ImageField(upload_to='wish_images/')\n    alt_text = models.CharField(max_length=255, blank=True, null=True) # SEO को लागि थपिएको\n    def save(self, *args, **kwargs):\n        if not self.alt_text:\n            self.alt_text = f\"Surprise image for {self.wish.receiver_name}\"\n        super().save(*args, **kwargs)\n    def __str__(self):\n        return f\"Image for {self.wish.receiver_name}\"",
+        "detail": "magic_wish.models",
+        "documentation": {}
+    },
+    {
+        "label": "VisitorCount",
+        "kind": 6,
+        "importPath": "magic_wish.models",
+        "description": "magic_wish.models",
+        "peekOfCode": "class VisitorCount(models.Model):\n    total_visits = models.PositiveIntegerField(default=0)\nclass Rating(models.Model):\n    score = models.IntegerField(default=5) \n    created_at = models.DateTimeField(auto_now_add=True)\n    def __str__(self):\n        return f\"{self.score} Stars\"",
+        "detail": "magic_wish.models",
+        "documentation": {}
+    },
+    {
+        "label": "Rating",
+        "kind": 6,
+        "importPath": "magic_wish.models",
+        "description": "magic_wish.models",
+        "peekOfCode": "class Rating(models.Model):\n    score = models.IntegerField(default=5) \n    created_at = models.DateTimeField(auto_now_add=True)\n    def __str__(self):\n        return f\"{self.score} Stars\"",
+        "detail": "magic_wish.models",
+        "documentation": {}
+    },
+    {
+        "label": "urlpatterns",
+        "kind": 5,
+        "importPath": "magic_wish.urls",
+        "description": "magic_wish.urls",
+        "peekOfCode": "urlpatterns = [\n    # -- FRONTEND URLs -- #\n    # Landing Page\n    path('', views.landing_page, name='home'), \n    # Wish Creation Flow (Step by Step)\n    path('create/', views.select_type, name='select_type'),\n    path('create/<str:wish_type>/', views.select_template, name='select_template'),\n    path('create/<str:wish_type>/<str:template_name>/', views.create_wish, name='create_wish'),\n    # SEO Friendly Public Views\n    path('wish/<slug:slug>/', views.wish_detail, name='wish_detail'),",
+        "detail": "magic_wish.urls",
+        "documentation": {}
+    },
+    {
+        "label": "landing_page",
+        "kind": 2,
+        "importPath": "magic_wish.views",
+        "description": "magic_wish.views",
+        "peekOfCode": "def landing_page(request):\n    if request.method == \"POST\" and request.headers.get('x-requested-with') == 'XMLHttpRequest':\n        score = request.POST.get('score')\n        Rating.objects.create(score=int(score))\n        return JsonResponse({'status': 'success'})\n    # Update Visitors\n    counter, _ = VisitorCount.objects.get_or_create(id=1)\n    counter.total_visits += 1 \n    counter.save()\n    # Get Real Stats",
+        "detail": "magic_wish.views",
+        "documentation": {}
+    },
+    {
+        "label": "select_type",
+        "kind": 2,
+        "importPath": "magic_wish.views",
+        "description": "magic_wish.views",
+        "peekOfCode": "def select_type(request):\n    return render(request, 'frontend/magic_wish/select_type.html', {'types': WISH_TYPES_LIST})\ndef select_template(request, wish_type):\n    category_map = {\n        'birthday': ['balloon_parade', 'colorful_magic', 'firework_show', 'floating_photos', 'comic_pop', 'golden_glitter'],\n        'anniversary': ['heart_shape', 'golden_luxury', 'firework_show', 'floating_photos', 'retro_polaroid'],\n        'love': ['heart_shape', 'sakura_bloom', 'space_odyssey', 'floating_photos', 'neon_pulse'],\n        'sorry': ['falling_leaves', 'underwater_vibes', 'snowy_winter', 'floating_photos'],\n        'friendship': ['floating_photos', 'glitch_art', 'retro_polaroid', 'colorful_magic'],\n        'good luck': ['firework_show', 'space_odyssey', 'neon_pulse'],",
+        "detail": "magic_wish.views",
+        "documentation": {}
+    },
+    {
+        "label": "select_template",
+        "kind": 2,
+        "importPath": "magic_wish.views",
+        "description": "magic_wish.views",
+        "peekOfCode": "def select_template(request, wish_type):\n    category_map = {\n        'birthday': ['balloon_parade', 'colorful_magic', 'firework_show', 'floating_photos', 'comic_pop', 'golden_glitter'],\n        'anniversary': ['heart_shape', 'golden_luxury', 'firework_show', 'floating_photos', 'retro_polaroid'],\n        'love': ['heart_shape', 'sakura_bloom', 'space_odyssey', 'floating_photos', 'neon_pulse'],\n        'sorry': ['falling_leaves', 'underwater_vibes', 'snowy_winter', 'floating_photos'],\n        'friendship': ['floating_photos', 'glitch_art', 'retro_polaroid', 'colorful_magic'],\n        'good luck': ['firework_show', 'space_odyssey', 'neon_pulse'],\n        'graduation': ['firework_show', 'golden_luxury', 'colorful_magic', 'matrix_rain'],\n        'thank you': ['sakura_bloom', 'floating_photos', 'retro_polaroid'],",
+        "detail": "magic_wish.views",
+        "documentation": {}
+    },
+    {
+        "label": "create_wish",
+        "kind": 2,
+        "importPath": "magic_wish.views",
+        "description": "magic_wish.views",
+        "peekOfCode": "def create_wish(request, wish_type, template_name):\n    template_info = ALL_TEMPLATES_CONFIG.get(template_name, {'name': 'Special Surprise'})\n    if request.method == 'POST':\n        form = WishForm(request.POST, request.FILES, wish_type=wish_type)\n        if form.is_valid():\n            wish = form.save(commit=False)\n            wish.wish_type = wish_type\n            wish.template_name = template_name \n            wish.save() \n            images = request.FILES.getlist('images')",
+        "detail": "magic_wish.views",
+        "documentation": {}
+    },
+    {
+        "label": "wish_detail",
+        "kind": 2,
+        "importPath": "magic_wish.views",
+        "description": "magic_wish.views",
+        "peekOfCode": "def wish_detail(request, slug):\n    wish = get_object_or_404(Wish, slug=slug)\n    template_path = f\"frontend/magic_wish/surprises/{wish.template_name}.html\"\n    # SEO context pass garne\n    context = {\n        'wish': wish,\n        'meta_title': wish.meta_title,\n        'meta_description': wish.meta_description\n    }\n    return render(request, template_path, context)",
+        "detail": "magic_wish.views",
+        "documentation": {}
+    },
+    {
+        "label": "wish_success",
+        "kind": 2,
+        "importPath": "magic_wish.views",
+        "description": "magic_wish.views",
+        "peekOfCode": "def wish_success(request, slug):\n    wish = get_object_or_404(Wish, slug=slug)\n    return render(request, 'frontend/magic_wish/success.html', {'wish': wish})\n#--- BACKEND VIEWS ---#\n@staff_member_required\ndef admin_wish_list(request):\n    query = request.GET.get('q', '')\n    wish_type = request.GET.get('type', '')\n    wishes = Wish.objects.all().order_by('-created_at')\n    if query:",
+        "detail": "magic_wish.views",
+        "documentation": {}
+    },
+    {
+        "label": "admin_wish_list",
+        "kind": 2,
+        "importPath": "magic_wish.views",
+        "description": "magic_wish.views",
+        "peekOfCode": "def admin_wish_list(request):\n    query = request.GET.get('q', '')\n    wish_type = request.GET.get('type', '')\n    wishes = Wish.objects.all().order_by('-created_at')\n    if query:\n        wishes = wishes.filter(Q(sender_name__icontains=query) | Q(receiver_name__icontains=query))\n    if wish_type:\n        wishes = wishes.filter(wish_type__iexact=wish_type)\n    paginator = Paginator(wishes, 15)\n    page_number = request.GET.get('page')",
+        "detail": "magic_wish.views",
+        "documentation": {}
+    },
+    {
+        "label": "admin_wish_delete",
+        "kind": 2,
+        "importPath": "magic_wish.views",
+        "description": "magic_wish.views",
+        "peekOfCode": "def admin_wish_delete(request, pk):\n    wish = get_object_or_404(Wish, pk=pk)\n    wish.delete()\n    messages.warning(request, \"Wish has been permanently deleted.\")\n    return redirect('admin_wish_list')\n@staff_member_required\ndef admin_template_list(request):\n    if request.method == \"POST\":\n        tid = request.POST.get('template_id')\n        name = request.POST.get('name')",
+        "detail": "magic_wish.views",
+        "documentation": {}
+    },
+    {
+        "label": "admin_template_list",
+        "kind": 2,
+        "importPath": "magic_wish.views",
+        "description": "magic_wish.views",
+        "peekOfCode": "def admin_template_list(request):\n    if request.method == \"POST\":\n        tid = request.POST.get('template_id')\n        name = request.POST.get('name')\n        img = request.FILES.get('preview_image')\n        obj, created = CelebrationTemplate.objects.get_or_create(template_id=tid)\n        obj.name = name\n        if img:\n            obj.preview_image = img\n        obj.save()",
+        "detail": "magic_wish.views",
+        "documentation": {}
+    },
+    {
+        "label": "admin_template_delete",
+        "kind": 2,
+        "importPath": "magic_wish.views",
+        "description": "magic_wish.views",
+        "peekOfCode": "def admin_template_delete(request, pk):\n    get_object_or_404(CelebrationTemplate, pk=pk).delete()\n    messages.warning(request, \"Template removed from database.\")\n    return redirect('admin_template_list')\n@staff_member_required\ndef admin_music_list(request):\n    for t_name in WISH_TYPES_LIST:\n        MusicCategory.objects.get_or_create(name=t_name)\n    if request.method == \"POST\":\n        form = MusicLibraryForm(request.POST, request.FILES)",
+        "detail": "magic_wish.views",
+        "documentation": {}
+    },
+    {
+        "label": "admin_music_list",
+        "kind": 2,
+        "importPath": "magic_wish.views",
+        "description": "magic_wish.views",
+        "peekOfCode": "def admin_music_list(request):\n    for t_name in WISH_TYPES_LIST:\n        MusicCategory.objects.get_or_create(name=t_name)\n    if request.method == \"POST\":\n        form = MusicLibraryForm(request.POST, request.FILES)\n        if form.is_valid():\n            form.save()\n            messages.success(request, \"New song added successfully!\")\n            return redirect('admin_music_list')\n    query = request.GET.get('q', '')",
+        "detail": "magic_wish.views",
+        "documentation": {}
+    },
+    {
+        "label": "admin_music_delete",
+        "kind": 2,
+        "importPath": "magic_wish.views",
+        "description": "magic_wish.views",
+        "peekOfCode": "def admin_music_delete(request, pk):\n    get_object_or_404(MusicLibrary, pk=pk).delete()\n    return redirect('admin_music_list')",
+        "detail": "magic_wish.views",
+        "documentation": {}
+    },
+    {
+        "label": "ALL_TEMPLATES_CONFIG",
+        "kind": 5,
+        "importPath": "magic_wish.views",
+        "description": "magic_wish.views",
+        "peekOfCode": "ALL_TEMPLATES_CONFIG = {\n    'heart_shape': {'id': 'heart_shape', 'name': 'Romantic Heart'},\n    'floating_photos': {'id': 'floating_photos', 'name': 'Floating Memories'},\n    'colorful_magic': {'id': 'colorful_magic', 'name': 'Color Blast'},\n    'balloon_parade': {'id': 'balloon_parade', 'name': 'Balloon Parade'},\n    'falling_leaves': {'id': 'falling_leaves', 'name': 'Autumn Whisper'},\n    'matrix_rain': {'id': 'matrix_rain', 'name': 'Matrix Digital'},\n    'snowy_winter': {'id': 'snowy_winter', 'name': 'Snowy Winter'},\n    'firework_show': {'id': 'firework_show', 'name': 'Firework Show'},\n    'sakura_bloom': {'id': 'sakura_bloom', 'name': 'Sakura Bloom'},",
+        "detail": "magic_wish.views",
+        "documentation": {}
+    },
+    {
+        "label": "WISH_TYPES_LIST",
+        "kind": 5,
+        "importPath": "magic_wish.views",
+        "description": "magic_wish.views",
+        "peekOfCode": "WISH_TYPES_LIST = [\n    'Birthday', 'Anniversary', 'Love', 'Sorry', \n    'Friendship', 'Good Luck', 'Graduation', 'Thank You', \n    'New Year', 'Miss You', 'Proposal', 'Festival'\n]\n#--- FRONTEND VIEWS ---#\ndef landing_page(request):\n    if request.method == \"POST\" and request.headers.get('x-requested-with') == 'XMLHttpRequest':\n        score = request.POST.get('score')\n        Rating.objects.create(score=int(score))",
+        "detail": "magic_wish.views",
+        "documentation": {}
+    },
+    {
+        "label": "application",
+        "kind": 5,
+        "importPath": "wish_generator.asgi",
+        "description": "wish_generator.asgi",
+        "peekOfCode": "application = get_asgi_application()",
+        "detail": "wish_generator.asgi",
+        "documentation": {}
+    },
+    {
+        "label": "common_types",
+        "kind": 2,
+        "importPath": "wish_generator.context_processors",
+        "description": "wish_generator.context_processors",
+        "peekOfCode": "def common_types(request):\n    return {\n        'types': [\n            'Birthday', 'Anniversary', 'Love', 'Sorry', \n            'Friendship', 'Good Luck', 'Graduation', 'Thank You', \n            'New Year', 'Miss You', 'Proposal', 'Festival'\n        ]\n    }",
+        "detail": "wish_generator.context_processors",
+        "documentation": {}
+    },
+    {
+        "label": "BASE_DIR",
+        "kind": 5,
+        "importPath": "wish_generator.settings",
+        "description": "wish_generator.settings",
+        "peekOfCode": "BASE_DIR = Path(__file__).resolve().parent.parent\nSECRET_KEY = 'django-insecure-pk69go7_xpdq9=91_3&1^h-anfd5+075*rioe0864ea3)so5h)'\nDEBUG = True\nALLOWED_HOSTS = ['*']\nCSRF_TRUSTED_ORIGINS = [\n    'https://elvin-nonsubjugable-unafflictedly.ngrok-free.dev',\n]\n# Application definition\nINSTALLED_APPS = [\n    'django.contrib.admin',",
+        "detail": "wish_generator.settings",
+        "documentation": {}
+    },
+    {
+        "label": "SECRET_KEY",
+        "kind": 5,
+        "importPath": "wish_generator.settings",
+        "description": "wish_generator.settings",
+        "peekOfCode": "SECRET_KEY = 'django-insecure-pk69go7_xpdq9=91_3&1^h-anfd5+075*rioe0864ea3)so5h)'\nDEBUG = True\nALLOWED_HOSTS = ['*']\nCSRF_TRUSTED_ORIGINS = [\n    'https://elvin-nonsubjugable-unafflictedly.ngrok-free.dev',\n]\n# Application definition\nINSTALLED_APPS = [\n    'django.contrib.admin',\n    'django.contrib.auth',",
+        "detail": "wish_generator.settings",
+        "documentation": {}
+    },
+    {
+        "label": "DEBUG",
+        "kind": 5,
+        "importPath": "wish_generator.settings",
+        "description": "wish_generator.settings",
+        "peekOfCode": "DEBUG = True\nALLOWED_HOSTS = ['*']\nCSRF_TRUSTED_ORIGINS = [\n    'https://elvin-nonsubjugable-unafflictedly.ngrok-free.dev',\n]\n# Application definition\nINSTALLED_APPS = [\n    'django.contrib.admin',\n    'django.contrib.auth',\n    'django.contrib.contenttypes',",
+        "detail": "wish_generator.settings",
+        "documentation": {}
+    },
+    {
+        "label": "ALLOWED_HOSTS",
+        "kind": 5,
+        "importPath": "wish_generator.settings",
+        "description": "wish_generator.settings",
+        "peekOfCode": "ALLOWED_HOSTS = ['*']\nCSRF_TRUSTED_ORIGINS = [\n    'https://elvin-nonsubjugable-unafflictedly.ngrok-free.dev',\n]\n# Application definition\nINSTALLED_APPS = [\n    'django.contrib.admin',\n    'django.contrib.auth',\n    'django.contrib.contenttypes',\n    'django.contrib.sessions',",
+        "detail": "wish_generator.settings",
+        "documentation": {}
+    },
+    {
+        "label": "CSRF_TRUSTED_ORIGINS",
+        "kind": 5,
+        "importPath": "wish_generator.settings",
+        "description": "wish_generator.settings",
+        "peekOfCode": "CSRF_TRUSTED_ORIGINS = [\n    'https://elvin-nonsubjugable-unafflictedly.ngrok-free.dev',\n]\n# Application definition\nINSTALLED_APPS = [\n    'django.contrib.admin',\n    'django.contrib.auth',\n    'django.contrib.contenttypes',\n    'django.contrib.sessions',\n    'django.contrib.messages',",
+        "detail": "wish_generator.settings",
+        "documentation": {}
+    },
+    {
+        "label": "INSTALLED_APPS",
+        "kind": 5,
+        "importPath": "wish_generator.settings",
+        "description": "wish_generator.settings",
+        "peekOfCode": "INSTALLED_APPS = [\n    'django.contrib.admin',\n    'django.contrib.auth',\n    'django.contrib.contenttypes',\n    'django.contrib.sessions',\n    'django.contrib.messages',\n    'django.contrib.staticfiles',\n    'accounts',\n    'magic_wish',\n    'magical_wishes',",
+        "detail": "wish_generator.settings",
+        "documentation": {}
+    },
+    {
+        "label": "MIDDLEWARE",
+        "kind": 5,
+        "importPath": "wish_generator.settings",
+        "description": "wish_generator.settings",
+        "peekOfCode": "MIDDLEWARE = [\n    'django.middleware.security.SecurityMiddleware',\n    'django.contrib.sessions.middleware.SessionMiddleware',\n    'django.middleware.common.CommonMiddleware',\n    'django.middleware.csrf.CsrfViewMiddleware',\n    'django.contrib.auth.middleware.AuthenticationMiddleware',\n    'django.contrib.messages.middleware.MessageMiddleware',\n    'django.middleware.clickjacking.XFrameOptionsMiddleware',\n    'whitenoise.middleware.WhiteNoiseMiddleware',\n]",
+        "detail": "wish_generator.settings",
+        "documentation": {}
+    },
+    {
+        "label": "ROOT_URLCONF",
+        "kind": 5,
+        "importPath": "wish_generator.settings",
+        "description": "wish_generator.settings",
+        "peekOfCode": "ROOT_URLCONF = 'wish_generator.urls'\nTEMPLATES = [\n    {\n        'BACKEND': 'django.template.backends.django.DjangoTemplates',\n        'DIRS': [BASE_DIR / 'templates'],\n        'APP_DIRS': True,\n        'OPTIONS': {\n            'context_processors': [\n                'django.template.context_processors.debug',\n                'django.template.context_processors.request',",
+        "detail": "wish_generator.settings",
+        "documentation": {}
+    },
+    {
+        "label": "TEMPLATES",
+        "kind": 5,
+        "importPath": "wish_generator.settings",
+        "description": "wish_generator.settings",
+        "peekOfCode": "TEMPLATES = [\n    {\n        'BACKEND': 'django.template.backends.django.DjangoTemplates',\n        'DIRS': [BASE_DIR / 'templates'],\n        'APP_DIRS': True,\n        'OPTIONS': {\n            'context_processors': [\n                'django.template.context_processors.debug',\n                'django.template.context_processors.request',\n                'django.contrib.auth.context_processors.auth',",
+        "detail": "wish_generator.settings",
+        "documentation": {}
+    },
+    {
+        "label": "WSGI_APPLICATION",
+        "kind": 5,
+        "importPath": "wish_generator.settings",
+        "description": "wish_generator.settings",
+        "peekOfCode": "WSGI_APPLICATION = 'wish_generator.wsgi.application'\n# Database\n# https://docs.djangoproject.com/en/5.1/ref/settings/#databases\nDATABASES = {\n    'default': {\n        'ENGINE': 'django.db.backends.sqlite3',\n        'NAME': BASE_DIR / 'db.sqlite3',\n    }\n}\n# Password validation",
+        "detail": "wish_generator.settings",
+        "documentation": {}
+    },
+    {
+        "label": "DATABASES",
+        "kind": 5,
+        "importPath": "wish_generator.settings",
+        "description": "wish_generator.settings",
+        "peekOfCode": "DATABASES = {\n    'default': {\n        'ENGINE': 'django.db.backends.sqlite3',\n        'NAME': BASE_DIR / 'db.sqlite3',\n    }\n}\n# Password validation\n# https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators\nAUTH_PASSWORD_VALIDATORS = [\n    {",
+        "detail": "wish_generator.settings",
+        "documentation": {}
+    },
+    {
+        "label": "AUTH_PASSWORD_VALIDATORS",
+        "kind": 5,
+        "importPath": "wish_generator.settings",
+        "description": "wish_generator.settings",
+        "peekOfCode": "AUTH_PASSWORD_VALIDATORS = [\n    {\n        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',\n    },\n    {\n        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',\n    },\n    {\n        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',\n    },",
+        "detail": "wish_generator.settings",
+        "documentation": {}
+    },
+    {
+        "label": "LANGUAGE_CODE",
+        "kind": 5,
+        "importPath": "wish_generator.settings",
+        "description": "wish_generator.settings",
+        "peekOfCode": "LANGUAGE_CODE = 'en-us'\nTIME_ZONE = 'UTC'\nUSE_I18N = True\nUSE_TZ = True\n# Static files (CSS, JavaScript, Images)\n# https://docs.djangoproject.com/en/5.1/howto/static-files/\nSTATIC_URL = 'static/'\n# Default primary key field type\n# https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field\nDEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'",
+        "detail": "wish_generator.settings",
+        "documentation": {}
+    },
+    {
+        "label": "TIME_ZONE",
+        "kind": 5,
+        "importPath": "wish_generator.settings",
+        "description": "wish_generator.settings",
+        "peekOfCode": "TIME_ZONE = 'UTC'\nUSE_I18N = True\nUSE_TZ = True\n# Static files (CSS, JavaScript, Images)\n# https://docs.djangoproject.com/en/5.1/howto/static-files/\nSTATIC_URL = 'static/'\n# Default primary key field type\n# https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field\nDEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'\nimport os",
+        "detail": "wish_generator.settings",
+        "documentation": {}
+    },
+    {
+        "label": "USE_I18N",
+        "kind": 5,
+        "importPath": "wish_generator.settings",
+        "description": "wish_generator.settings",
+        "peekOfCode": "USE_I18N = True\nUSE_TZ = True\n# Static files (CSS, JavaScript, Images)\n# https://docs.djangoproject.com/en/5.1/howto/static-files/\nSTATIC_URL = 'static/'\n# Default primary key field type\n# https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field\nDEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'\nimport os\nSTATIC_URL = 'static/'",
+        "detail": "wish_generator.settings",
+        "documentation": {}
+    },
+    {
+        "label": "USE_TZ",
+        "kind": 5,
+        "importPath": "wish_generator.settings",
+        "description": "wish_generator.settings",
+        "peekOfCode": "USE_TZ = True\n# Static files (CSS, JavaScript, Images)\n# https://docs.djangoproject.com/en/5.1/howto/static-files/\nSTATIC_URL = 'static/'\n# Default primary key field type\n# https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field\nDEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'\nimport os\nSTATIC_URL = 'static/'\nSTATICFILES_DIRS = [BASE_DIR / 'static']",
+        "detail": "wish_generator.settings",
+        "documentation": {}
+    },
+    {
+        "label": "STATIC_URL",
+        "kind": 5,
+        "importPath": "wish_generator.settings",
+        "description": "wish_generator.settings",
+        "peekOfCode": "STATIC_URL = 'static/'\n# Default primary key field type\n# https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field\nDEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'\nimport os\nSTATIC_URL = 'static/'\nSTATICFILES_DIRS = [BASE_DIR / 'static']\nMEDIA_URL = '/media/'\nMEDIA_ROOT = BASE_DIR / 'media'\nSTATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles') ",
+        "detail": "wish_generator.settings",
+        "documentation": {}
+    },
+    {
+        "label": "DEFAULT_AUTO_FIELD",
+        "kind": 5,
+        "importPath": "wish_generator.settings",
+        "description": "wish_generator.settings",
+        "peekOfCode": "DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'\nimport os\nSTATIC_URL = 'static/'\nSTATICFILES_DIRS = [BASE_DIR / 'static']\nMEDIA_URL = '/media/'\nMEDIA_ROOT = BASE_DIR / 'media'\nSTATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles') \nAUTH_USER_MODEL = 'accounts.CustomUser'",
+        "detail": "wish_generator.settings",
+        "documentation": {}
+    },
+    {
+        "label": "STATIC_URL",
+        "kind": 5,
+        "importPath": "wish_generator.settings",
+        "description": "wish_generator.settings",
+        "peekOfCode": "STATIC_URL = 'static/'\nSTATICFILES_DIRS = [BASE_DIR / 'static']\nMEDIA_URL = '/media/'\nMEDIA_ROOT = BASE_DIR / 'media'\nSTATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles') \nAUTH_USER_MODEL = 'accounts.CustomUser'",
+        "detail": "wish_generator.settings",
+        "documentation": {}
+    },
+    {
+        "label": "STATICFILES_DIRS",
+        "kind": 5,
+        "importPath": "wish_generator.settings",
+        "description": "wish_generator.settings",
+        "peekOfCode": "STATICFILES_DIRS = [BASE_DIR / 'static']\nMEDIA_URL = '/media/'\nMEDIA_ROOT = BASE_DIR / 'media'\nSTATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles') \nAUTH_USER_MODEL = 'accounts.CustomUser'",
+        "detail": "wish_generator.settings",
+        "documentation": {}
+    },
+    {
+        "label": "MEDIA_URL",
+        "kind": 5,
+        "importPath": "wish_generator.settings",
+        "description": "wish_generator.settings",
+        "peekOfCode": "MEDIA_URL = '/media/'\nMEDIA_ROOT = BASE_DIR / 'media'\nSTATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles') \nAUTH_USER_MODEL = 'accounts.CustomUser'",
+        "detail": "wish_generator.settings",
+        "documentation": {}
+    },
+    {
+        "label": "MEDIA_ROOT",
+        "kind": 5,
+        "importPath": "wish_generator.settings",
+        "description": "wish_generator.settings",
+        "peekOfCode": "MEDIA_ROOT = BASE_DIR / 'media'\nSTATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles') \nAUTH_USER_MODEL = 'accounts.CustomUser'",
+        "detail": "wish_generator.settings",
+        "documentation": {}
+    },
+    {
+        "label": "STATIC_ROOT",
+        "kind": 5,
+        "importPath": "wish_generator.settings",
+        "description": "wish_generator.settings",
+        "peekOfCode": "STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles') \nAUTH_USER_MODEL = 'accounts.CustomUser'",
+        "detail": "wish_generator.settings",
+        "documentation": {}
+    },
+    {
+        "label": "AUTH_USER_MODEL",
+        "kind": 5,
+        "importPath": "wish_generator.settings",
+        "description": "wish_generator.settings",
+        "peekOfCode": "AUTH_USER_MODEL = 'accounts.CustomUser'",
+        "detail": "wish_generator.settings",
+        "documentation": {}
+    },
+    {
+        "label": "urlpatterns",
+        "kind": 5,
+        "importPath": "wish_generator.urls",
+        "description": "wish_generator.urls",
+        "peekOfCode": "urlpatterns = [\n    path('admin/', admin.site.urls),\n    path('', include('accounts.urls')),\n    path('', include('magic_wish.urls')),\n    path('magic/', include('magical_wishes.urls')),\n    path('birthday/', include('birthdaywish.urls')),\n]\nif settings.DEBUG:\n    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)\n    urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)",
+        "detail": "wish_generator.urls",
+        "documentation": {}
+    },
+    {
+        "label": "application",
+        "kind": 5,
+        "importPath": "wish_generator.wsgi",
+        "description": "wish_generator.wsgi",
+        "peekOfCode": "application = get_wsgi_application()",
+        "detail": "wish_generator.wsgi",
+        "documentation": {}
+    },
+    {
+        "label": "main",
+        "kind": 2,
+        "importPath": "manage",
+        "description": "manage",
+        "peekOfCode": "def main():\n    \"\"\"Run administrative tasks.\"\"\"\n    os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'wish_generator.settings')\n    try:\n        from django.core.management import execute_from_command_line\n    except ImportError as exc:\n        raise ImportError(\n            \"Couldn't import Django. Are you sure it's installed and \"\n            \"available on your PYTHONPATH environment variable? Did you \"\n            \"forget to activate a virtual environment?\"",
+        "detail": "manage",
+        "documentation": {}
+    }
+]

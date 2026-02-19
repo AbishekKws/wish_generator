@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <title>A Special Surprise for {{ wish.receiver_name }}! ✨</title>
+    <meta name="description" content="{{ wish.sender_name }} has sent you a magical {{ wish.wish_type }} surprise. Click to unlock the magic!">
+    
+    <meta property="og:title" content="A Special Surprise for {{ wish.receiver_name }}! ✨">
+    <meta property="og:description" content="Open the link to see a magical surprise from {{ wish.sender_name }}.">
+    <meta property="og:url" content="{{ request.build_absolute_uri }}">
+    
+    {% if wish.images.exists %}
+    <meta property="og:image" content="{{ request.scheme }}://{{ request.get_host }}{{ wish.images.first.image.url }}">
+    {% endif %}
+    
+    <meta property="og:type" content="website">
+    <title>Cyber Glitch | {{ wish.receiver_name }}</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Major+Mono+Display&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            {% if wish.wish_type|lower == 'friendship' %}
+                --g-red: #00ff00; --g-cyan: #ffff00;
+            {% elif wish.wish_type|lower == 'birthday' %}
+                --g-red: #ff00ff; --g-cyan: #00ffff;
+            {% else %}
+                --g-red: #ff0000; --g-cyan: #00ffff;
+            {% endif %}
+            --bg: #050505;
+        }
+
+        body, html { 
+            margin: 0; padding: 0; background: var(--bg);
+            color: #fff; overflow: hidden; font-family: 'Share Tech Mono', monospace;
+            height: 100vh; width: 100vw;
+        }
+
+        /* NEW: Digital Celebration Particles */
+        .cyber-particle {
+            position: absolute; width: 2px; height: 15px;
+            background: var(--g-cyan); opacity: 0.5;
+            pointer-events: none; z-index: 5;
+        }
+
+        .noise-bg {
+            position: fixed; inset: 0;
+            background: url('https://media.giphy.com/media/oEI9uWUic9ZIs/giphy.gif');
+            opacity: 0.03; z-index: -1; pointer-events: none;
+        }
+
+        .glitch {
+            position: relative;
+            font-family: 'Major Mono Display', monospace;
+            font-size: clamp(2.5rem, 8vw, 5rem);
+            text-transform: lowercase; line-height: 1;
+        }
+
+        .glitch::before, .glitch::after {
+            content: attr(data-text);
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+        }
+
+        .glitch::before {
+            left: 2px; text-shadow: -2px 0 var(--g-red);
+            clip: rect(44px, 450px, 56px, 0);
+            animation: glitch-anim-2 3s infinite linear alternate-reverse;
+        }
+
+        .glitch::after {
+            left: -2px; text-shadow: -2px 0 var(--g-cyan);
+            clip: rect(100px, 450px, 120px, 0);
+            animation: glitch-anim-3 2s infinite linear alternate-reverse;
+        }
+
+        @keyframes glitch-anim-2 {
+            0% { clip: rect(10px, 9999px, 20px, 0); transform: translateX(-2px); }
+            100% { clip: rect(80px, 9999px, 90px, 0); transform: translateX(2px); }
+        }
+
+        .photo-container {
+            display: flex; gap: 1rem; justify-content: center;
+            width: 100%; overflow-x: auto; padding: 10px;
+            scrollbar-width: none; z-index: 10;
+        }
+        .photo-container::-webkit-scrollbar { display: none; }
+
+        .distorted-card {
+            flex: 0 0 auto; position: relative;
+            width: 140px; height: 180px;
+            background: #111; padding: 3px; border: 1px solid #333;
+            opacity: 0; filter: grayscale(1); transition: 0.3s;
+        }
+        @media (min-width: 768px) { .distorted-card { width: 200px; height: 260px; } }
+
+        .distorted-card:hover {
+            filter: grayscale(0); border-color: var(--g-cyan);
+            box-shadow: 4px 0 var(--g-red), -4px 0 var(--g-cyan);
+            transform: translateY(-5px) skewX(-2deg);
+        }
+
+        .distorted-card img { width: 100%; height: 100%; object-fit: cover; }
+
+        .scanline {
+            width: 100%; height: 100px;
+            background: linear-gradient(0deg, rgba(0,255,255,0.05) 0%, transparent 100%);
+            position: fixed; bottom: 100%; left: 0;
+            animation: scan 3s linear infinite; z-index: 100; pointer-events: none;
+        }
+        @keyframes scan { 0% { bottom: 100%; } 100% { bottom: -100px; } }
+
+        .btn-glitch {
+            background: white; color: black;
+            padding: 0.8rem 2.5rem; font-weight: bold;
+            border: none; position: relative; cursor: pointer;
+        }
+        .btn-glitch::after {
+            content: "DECRYPT"; position: absolute; top: 4px; left: 4px;
+            width: 100%; height: 100%; background: var(--g-cyan);
+            z-index: -1; transition: 0.2s;
+        }
+    </style>
+</head>
+<body>
+
+    {% if wish.custom_music or wish.selected_music %}
+        <audio id="bgMusic" src="{% if wish.custom_music %}{{ wish.custom_music.url }}{% else %}{{ wish.selected_music.audio_file.url }}{% endif %}" loop></audio>
+    {% endif %}
+
+    <div class="noise-bg"></div>
+    <div class="scanline"></div>
+    <div id="particle-canvas" class="fixed inset-0 pointer-events-none"></div>
+
+    <div id="overlay" class="fixed inset-0 z-[500] flex items-center justify-center bg-black">
+        <div class="text-center">
+            <div class="mb-6 text-[10px] tracking-[0.8em] text-gray-500 uppercase">Click_{{ wish.wish_type|upper }}_WISH</div>
+            <button id="glitchBtn" onclick="startGlitch()" class="btn-glitch uppercase tracking-widest">OPEN SURPRISE</button>
+        </div>
+    </div>
+
+    <main id="scene" class="hidden h-screen flex flex-col items-center justify-between py-12 px-4 overflow-hidden">
+        
+        <div class="text-center z-20">
+            <div class="text-[9px] tracking-[0.5em] mb-2" style="color: var(--g-cyan)">
+                {% if wish.wish_type|lower == 'friendship' %} BEST_FRIENDS_FOREVER
+                {% elif wish.wish_type|lower == 'birthday' %} // SYSTEM_UPDATE: AGE++
+                {% else %} // PROTOCOL: SECURE_WISH {% endif %}
+            </div>
+
+            <h1 id="receiver-name" class="glitch" data-text="{{ wish.receiver_name }}">
+                {{ wish.receiver_name }}
+            </h1>
+
+            <p id="message-text" class="text-sm md:text-xl text-gray-400 max-w-lg mt-6 font-mono">
+                {{ wish.message }}
+            </p>
+        </div>
+
+        <div class="photo-container">
+            {% for img_obj in wish.images.all %}
+            <div class="distorted-card">
+                <img src="{{ img_obj.image.url }}" alt="Memory">
+                <div class="absolute bottom-1 right-1 text-[7px] text-white bg-red-600 px-1">DATA_0{{ forloop.counter }}</div>
+            </div>
+            {% endfor %}
+        </div>
+
+        <footer class="w-full flex flex-col items-center gap-2 z-20">
+            <div class="flex gap-4 font-mono text-[9px] text-gray-600">
+                <span>FROM : {{ wish.sender_name }}</span>
+                <span class="text-gray-800">|</span>
+                <span>{{ wish.wish_type|upper }}</span>
+            </div>
+            <a href="{% url 'home' %}" class="text-[8px] tracking-[0.5em] text-gray-700 hover:text-white transition-colors uppercase">
+                Created_By_SurpriseMe
+            </a>
+        </footer>
+    </main>
+
+    <script>
+        function createParticles() {
+            const container = document.getElementById('particle-canvas');
+            const colors = [getComputedStyle(document.documentElement).getPropertyValue('--g-cyan'), 
+                           getComputedStyle(document.documentElement).getPropertyValue('--g-red'), 
+                           '#ffffff'];
+            
+            for (let i = 0; i < 50; i++) {
+                const p = document.createElement('div');
+                p.className = 'cyber-particle';
+                p.style.left = Math.random() * 100 + 'vw';
+                p.style.top = -20 + 'px';
+                p.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                container.appendChild(p);
+
+                gsap.to(p, {
+                    y: window.innerHeight + 50,
+                    duration: Math.random() * 2 + 1,
+                    delay: Math.random() * 3,
+                    repeat: -1,
+                    ease: "none",
+                    opacity: Math.random()
+                });
+            }
+        }
+
+        function startGlitch() {
+            const music = document.getElementById('bgMusic');
+            if(music) music.play().catch(e => {});
+
+            gsap.to("body", { backgroundColor: "#fff", duration: 0.05, repeat: 3, yoyo: true });
+            
+            setTimeout(() => {
+                document.getElementById('overlay').style.display = 'none';
+                document.getElementById('scene').classList.remove('hidden');
+                createParticles();
+
+                gsap.to(".distorted-card", { 
+                    opacity: 1, duration: 0.1, stagger: 0.1,
+                    onComplete: () => {
+                        gsap.to(".distorted-card", { filter: "grayscale(0.6)", duration: 1 });
+                    }
+                });
+
+                setInterval(() => {
+                    gsap.to("#message-text", { x: Math.random() * 2 - 1, duration: 0.1 });
+                }, 150);
+
+            }, 400);
+        }
+
+        document.addEventListener('mousemove', (e) => {
+            const x = (window.innerWidth / 2 - e.pageX) / 40;
+            const y = (window.innerHeight / 2 - e.pageY) / 40;
+            gsap.to(".glitch", { x: x, y: y, duration: 1 });
+        });
+    </script>
+</body>
+</html>

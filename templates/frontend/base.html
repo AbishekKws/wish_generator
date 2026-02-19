@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <title>{% block title %}Surprise Me | Create Magical Digital Wishes & Surprises{% endblock %}</title>
+    <meta name="description" content="{% block meta_description %}Create and send magical, interactive digital surprises for birthdays, anniversaries, and special moments. The most unique way to wish your loved ones.{% endblock %}">
+    <meta name="keywords" content="digital surprise, birthday wish, interactive cards, magical wishes, surprise me, online gift, personalized greetings">
+    <meta name="author" content="Abishek Khawas">
+    <meta name="robots" content="index, follow">
+
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="{{ request.build_absolute_uri }}">
+    <meta property="og:title" content="{% block og_title %}Surprise Me - Send Magic in a Link ✨{% endblock %}">
+    <meta property="og:description" content="{% block og_description %}I have a special surprise for you! Click the link to unlock the magic. Created with Surprise Me.{% endblock %}">
+    <meta property="og:image" content="{% block og_image %}https://{{ request.get_host }}/static/images/default-share-banner.jpg{% endblock %}">
+
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:url" content="{{ request.build_absolute_uri }}">
+    <meta property="twitter:title" content="{% block twitter_title %}Surprise Me - Send Magic in a Link ✨{% endblock %}">
+    <meta property="twitter:description" content="{% block twitter_description %}Create interactive digital surprises for your loved ones instantly.{% endblock %}">
+    <meta property="twitter:image" content="{% block twitter_image %}https://{{ request.get_host }}/static/images/default-share-banner.jpg{% endblock %}">
+
+    <link rel="canonical" href="{{ request.build_absolute_uri }}">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebApplication",
+      "name": "Surprise Me",
+      "url": "https://{{ request.get_host }}",
+      "description": "A platform to create and send interactive digital surprises.",
+      "applicationCategory": "EntertainmentApplication",
+      "operatingSystem": "All",
+      "author": {
+        "@type": "Person",
+        "name": "Abishek Khawas"
+      }
+    }
+    </script>
+
+    {% block extra_head %}{% endblock %}
+</head>
+<body class="bg-slate-900 text-white min-h-screen flex flex-col">
+
+    <nav class="bg-slate-800/50 backdrop-blur-md border-b border-white/10 sticky top-0 z-[100]">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex-shrink-0 flex items-center gap-2">
+                    <span class="text-2xl">✨</span>
+                    <a href="/" class="text-xl font-black bg-clip-text text-transparent bg-gradient-to-r from-pink-500 to-yellow-500">
+                        SURPRISE ME
+                    </a>
+                </div>
+
+                <div class="hidden md:flex space-x-8 items-center">
+                    <a href="{% url 'home' %}" class="hover:text-pink-500 transition">Home</a>
+                    
+                    <div class="relative group">
+                        <button class="flex items-center gap-1 hover:text-pink-500 py-4 transition-colors">
+                            🎁 Quick Wish <i class="fas fa-chevron-down text-[10px] ml-1"></i>
+                        </button>
+                        
+                        <div class="absolute hidden group-hover:block w-64 bg-slate-900 border border-white/10 rounded-2xl shadow-2xl p-2 top-full z-50">
+                            <div class="grid grid-cols-1 gap-1">
+                                {% for type in types|slice:":8" %}
+                                <a href="{% url 'select_template' type|lower %}" class="flex items-center gap-3 p-3 hover:bg-pink-600/20 hover:text-pink-400 rounded-xl transition-all group/item">
+                                    <span class="text-xl group-hover/item:scale-110 transition-transform">
+                                        {% if type == 'Birthday' %}🎂
+                                        {% elif type == 'Anniversary' %}💑
+                                        {% elif type == 'Love' %}💖
+                                        {% elif type == 'Sorry' %}🙏
+                                        {% elif type == 'Friendship' %}🤝
+                                        {% elif type == 'Good Luck' %}🍀
+                                        {% elif type == 'Graduation' %}🎓
+                                        {% elif type == 'Thank You' %}💐
+                                        {% else %}✨{% endif %}
+                                    </span>
+                                    <span class="text-sm font-medium">{{ type }}</span>
+                                </a>
+                                {% endfor %}
+                            </div>
+                            <div class="mt-2 pt-2 border-t border-white/5">
+                                <a href="{% url 'select_type' %}" class="flex items-center justify-between px-4 py-3 bg-white/5 hover:bg-white/10 rounded-xl transition-all group/all">
+                                    <span class="text-[11px] font-bold uppercase tracking-widest text-gray-400 group-hover/all:text-white">View All Categories</span>
+                                    <i class="fas fa-arrow-right text-[10px] text-pink-500 group-hover/all:translate-x-1 transition-transform"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="relative group">
+                        <button class="relative flex items-center gap-2 py-4 hover:text-pink-400 transition-colors">
+                            <span class="flex h-2 w-2">
+                                <span class="animate-ping absolute inline-flex h-2 w-2 rounded-full bg-pink-400 opacity-75"></span>
+                                <span class="relative inline-flex rounded-full h-2 w-2 bg-pink-500"></span>
+                            </span>
+                            <span class="font-semibold text-sm">Magic Wish ✨</span>
+                            <i class="fas fa-chevron-down text-[10px] ml-1 group-hover:rotate-180 transition-transform"></i>
+                        </button>
+
+                        <div class="absolute hidden group-hover:block w-56 bg-slate-900 border border-white/10 rounded-2xl shadow-2xl p-2 top-full right-0 z-50">
+                            <div class="grid grid-cols-1 gap-1">
+                                <a href="{% url 'create_wish' %}" class="flex items-center gap-3 p-3 hover:bg-pink-600/20 hover:text-pink-400 rounded-xl transition-all group/sub">
+                                    <div class="w-8 h-8 rounded-lg bg-pink-500/10 flex items-center justify-center group-hover/sub:bg-pink-500/20">
+                                        <i class="fas fa-plus text-sm"></i>
+                                    </div>
+                                    <div>
+                                        <p class="text-sm font-bold">Master Magic Wish</p>
+                                        <p class="text-[10px] text-gray-500 leading-none">For Everyone!</p>
+                                    </div>
+                                </a>
+                                <a href="{% url 'birthday:create_wish' %}" class="flex items-center gap-3 p-3 hover:bg-purple-600/20 hover:text-purple-400 rounded-xl transition-all group/sub">
+                                    <div class="w-8 h-8 rounded-lg bg-purple-500/10 flex items-center justify-center group-hover/sub:bg-purple-500/20">
+                                        <i class="fas fa-bolt text-sm"></i>
+                                    </div>
+                                    <div>
+                                        <p class="text-sm font-bold">Lover's Special Wish</p>
+                                        <p class="text-[10px] text-gray-500 leading-none">Only for GF / BF ❤️</p>
+                                    </div>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="md:hidden">
+                    <button id="mobile-menu-button" class="text-gray-300 hover:text-white focus:outline-none p-2" aria-label="Toggle menu">
+                        <i class="fa-solid fa-bars text-2xl"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div id="mobile-menu" class="hidden md:hidden bg-slate-900 border-b border-white/10 px-4 pt-2 pb-6 space-y-4">
+            <a href="{% url 'home' %}" class="block py-3 px-4 hover:bg-white/5 rounded-lg transition">Home</a>
+            
+            <div class="py-2 px-4 text-gray-400 font-bold text-xs uppercase tracking-widest border-t border-white/5 mt-2">🎁 Quick Wish</div>
+            <div class="grid grid-cols-2 gap-2">
+                {% if types %}
+                    {% for type in types|slice:":8" %}
+                    <a href="{% url 'select_template' type|lower %}" class="flex items-center gap-2 p-3 bg-white/5 rounded-xl text-sm">
+                        <span>{% if type == 'Birthday' %}🎂{% elif type == 'Love' %}💖{% else %}✨{% endif %}</span>
+                        {{ type }}
+                    </a>
+                    {% endfor %}
+                {% endif %}
+            </div>
+
+            <div class="space-y-2 pt-4 border-t border-white/5">
+                <a href="{% url 'select_type' %}" class="block py-3 px-4 text-pink-500 font-bold text-center border border-pink-500/30 rounded-xl hover:bg-pink-500/10 transition text-sm">
+                    View All Categories
+                </a>
+
+                <a href="{% url 'create_wish' %}" class="flex items-center justify-between py-3 px-4 bg-slate-800/50 border border-white/10 rounded-xl text-white">
+                    <div class="flex items-center gap-3">
+                        <i class="fas fa-wand-magic-sparkles text-pink-400"></i>
+                        <span class="font-bold text-sm">Master Magic Wish</span>
+                    </div>
+                    <span class="text-[9px] bg-pink-500/20 text-pink-400 px-2 py-0.5 rounded-full">Everyone</span>
+                </a>
+
+                <a href="{% url 'birthday:create_wish' %}" class="flex items-center justify-between py-3 px-4 bg-slate-800/50 border border-white/10 rounded-xl text-white">
+                    <div class="flex items-center gap-3">
+                        <span class="relative flex h-2 w-2">
+                            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+                            <span class="relative inline-flex rounded-full h-2 w-2 bg-red-500"></span>
+                        </span>
+                        <span class="font-bold text-sm text-red-400">Lover's Special Wish</span>
+                    </div>
+                    <i class="fas fa-heart text-red-500 text-xs"></i>
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <main class="flex-grow">
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer class="relative bg-slate-950 border-t border-white/5 pt-16 pb-10 overflow-hidden">
+        <div class="max-w-7xl mx-auto px-4 relative z-10 text-center md:text-left">
+             <div class="flex flex-col items-center mb-8">
+                <div class="flex items-center gap-2 mb-4 group cursor-default">
+                    <i class="fas fa-wand-magic-sparkles text-2xl text-pink-500"></i>
+                    <span class="text-xl font-black text-white">SURPRISE<span class="text-pink-500">ME</span></span>
+                </div>
+                <p class="text-gray-500 text-xs md:text-sm max-w-sm text-center">Making the world a bit more magical, one surprise at a time. ✨</p>
+            </div>
+            <div class="pt-8 border-t border-white/5 flex flex-col md:flex-row items-center justify-between gap-4">
+                <p class="text-[10px] md:text-xs text-gray-500 uppercase tracking-widest font-medium">
+                 Copyright &copy; <span id="current-year"></span> <span class="text-white">Surprise Me</span>. All Rights Reserved.
+                </p>
+                <p class="text-[10px] md:text-xs text-gray-500 flex items-center gap-1.5">
+                    <span>Designed & Developed by</span>
+                    <a href="https://www.abishekkhawas.com.np" target="_blank" class="text-gray-300 hover:text-white font-black">Abishek Khawas</a>
+                </p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        const btn = document.getElementById('mobile-menu-button');
+        const menu = document.getElementById('mobile-menu');
+        btn.addEventListener('click', (e) => { 
+            e.stopPropagation();
+            menu.classList.toggle('hidden'); 
+        });
+        window.addEventListener('click', (e) => {
+            if (!menu.contains(e.target) && !btn.contains(e.target)) {
+                menu.classList.add('hidden');
+            }
+        });
+        document.getElementById('current-year').textContent = new Date().getFullYear();
+    </script>
+
+    {% block scripts %}{% endblock %}
+</body>
+</html>

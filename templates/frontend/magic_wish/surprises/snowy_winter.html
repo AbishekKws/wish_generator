@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <title>A Special Surprise for {{ wish.receiver_name }}! ✨</title>
+    <meta name="description" content="{{ wish.sender_name }} has sent you a magical {{ wish.wish_type }} surprise. Click to unlock the magic!">
+    
+    <meta property="og:title" content="A Special Surprise for {{ wish.receiver_name }}! ✨">
+    <meta property="og:description" content="Open the link to see a magical surprise from {{ wish.sender_name }}.">
+    <meta property="og:url" content="{{ request.build_absolute_uri }}">
+    
+    {% if wish.images.exists %}
+    <meta property="og:image" content="{{ request.scheme }}://{{ request.get_host }}{{ wish.images.first.image.url }}">
+    {% endif %}
+    
+    <meta property="og:type" content="website">
+    <title>Winter Serenade | {{ wish.receiver_name }}</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=Quicksand:wght@300;500&family=Great+Vibes&display=swap" rel="stylesheet">
+    
+    <style>
+        :root { --ice-blue: #e0f7fa; --deep-frost: #002b36; --snow-white: #ffffff; }
+        
+        body, html { 
+            margin: 0; padding: 0; background: #001219; 
+            color: var(--ice-blue); overflow: hidden; 
+            font-family: 'Quicksand', sans-serif; height: 100vh; width: 100vw;
+        }
+
+        .arctic-bg { position: fixed; inset: 0; background: linear-gradient(to bottom, #001219 0%, #003d4d 100%); z-index: -1; }
+        .frost-overlay { position: fixed; inset: 0; background: url('https://www.transparenttextures.com/patterns/pave.png'); opacity: 0.1; pointer-events: none; z-index: 1; }
+        #snow-canvas { position: fixed; inset: 0; z-index: 15; pointer-events: none; }
+
+        .snow-floor {
+            position: fixed; bottom: 0; left: 0; width: 100%; height: 15vh;
+            background: linear-gradient(to top, rgba(255,255,255,0.7) 0%, rgba(255,255,255,0) 100%);
+            z-index: 20; pointer-events: none; filter: blur(12px);
+        }
+
+        /* GIANT SNOWBALL MESSAGE BOX */
+        .frozen-card { 
+            background: rgba(255, 255, 255, 0.08); 
+            backdrop-filter: blur(18px); 
+            border: 2px solid rgba(255, 255, 255, 0.3); 
+            border-radius: 50%; 
+            box-shadow: 
+                0 0 60px rgba(255, 255, 255, 0.15), 
+                inset 0 0 50px rgba(255, 255, 255, 0.3),
+                inset 20px -20px 60px rgba(0, 0, 0, 0.2); 
+            
+            width: clamp(340px, 90vw, 520px);
+            height: clamp(340px, 90vw, 520px);
+            
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 3.5rem;
+            text-align: center; 
+            position: relative; 
+            z-index: 100; 
+        }
+
+        .winter-title { 
+            font-family: 'Cinzel', serif; 
+            color: var(--snow-white); 
+            text-shadow: 0 0 15px rgba(255, 255, 255, 0.4); 
+            letter-spacing: 1px;
+            font-size: clamp(1.2rem, 5vw, 1.8rem);
+            line-height: 1.2;
+        }
+
+        #message-text { 
+            font-family: 'Great Vibes', cursive; 
+            font-size: clamp(1.8rem, 7vw, 2.6rem); 
+            color: var(--ice-blue); 
+            line-height: 1.1;
+            margin: 0.8rem 0;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.3);
+        }
+
+        /* FALLING PHOTO SNOWBALLS */
+        .ice-frame { 
+            position: absolute;
+            width: 130px; height: 130px; 
+            background: white; 
+            border-radius: 50%; 
+            padding: 5px; 
+            box-shadow: 0 0 25px rgba(255,255,255,0.7); 
+            border: 4px solid white; 
+            opacity: 0; 
+            z-index: 50;
+            pointer-events: none;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .ice-frame img { 
+            width: 100%; height: 100%; 
+            object-fit: cover; 
+            border-radius: 50%; 
+        }
+
+        .btn-freeze { 
+            background: white; color: var(--deep-frost); 
+            padding: 1.2rem 3rem; border-radius: 60px; 
+            font-weight: bold; letter-spacing: 4px; 
+            box-shadow: 0 0 30px rgba(255, 255, 255, 0.4);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+    <audio id="bg-music" loop>
+        {% if wish.custom_music or wish.selected_music %}
+            <source src="{% if wish.custom_music %}{{ wish.custom_music.url }}{% else %}{{ wish.selected_music.audio_file.url }}{% endif %}" type="audio/mpeg">
+        {% endif %}
+    </audio>
+
+    <div class="arctic-bg"></div>
+    <div class="frost-overlay"></div>
+    <div class="snow-floor"></div>
+    <canvas id="snow-canvas"></canvas>
+
+    <div id="overlay" class="fixed inset-0 z-[500] flex items-center justify-center bg-[#001219]">
+        <div class="text-center px-4">
+            <div class="mb-8 text-8xl animate-bounce">❄️</div>
+            <button id="freezeBtn" class="btn-freeze uppercase">Open Surprise</button>
+            <p class="mt-6 text-[10px] tracking-[0.4em] text-cyan-200/50 uppercase">From {{ wish.sender_name }}</p>
+        </div>
+    </div>
+
+    <div id="floating-images" class="fixed inset-0 pointer-events-none overflow-hidden">
+        {% for img_obj in wish.images.all %}
+        <div class="ice-frame">
+            <img src="{{ img_obj.image.url }}">
+        </div>
+        {% endfor %}
+    </div>
+
+    <main id="scene" class="hidden h-screen w-screen flex items-center justify-center p-6">
+        <div class="frozen-card">
+
+            <h1 class="winter-title">
+                {% if wish.wish_type|lower == 'sorry' %}
+                    Truly Sorry from Heart,<br>{{ wish.receiver_name|upper }}
+                {% elif wish.wish_type|lower == 'love' %}
+                    MY WINTER LOVE 💓,<br>{{ wish.receiver_name|upper }}
+                {% elif wish.wish_type|lower == 'miss you' %}
+                    MISSING YOU A LOT 🥲<br>{{ wish.receiver_name|upper }}
+                {% else %}
+                    DEAR<br>{{ wish.receiver_name|upper }}
+                {% endif %}
+            </h1>
+
+            <p id="message-text"></p>
+            
+            <div class="mt-4 flex justify-center items-center gap-4 opacity-40">
+                <div class="h-[1px] w-8 bg-white"></div>
+                <span class="text-[10px] tracking-[0.4em] text-white uppercase">{{ wish.sender_name }}</span>
+                <div class="h-[1px] w-8 bg-white"></div>
+            </div>
+        </div>
+
+        <footer class="absolute bottom-6 w-full flex justify-center opacity-40 z-[110]">
+            <a href="{% url 'home' %}" class="flex flex-col items-center gap-1 group pointer-events-auto">
+                <span class="text-[7px] tracking-[0.3em] uppercase text-white">Crafted by</span>
+                <span class="text-[10px] font-black tracking-widest text-cyan-200">SURPRISE ME</span>
+            </a>
+        </footer>
+    </main>
+
+    <script>
+        const canvas = document.getElementById('snow-canvas');
+        const ctx = canvas.getContext('2d');
+        let snowFlakes = [];
+
+        function resize() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+        window.addEventListener('resize', resize); resize();
+
+        class Snowflake {
+            constructor() { this.reset(); this.y = Math.random() * canvas.height; }
+            reset() { this.x = Math.random() * canvas.width; this.y = -20; this.size = Math.random() * 3 + 1; this.speed = Math.random() * 1.5 + 0.5; this.velX = Math.random() * 0.6 - 0.3; }
+            draw() { ctx.beginPath(); ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2); ctx.fillStyle = "rgba(255, 255, 255, 0.8)"; ctx.fill(); }
+            update() { this.y += this.speed; this.x += this.velX; if (this.y > canvas.height) this.reset(); }
+        }
+
+        document.getElementById('freezeBtn').addEventListener('click', () => {
+            // 1. Music Initiation
+            const music = document.getElementById('bg-music');
+            if (music) {
+                music.volume = 0;
+                music.play().catch(e => console.log("Audio blocked"));
+                gsap.to(music, { volume: 0.5, duration: 4 });
+            }
+
+            // 2. Transition Logic
+            gsap.to("#overlay", { opacity: 0, duration: 1, onComplete: () => {
+                document.getElementById('overlay').style.display = 'none';
+                document.getElementById('scene').classList.remove('hidden');
+                document.getElementById('message-text').innerText = "{{ wish.message|escapejs }}";
+
+                // Entrance Animation
+                gsap.from(".frozen-card", { scale: 0.5, opacity: 0, duration: 2, ease: "elastic.out(1, 0.75)" });
+
+                // Falling Snowball Images
+                const frames = document.querySelectorAll('.ice-frame');
+                frames.forEach((f, i) => {
+                    function startFalling() {
+                        const startX = Math.random() * (window.innerWidth - 130);
+                        const duration = 12 + Math.random() * 10;
+                        gsap.set(f, { x: startX, y: -200, opacity: 0, scale: 0.7 });
+                        gsap.to(f, {
+                            y: window.innerHeight + 200,
+                            x: startX + (Math.random() * 200 - 100),
+                            rotation: Math.random() * 360,
+                            opacity: 0.8,
+                            duration: duration,
+                            ease: "none",
+                            onComplete: startFalling
+                        });
+                    }
+                    setTimeout(startFalling, i * 4000);
+                });
+
+                // Snow Animation Start
+                for (let i = 0; i < 100; i++) snowFlakes.push(new Snowflake());
+                function animate() { 
+                    ctx.clearRect(0, 0, canvas.width, canvas.height); 
+                    snowFlakes.forEach(s => { s.update(); s.draw(); }); 
+                    requestAnimationFrame(animate); 
+                }
+                animate();
+            }});
+        });
+
+        // Parallax Interaction
+        document.addEventListener('mousemove', (e) => {
+            if(document.getElementById('scene').classList.contains('hidden')) return;
+            const x = (window.innerWidth / 2 - e.pageX) / 40;
+            const y = (window.innerHeight / 2 - e.pageY) / 40;
+            gsap.to(".frozen-card", { x: x, y: y, duration: 2 });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,134 @@
+{% extends 'frontend/base.html' %}
+{% load static %}
+
+{% block title %}Select {{ wish_type|title }} Template | Surprise Me{% endblock %}
+
+{% block content %}
+<div class="max-w-6xl mx-auto px-5 py-4 md:py-8 min-h-screen">
+    
+    <div class="mb-8 md:mb-12">
+        <div class="inline-block mb-6">
+            <a href="{% url 'select_type' %}" class="group relative px-5 py-2.5 flex items-center justify-center bg-white/5 backdrop-blur-md border border-white/10 rounded-full transition-all duration-300 active:scale-95 hover:border-pink-500/50 hover:bg-pink-500/5 shadow-[0_5px_15px_rgba(0,0,0,0.2)]">
+                <div class="absolute inset-0 rounded-full bg-gradient-to-r from-pink-600 to-violet-600 blur-md opacity-0 group-hover:opacity-20 transition-opacity duration-300"></div>
+                <div class="relative flex items-center gap-3">
+                    <div class="flex items-center justify-center w-7 h-7 rounded-full bg-gradient-to-tr from-pink-600 to-violet-600 shadow-[0_2px_10px_rgba(236,72,153,0.4)] group-hover:rotate-[-360deg] transition-transform duration-500">
+                        <i class="fas fa-chevron-left text-[10px] text-white"></i>
+                    </div>
+                    <span class="text-[10px] md:text-xs font-black text-gray-300 uppercase tracking-[0.2em] group-hover:text-pink-400 transition-colors">Go Back</span>
+                </div>
+            </a>
+        </div>
+        
+        <h1 class="text-4xl md:text-6xl font-black mt-2 capitalize leading-tight tracking-tight text-white">
+            {{ wish_type }} <span class="bg-gradient-to-r from-pink-500 to-violet-500 bg-clip-text text-transparent">Templates</span>
+        </h1>
+        
+        <div class="flex items-center gap-3 mt-3">
+            <div class="h-[2px] w-12 bg-pink-500 rounded-full"></div>
+            <p class="text-gray-400 text-sm md:text-base font-medium">Select an animation style for your surprise.</p>
+        </div>
+    </div>
+
+    <div id="imageModal" class="fixed inset-0 z-[999] hidden bg-black/95 backdrop-blur-xl flex items-center justify-center p-4 transition-all duration-300 opacity-0" onclick="closeModal()">
+        <div class="relative max-w-5xl w-full h-full flex flex-col items-center justify-center transform scale-90 transition-transform duration-300" id="modalContainer">
+            <button class="absolute top-0 right-0 md:-top-12 md:-right-4 text-white text-5xl hover:text-pink-500 transition-colors z-[1000]" onclick="closeModal()">&times;</button>
+            
+            <div class="w-full h-[80vh] flex items-center justify-center">
+                <img id="modalImg" src="" class="max-w-full max-h-full object-contain rounded-xl shadow-2xl border border-white/10" onclick="event.stopPropagation()">
+            </div>
+            
+            <div class="mt-6 text-center">
+                <p id="modalCaption" class="text-white font-black text-xl md:text-3xl uppercase tracking-[0.3em] bg-gradient-to-r from-pink-400 to-violet-400 bg-clip-text text-transparent animate__animated animate__fadeInUp"></p>
+            </div>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
+        {% for temp in templates %}
+        <div class="group relative bg-slate-900/50 border border-white/10 rounded-[2.5rem] overflow-hidden hover:border-pink-500/50 transition-all duration-500 flex flex-col hover:-translate-y-2 hover:shadow-[0_20px_50px_rgba(0,0,0,0.5)]">
+            
+            <div class="aspect-video bg-slate-950 relative overflow-hidden flex items-center justify-center">
+                
+                <div class="absolute inset-0 opacity-40 blur-2xl scale-125">
+                    <img src="{{ temp.preview_url }}" class="w-full h-full object-cover">
+                </div>
+
+                <img src="{{ temp.preview_url }}" 
+                    class="relative z-10 w-full h-full object-cover group-hover:scale-110 transition-all duration-700 ease-out"
+                    onerror="this.onerror=null; this.src='https://picsum.photos/seed/{{ temp.id }}/800/600';"
+                    alt="{{ temp.name }}">
+                
+                <a href="{% url 'create_wish' wish_type temp.id %}" class="absolute inset-0 z-20 flex items-center justify-center bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                    <div class="w-16 h-16 flex items-center justify-center bg-pink-600 rounded-full border border-pink-400 shadow-[0_0_30px_rgba(219,39,119,0.6)] transform scale-50 group-hover:scale-100 transition-all duration-500">
+                        <i class="fas fa-magic text-white text-2xl"></i>
+                    </div>
+                </a>
+
+                <button onclick="openModal('{{ temp.preview_url }}', '{{ temp.name }}')" class="absolute top-4 right-4 z-30 bg-black/60 backdrop-blur-md px-4 py-1.5 rounded-full text-[9px] font-black uppercase tracking-widest text-white border border-white/10 hover:bg-white hover:text-black transition-all duration-300">
+                    Preview
+                </button>
+            </div>
+
+            <div class="p-6 flex flex-col flex-grow bg-slate-900">
+                <div class="flex items-center justify-between mb-6">
+                    <h3 class="text-xl font-black text-white tracking-tight">{{ temp.name }}</h3>
+                    <div class="flex gap-1">
+                        <i class="fas fa-star text-amber-500 text-[10px]"></i>
+                        <i class="fas fa-star text-amber-500 text-[10px]"></i>
+                        <i class="fas fa-star text-amber-500 text-[10px]"></i>
+                    </div>
+                </div>
+                
+                <a href="{% url 'create_wish' wish_type temp.id %}" class="mt-auto block text-center bg-white/5 border border-white/10 hover:border-pink-500/50 hover:bg-gradient-to-r hover:from-pink-600 hover:to-violet-600 text-white font-black py-4 rounded-2xl transition-all duration-300 uppercase text-xs tracking-[0.2em] shadow-lg">
+                    Use This Template
+                </a>
+            </div>
+        </div>
+        {% empty %}
+        <div class="col-span-full py-20 text-center">
+            <p class="text-gray-500 font-bold uppercase tracking-widest">No templates found for this category.</p>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<script>
+    function openModal(imgSrc, title) {
+        const modal = document.getElementById('imageModal');
+        const modalImg = document.getElementById('modalImg');
+        const modalCaption = document.getElementById('modalCaption');
+        const container = document.getElementById('modalContainer');
+
+        modalImg.src = imgSrc;
+        modalCaption.innerText = title;
+        
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+        setTimeout(() => {
+            modal.classList.add('opacity-100');
+            container.classList.remove('scale-90');
+            container.classList.add('scale-100');
+        }, 10);
+        document.body.style.overflow = 'hidden';
+    }
+
+    function closeModal() {
+        const modal = document.getElementById('imageModal');
+        const container = document.getElementById('modalContainer');
+        
+        modal.classList.remove('opacity-100');
+        container.classList.remove('scale-100');
+        container.classList.add('scale-90');
+        
+        setTimeout(() => {
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }, 300);
+        document.body.style.overflow = 'auto';
+    }
+
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') closeModal();
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Golden Magic | {{ wish.receiver_name }} ✨</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&family=Playfair+Display:ital,wght@1,500&display=swap" rel="stylesheet">
+
+    <style>
+        body, html { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background: #050505; color: white; }
+        
+        .main-title { font-family: 'Cinzel', serif; }
+        .intro-text { font-family: 'Playfair Display', serif; }
+
+        /* Floating Circular Image Frames */
+        .golden-orb {
+            position: absolute;
+            border-radius: 50%;
+            border: 2px solid rgba(234, 179, 8, 0.6);
+            box-shadow: 0 0 25px rgba(234, 179, 8, 0.5);
+            overflow: hidden;
+            opacity: 0;
+            z-index: 5;
+            pointer-events: none;
+        }
+        .golden-orb img { width: 100%; height: 100%; object-fit: cover; }
+
+        /* Surprise Button Style */
+        .portal-btn {
+            position: relative; width: 110px; height: 110px;
+            background: linear-gradient(45deg, #fbbf24, #d97706);
+            border-radius: 50%; display: flex; align-items: center; justify-content: center;
+            box-shadow: 0 0 45px rgba(217, 119, 6, 0.8);
+            animation: heartbeat 1.5s infinite ease-in-out;
+            cursor: pointer; border: none;
+        }
+        @keyframes heartbeat { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.1); box-shadow: 0 0 65px rgba(251, 191, 36, 1); } }
+
+        .glass-panel { 
+            background: rgba(0, 0, 0, 0.65); backdrop-filter: blur(20px); 
+            border: 1px solid rgba(234, 179, 8, 0.25);
+            border-radius: 1.5rem; padding: 2rem;
+        }
+
+        canvas { filter: blur(1px); }
+    </style>
+</head>
+<body>
+
+    {% if wish.custom_music or wish.selected_music %}
+        <audio id="bgMusic" src="{% if wish.custom_music %}{{ wish.custom_music.url }}{% else %}{{ wish.selected_music.audio_file.url }}{% endif %}" loop></audio>
+    {% endif %}
+
+    <div id="overlay" class="fixed inset-0 z-[100] flex items-center justify-center bg-[#050505]">
+        <button onclick="unlockMagic()" class="flex flex-col items-center gap-6">
+            <div class="portal-btn">
+                <i class="fa-solid fa-wand-magic-sparkles text-4xl text-black"></i>
+            </div>
+            <div class="text-center">
+                <span class="block text-[10px] font-black tracking-[0.6em] text-yellow-500 uppercase">A Surprise For You</span>
+                <span class="block text-sm text-gray-300 mt-2">Tap to see the magic</span>
+            </div>
+        </button>
+    </div>
+
+    <div id="magic-content" class="hidden opacity-0 fixed inset-0">
+        <canvas id="particleCanvas" class="absolute inset-0 z-0"></canvas>
+        <div class="absolute inset-0 bg-gradient-to-t from-black via-transparent to-black z-[1]"></div>
+        <div class="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(234,179,8,0.15)_0%,transparent_70%)] z-[1]"></div>
+
+        <div id="image-space" class="absolute inset-0 pointer-events-none">
+            {% for img_obj in wish.images.all|slice:":6" %}
+                <div class="golden-orb" style="width: 130px; height: 130px;">
+                    <img src="{{ img_obj.image.url }}" alt="Memory">
+                </div>
+            {% endfor %}
+        </div>
+
+        <div class="relative z-10 flex flex-col items-center justify-center h-full px-6 text-center">
+            <div id="intro-wrap">
+                <h2 class="intro-text text-2xl md:text-4xl text-yellow-200/60 tracking-widest mb-2">
+                    Wishing You
+                </h2>
+            </div>
+
+            <div id="title-wrap" class="relative inline-block mt-2">
+                <h1 class="main-title text-6xl md:text-9xl font-black uppercase leading-none tracking-tighter text-transparent bg-clip-text bg-gradient-to-b from-yellow-100 via-yellow-500 to-yellow-800 filter drop-shadow-[0_0_20px_rgba(234,179,8,0.4)]">
+                    Happy <br> Birthday
+                </h1>
+                <div class="absolute -top-4 -right-4 text-2xl animate-pulse">✨</div>
+                <div class="absolute -bottom-4 -left-4 text-2xl animate-pulse [animation-delay:1s]">✨</div>
+            </div>
+
+            <div id="name-wrap" class="mt-8">
+                <div class="flex items-center justify-center gap-4 mb-2">
+                    <div class="h-[1px] w-12 bg-gradient-to-r from-transparent to-yellow-500"></div>
+                    <span class="text-3xl md:text-6xl font-bold text-white tracking-[0.2em] drop-shadow-lg">
+                        {{ wish.receiver_name }}
+                    </span>
+                    <div class="h-[1px] w-12 bg-gradient-to-l from-transparent to-yellow-500"></div>
+                </div>
+            </div>
+
+            <div id="message-wrap" class="mt-8 glass-panel max-w-2xl mx-auto">
+                <p class="text-lg md:text-xl text-yellow-100/90 italic font-light leading-relaxed">
+                    "{{ wish.message }}"
+                </p>
+                <div class="mt-6 pt-4 border-t border-yellow-500/20">
+                    <p class="text-[10px] font-bold text-yellow-600 uppercase tracking-[0.4em]">From: {{ wish.sender_name }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('particleCanvas');
+        const ctx = canvas.getContext('2d');
+        let particles = [];
+
+        function resize() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+        window.addEventListener('resize', resize); resize();
+
+        class Particle {
+            constructor() { this.reset(); }
+            reset() {
+                this.x = Math.random() * canvas.width;
+                this.y = Math.random() * canvas.height + canvas.height;
+                this.size = Math.random() * 2.5 + 0.5;
+                this.speedY = Math.random() * 1.2 + 0.5;
+                this.speedX = Math.random() * 0.8 - 0.4;
+                this.opacity = Math.random() * 0.6 + 0.2;
+            }
+            update() {
+                this.y -= this.speedY; this.x += this.speedX;
+                if (this.y < -10) this.reset();
+            }
+            draw() {
+                ctx.fillStyle = `rgba(234, 179, 8, ${this.opacity})`;
+                ctx.beginPath(); ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2); ctx.fill();
+            }
+        }
+
+        for (let i = 0; i < 150; i++) particles.push(new Particle());
+
+        function animate() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            particles.forEach(p => { p.update(); p.draw(); });
+            requestAnimationFrame(animate);
+        }
+
+        function unlockMagic() {
+            const music = document.getElementById('bgMusic');
+            if(music) music.play().catch(e => console.log("Audio play blocked"));
+
+            gsap.to("#overlay", { 
+                scale: 1.2, opacity: 0, duration: 0.8, ease: "power2.in",
+                onComplete: () => {
+                    document.getElementById('overlay').style.display = 'none';
+                    const content = document.getElementById('magic-content');
+                    content.classList.remove('hidden');
+                    gsap.to(content, { opacity: 1, duration: 0.5 });
+                    
+                    runSequence();
+                    startImageFloating();
+                    animate();
+                }
+            });
+        }
+
+        function runSequence() {
+            const tl = gsap.timeline();
+
+            // Set initial hidden states
+            gsap.set(".intro-text", { opacity: 0, y: 20 });
+            gsap.set(".main-title", { opacity: 0, scale: 0.8, filter: "blur(12px)" });
+            gsap.set("#name-wrap", { opacity: 0, y: 30 });
+            gsap.set("#message-wrap", { opacity: 0, scale: 0.9 });
+
+            // Execution sequence
+            tl.to(".intro-text", { opacity: 1, y: 0, duration: 1.2, ease: "power2.out" })
+              .to(".main-title", { 
+                  opacity: 1, scale: 1, filter: "blur(0px)", 
+                  duration: 1.8, ease: "expo.out" 
+              }, "-=0.4")
+              .to("#name-wrap", { 
+                  opacity: 1, y: 0, duration: 1, ease: "back.out(1.7)" 
+              }, "-=0.6")
+              .to("#message-wrap", { 
+                  opacity: 1, scale: 1, duration: 1.2, ease: "power3.out" 
+              }, "-=0.5");
+
+            // Continuous floating title
+            gsap.to(".main-title", {
+                y: 15, duration: 3, repeat: -1, yoyo: true, ease: "sine.inOut"
+            });
+        }
+
+        function startImageFloating() {
+            const orbs = document.querySelectorAll('.golden-orb');
+            orbs.forEach((orb, index) => {
+                const startX = Math.random() * (window.innerWidth - 150);
+                const startY = Math.random() * (window.innerHeight - 150);
+                
+                gsap.set(orb, { x: startX, y: startY, opacity: 0, scale: 0 });
+
+                gsap.to(orb, {
+                    opacity: 1, scale: 1, duration: 1.5, delay: 1 + (index * 0.4), ease: "back.out(1.2)"
+                });
+
+                // Random bouncing / floating path
+                gsap.to(orb, {
+                    x: `+=${Math.random() * 120 - 60}`,
+                    y: `+=${Math.random() * 120 - 60}`,
+                    duration: 4 + Math.random() * 3,
+                    repeat: -1,
+                    yoyo: true,
+                    ease: "sine.inOut"
+                });
+            });
+        }
+    </script>
+</body>
+</html>

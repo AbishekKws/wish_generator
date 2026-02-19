@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <title>A Special Surprise for {{ wish.receiver_name }}! ✨</title>
+    <meta name="description" content="{{ wish.sender_name }} has sent you a magical {{ wish.wish_type }} surprise. Click to unlock the magic!">
+    
+    <meta property="og:title" content="A Special Surprise for {{ wish.receiver_name }}! ✨">
+    <meta property="og:description" content="Open the link to see a magical surprise from {{ wish.sender_name }}.">
+    <meta property="og:url" content="{{ request.build_absolute_uri }}">
+    
+    {% if wish.images.exists %}
+    <meta property="og:image" content="{{ request.scheme }}://{{ request.get_host }}{{ wish.images.first.image.url }}">
+    {% endif %}
+    
+    <meta property="og:type" content="website">
+    <title>Floating Memories | {{ wish.receiver_name }}</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300;500;700&family=Dancing+Script:wght@700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            {% if wish.wish_type|lower == 'love' or wish.wish_type|lower == 'anniversary' or wish.wish_type|lower == 'proposal' %}
+                --primary-glow: #ff2d55; --accent-glow: #ff3700;
+            {% elif wish.wish_type|lower == 'birthday' or wish.wish_type|lower == 'new year' %}
+                --primary-glow: #00d2ff; --accent-glow: #3a7bd5;
+            {% elif wish.wish_type|lower == 'sorry' or wish.wish_type|lower == 'miss you' %}
+                --primary-glow: #94a3b8; --accent-glow: #475569;
+            {% elif wish.wish_type|lower == 'friendship' or wish.wish_type|lower == 'thank you' %}
+                --primary-glow: #facc15; --accent-glow: #fb923c;
+            {% else %}
+                --primary-glow: #ec4899; --accent-glow: #8b5cf6;
+            {% endif %}
+        }
+
+        body, html { 
+            margin: 0; padding: 0; width: 100%; height: 100%; 
+            overflow: hidden; background: #01040f; 
+            font-family: 'Quicksand', sans-serif; color: white;
+            position: fixed; /* Prevents bounce on mobile */
+        }
+
+        .light-spot {
+            position: fixed; width: 70vw; height: 70vw;
+            border-radius: 50%; filter: blur(140px);
+            z-index: 0; opacity: 0.25; pointer-events: none;
+            animation: move-light 25s infinite alternate ease-in-out;
+        }
+        @keyframes move-light {
+            0% { transform: translate(-15%, -15%) scale(1); }
+            100% { transform: translate(35%, 25%) scale(1.1); }
+        }
+
+        .blink-light {
+            position: absolute; background: white; border-radius: 50%;
+            filter: blur(1px); pointer-events: none; z-index: 2;
+            animation: blink-fast var(--speed) infinite ease-in-out;
+            box-shadow: 0 0 10px white, 0 0 20px var(--primary-glow);
+        }
+        @keyframes blink-fast {
+            0%, 100% { opacity: 0; transform: scale(0.5) translateY(0); }
+            50% { opacity: 1; transform: scale(1.2) translateY(-20px); }
+        }
+
+        .stars-container { position: fixed; inset: 0; z-index: 1; }
+        .star {
+            position: absolute; background: white; border-radius: 50%;
+            opacity: 0.3; animation: twinkle var(--d) infinite ease-in-out;
+        }
+        @keyframes twinkle { 0%, 100% { opacity: 0.3; transform: scale(1); } 50% { opacity: 0.8; transform: scale(1.3); } }
+
+        .message-hub {
+            position: relative; z-index: 100;
+            text-align: center; 
+            width: 90%; 
+            max-width: 400px; /* Adjusted to fit all screens */
+            padding: 1.5rem 1rem;
+            border-radius: 30px;
+            background: rgba(255, 255, 255, 0.04);
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.6);
+            transition: opacity 0.6s ease;
+            margin: auto;
+        }
+
+        .neon-name {
+            font-family: 'Dancing Script', cursive;
+            filter: drop-shadow(0 0 15px var(--primary-glow));
+            line-height: 1.1;
+        }
+
+        .float-box {
+            position: absolute; perspective: 1000px;
+            z-index: 50; transition: all 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+            transform: translate(-50%, -50%);
+            cursor: pointer;
+            will-change: left, top, transform;
+        }
+        .photo-card {
+            background: rgba(255, 255, 255, 0.1); 
+            backdrop-filter: blur(4px); 
+            border: 2px solid rgba(255, 255, 255, 0.4); 
+            padding: 4px; border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+            width: 85px; /* Compact for mobile first */
+            transition: all 0.4s ease;
+        }
+        @media (min-width: 768px) { .photo-card { width: 140px; } }
+        .photo-card img { width: 100%; aspect-ratio: 1/1; object-fit: cover; border-radius: 8px; display: block; }
+
+        .float-box.active {
+            z-index: 1000 !important;
+            left: 50% !important; top: 50% !important;
+            transform: translate(-50%, -50%) scale(2.2) rotate(0deg) !important;
+        }
+
+        @keyframes float-around {
+            0%, 100% { transform: translate(-50%, -50%) rotate(var(--r)); }
+            50% { transform: translate(calc(-50% + var(--mx)), calc(-50% + var(--my))) rotate(calc(var(--r) + 8deg)); }
+        }
+        .animate-floating { animation: float-around var(--duration) infinite ease-in-out; }
+
+        .rainbow-char { display: inline-block; transition: transform 0.3s; }
+
+        @keyframes float-slow {
+            0%, 100% { transform: translateY(0) rotateX(5deg); }
+            50% { transform: translateY(-10px) rotateX(-5deg); }
+        }
+
+        .animate-float-slow {
+            animation: float-slow 4s ease-in-out infinite;
+            transform-style: preserve-3d;
+        }
+
+        .perspective-1000 {
+            perspective: 1000px;
+        }
+
+        .neon-name {
+            /* Depth effect for the name */
+            text-shadow: 0 0 10px var(--primary-glow),
+                        0 0 20px var(--primary-glow),
+                        2px 2px 0px #000;
+        }
+    </style>
+</head>
+<body>
+
+    {% if wish.custom_music or wish.selected_music %}
+        <audio id="bgMusic" src="{% if wish.custom_music %}{{ wish.custom_music.url }}{% else %}{{ wish.selected_music.audio_file.url }}{% endif %}" loop></audio>
+    {% endif %}
+
+    <div class="light-spot" style="background: var(--primary-glow); top: -10%; left: -10%;"></div>
+    <div class="light-spot" style="background: var(--accent-glow); bottom: -10%; right: -10%; animation-delay: -5s;"></div>
+    <div class="stars-container" id="stars"></div>
+    <div id="blink-container" class="fixed inset-0 pointer-events-none z-10"></div>
+
+    <div id="overlay" class="fixed inset-0 z-[2000] flex flex-col items-center justify-center bg-[#01040f] transition-all duration-1000">
+        <button onclick="startDream()" class="relative px-12 py-5 bg-white/5 border-2 border-[var(--primary-glow)] text-[var(--primary-glow)] font-black rounded-full tracking-[0.2em] uppercase hover:bg-[var(--primary-glow)] hover:text-white transition-all duration-500 active:scale-95 group overflow-hidden">
+            <span class="relative z-10 flex items-center gap-3">Open Memories <i class="fa-solid fa-sparkles"></i></span>
+            <span class="absolute inset-0 bg-[var(--primary-glow)] scale-x-0 group-hover:scale-x-100 transition-transform origin-left duration-500"></span>
+        </button>
+    </div>
+
+    <main id="scene" class="hidden opacity-0 w-full h-screen flex items-center justify-center relative overflow-hidden transition-opacity duration-1000">
+        
+        <div id="hub" class="message-hub">
+            <div class="mb-6 perspective-1000"> 
+                <div class="relative inline-block px-6 py-2 rounded-xl 
+                            bg-white/10 backdrop-blur-md 
+                            border border-white/20 shadow-[0_10px_30px_rgba(0,0,0,0.5)] 
+                            transform -rotate-1 hover:rotate-0 transition-all duration-500
+                            animate-float-slow">
+                    
+                    <div class="absolute inset-0 bg-gradient-to-r from-pink-500/20 to-purple-500/20 blur-xl rounded-xl"></div>
+
+                    <div class="relative text-[10px] md:text-xs tracking-[0.4em] uppercase font-black italic" 
+                        style="color: var(--primary-glow); text-shadow: 2px 2px 0px rgba(0,0,0,0.3), 0 0 10px var(--primary-glow);">
+                        
+                        {% if wish.wish_type|lower == 'birthday' %}
+                            <i class="fas fa-birthday-cake mr-2"></i> May Your Birthday Be Full Of Happiness 🎂!
+                        {% elif wish.wish_type|lower == 'anniversary' %}
+                            <i class="fas fa-ring mr-2"></i> Made for Each Other, Happy Anniversary
+                        {% elif wish.wish_type|lower == 'love' %}
+                            <i class="fas fa-heart mr-2"></i> Today, Tomorrow, Always
+                        {% elif wish.wish_type|lower == 'sorry' %}
+                            <i class="fas fa-sad-tear mr-2"></i> So Sorry for Everything
+                        {% elif wish.wish_type|lower == 'friendship' %}
+                            <i class="fas fa-user-friends mr-2"></i> Better Together
+                        {% elif wish.wish_type|lower == 'thank you' %}
+                            <i class="fas fa-hand-holding-heart mr-2"></i> Heartfelt Thanks to You ✨
+                        {% elif wish.wish_type|lower == 'miss you' %}
+                            <i class="fas fa-cloud mr-2"></i> Thinking of You
+                        {% else %}
+                            <i class="fas fa-star mr-2"></i> A Special Memory
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <h1 class="text-4xl md:text-7xl font-black mb-4 neon-name tracking-tighter transform hover:scale-105 transition-transform">
+                {{ wish.receiver_name }}
+            </h1>
+
+            <div id="rainbow-message" class="text-sm md:text-xl font-medium leading-relaxed mb-8 px-6 text-white/90 max-w-2xl mx-auto italic">
+                "{{ wish.message }}"
+            </div>
+
+            <div class="inline-block px-5 py-2 rounded-full border border-white/10 bg-black/20 backdrop-blur-md shadow-inner">
+                <p class="text-[9px] md:text-[10px] uppercase tracking-[0.3em] text-white/70">
+                    With Love, <span class="font-black" style="color: var(--primary-glow); text-shadow: 0 0 5px var(--primary-glow);">{{ wish.sender_name }}</span>
+                </p>
+            </div>
+        </div>
+
+        {% for img_obj in wish.images.all %}
+        <div class="float-box animate-floating" 
+            onclick="focusImage(this)"
+            style="--r: {{ forloop.counter|add:5 }}deg; 
+                    --duration: {{ forloop.counter|add:8 }}s; 
+                    --mx: {{ forloop.counter|add:10 }}px; 
+                    --my: {{ forloop.counter|add:15 }}px;">
+            <div class="photo-card">
+                <img src="{{ img_obj.image.url }}" alt="Memory" loading="lazy">
+            </div>
+        </div>
+        {% endfor %}
+        
+        <footer class="absolute bottom-4 w-full flex justify-center opacity-60">
+            <a href="{% url 'home' %}" class="flex flex-col items-center gap-1 group">
+                <span class="text-[7px] tracking-[0.3em] uppercase text-gray-400">Created With</span>
+                <span class="text-[9px] font-black tracking-widest text-white hover:text-[var(--primary-glow)] transition-colors">SURPRISE ME</span>
+            </a>
+        </footer>
+    </main>
+
+    <script>
+        let activeImg = null;
+
+        function createBlinkLights() {
+            const container = document.getElementById('blink-container');
+            for (let i = 0; i < 40; i++) {
+                const light = document.createElement('div');
+                light.className = 'blink-light';
+                const size = Math.random() * 4 + 2 + 'px';
+                light.style.width = size; light.style.height = size;
+                light.style.left = Math.random() * 100 + '%';
+                light.style.top = Math.random() * 100 + '%';
+                light.style.setProperty('--speed', Math.random() * 2 + 1 + 's');
+                container.appendChild(light);
+            }
+        }
+
+        function focusImage(el) {
+            const hub = document.getElementById('hub');
+            if (activeImg === el) {
+                el.classList.remove('active');
+                hub.style.opacity = '1';
+                activeImg = null;
+            } else {
+                if (activeImg) activeImg.classList.remove('active');
+                el.classList.add('active');
+                hub.style.opacity = '0.05';
+                activeImg = el;
+            }
+        }
+
+        window.addEventListener('mousedown', (e) => {
+            if (activeImg && !activeImg.contains(e.target)) {
+                activeImg.classList.remove('active');
+                document.getElementById('hub').style.opacity = '1';
+                activeImg = null;
+            }
+        });
+
+        function createStars() {
+            const container = document.getElementById('stars');
+            for (let i = 0; i < 80; i++) {
+                const star = document.createElement('div');
+                star.className = 'star';
+                const size = Math.random() * 2 + 1 + 'px';
+                star.style.width = size; star.style.height = size;
+                star.style.left = Math.random() * 100 + '%';
+                star.style.top = Math.random() * 100 + '%';
+                star.style.setProperty('--d', Math.random() * 3 + 2 + 's');
+                container.appendChild(star);
+            }
+        }
+
+        function applyRainbowEffect() {
+            const container = document.getElementById('rainbow-message');
+            const text = container.innerText;
+            container.innerHTML = '';
+            const colorList = ['#ffffff', 'var(--primary-glow)', '#f1f5f9', 'var(--accent-glow)'];
+            [...text].forEach((char, i) => {
+                const span = document.createElement('span');
+                span.innerText = char;
+                span.className = 'rainbow-char';
+                span.style.color = colorList[i % colorList.length];
+                container.appendChild(span);
+            });
+        }
+
+        function randomizePhotos() {
+            const boxes = document.querySelectorAll('.float-box');
+            const isMobile = window.innerWidth < 768;
+            
+            // Adjust radius to keep boxes within viewport
+            const rx = isMobile ? 38 : 42; 
+            const ry = isMobile ? 42 : 38;
+
+            boxes.forEach((box, index) => {
+                if (box.classList.contains('active')) return;
+                const angle = (index / boxes.length) * Math.PI * 2;
+                const x = 50 + Math.cos(angle) * rx;
+                const y = 50 + Math.sin(angle) * ry;
+                box.style.left = x + '%';
+                box.style.top = y + '%';
+            });
+        }
+
+        function startDream() {
+            const music = document.getElementById('bgMusic');
+            if(music) music.play().catch(e => {});
+            createStars();
+            createBlinkLights();
+            applyRainbowEffect();
+            randomizePhotos();
+            document.getElementById('overlay').classList.add('opacity-0');
+            setTimeout(() => {
+                document.getElementById('overlay').style.display = 'none';
+                const scene = document.getElementById('scene');
+                scene.classList.remove('hidden');
+                setTimeout(() => scene.classList.add('opacity-100'), 100);
+                gsap.from(".message-hub", { scale: 0.8, opacity: 0, duration: 1.2, ease: "back.out(1.7)" });
+            }, 800);
+        }
+
+        window.addEventListener('resize', randomizePhotos);
+    </script>
+</body>
+</html>

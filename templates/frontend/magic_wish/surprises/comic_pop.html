@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <title>A Special Surprise for {{ wish.receiver_name }}! ✨</title>
+    <meta name="description" content="{{ wish.sender_name }} has sent you a magical {{ wish.wish_type }} surprise. Click to unlock the magic!">
+    
+    <meta property="og:title" content="A Special Surprise for {{ wish.receiver_name }}! ✨">
+    <meta property="og:description" content="Open the link to see a magical surprise from {{ wish.sender_name }}.">
+    <meta property="og:url" content="{{ request.build_absolute_uri }}">
+    
+    {% if wish.images.exists %}
+    <meta property="og:image" content="{{ request.scheme }}://{{ request.get_host }}{{ wish.images.first.image.url }}">
+    {% endif %}
+    
+    <meta property="og:type" content="website">
+    <title>Comedy Pop! | {{ wish.receiver_name }}</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Bangers&family=Permanent+Marker&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --bg-dark: #0f172a;
+            --neon-pink: #f43f5e;
+            --neon-blue: #0ea5e9;
+            --comic-white: #f8fafc;
+        }
+
+        body, html { 
+            margin: 0; padding: 0; width: 100%; height: 100vh; 
+            background: var(--bg-dark); overflow: hidden;
+            font-family: 'Bangers', cursive; color: white;
+            user-select: none;
+        }
+
+        /* Lightning & Sunburst Background */
+        .lightning-flash {
+            position: fixed; inset: 0; background: white;
+            opacity: 0; z-index: 2000; pointer-events: none;
+        }
+        .sunburst {
+            position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            width: 250vw; height: 250vw;
+            background: repeating-conic-gradient(from 0deg, #1e293b 0deg 15deg, #0f172a 15deg 30deg);
+            z-index: -2; animation: rotate 100s linear infinite;
+        }
+        @keyframes rotate { from { transform: translate(-50%, -50%) rotate(0deg); } to { transform: translate(-50%, -50%) rotate(360deg); } }
+
+        /* Floating Emojis */
+        .emoji {
+            position: fixed; pointer-events: none; z-index: 1;
+            font-size: 2rem; animation: floatUp var(--d) linear infinite;
+            opacity: 0; bottom: -50px;
+        }
+        @keyframes floatUp {
+            0% { transform: translateY(0) rotate(0deg); opacity: 0; }
+            10% { opacity: 1; }
+            100% { transform: translateY(-110vh) rotate(360deg); opacity: 0; }
+        }
+
+        /* Layout Container - Fixed Viewport */
+        #scene {
+            display: none;
+            height: 100vh;
+            width: 100vw;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        /* Laptop View: Side-by-Side */
+        @media (min-width: 1024px) {
+            #scene {
+                flex-direction: row;
+                justify-content: space-evenly;
+                gap: 40px;
+                padding: 40px;
+            }
+        }
+
+        .message-section {
+            flex-shrink: 0;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            z-index: 10;
+            max-width: 90%;
+        }
+
+        @media (min-width: 1024px) {
+            .message-section { max-width: 45%; }
+        }
+
+        /* Dynamic Wish Tag */
+        .wish-tag {
+            background: #fde047;
+            color: black;
+            padding: 5px 20px;
+            font-size: clamp(1rem, 2vw, 1.5rem);
+            border: 3px solid black;
+            transform: skew(-10deg) rotate(-2deg);
+            box-shadow: 5px 5px 0px var(--neon-pink);
+            margin-bottom: 10px;
+        }
+
+        .message-bubble {
+            background: white;
+            color: black;
+            padding: 20px;
+            border: 4px solid black;
+            box-shadow: 10px 10px 0px white;
+            width: 100%;
+            overflow-y: auto; /* Scroll message if too long inside bubble */
+            max-height: 30vh;
+        }
+
+        @media (min-width: 1024px) {
+            .message-bubble { max-height: 50vh; }
+        }
+
+        #rainbow-message {
+            font-family: 'Permanent Marker', cursive;
+            line-height: 1.3;
+            font-size: clamp(1.1rem, 2.5vw, 2.2rem);
+        }
+
+        /* Photo Container - Grid/Row Control */
+        #photo-container {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            width: fit-content;
+            margin-top: 20px;
+        }
+
+        @media (min-width: 1024px) {
+            #photo-container { margin-top: 0; }
+        }
+
+        .comic-card {
+            background: var(--comic-white); border: 3px solid black;
+            padding: 5px; position: relative;
+            box-shadow: 6px 6px 0px var(--neon-blue);
+            width: clamp(110px, 15vw, 180px);
+            transition: 0.2s;
+        }
+        .comic-card:hover { transform: scale(1.1) rotate(0deg) !important; z-index: 100; box-shadow: 8px 8px 0px var(--neon-pink); }
+        .comic-card img { width: 100%; aspect-ratio: 1/1; object-fit: cover; border: 2px solid black; }
+
+        .bubble {
+            position: absolute; padding: 2px 8px;
+            background: var(--neon-pink); color: white;
+            border: 2px solid black; font-size: 0.7rem;
+            top: -10px; right: -5px; transform: rotate(10deg);
+            font-family: 'Permanent Marker', cursive;
+            z-index: 10;
+        }
+
+        #overlay { background: #000; z-index: 3000; }
+        .btn-boom {
+            background: var(--neon-pink);
+            box-shadow: 8px 8px 0px white;
+            animation: shake 0.5s infinite;
+        }
+        @keyframes shake {
+            0%, 100% { transform: translate(0, 0); }
+            25% { transform: translate(-3px, 3px); }
+            75% { transform: translate(3px, -3px); }
+        }
+
+        .boom-flash { animation: flashScreen 0.3s ease-out forwards; }
+        @keyframes flashScreen { 0% { opacity: 0; } 50% { opacity: 1; } 100% { opacity: 0; } }
+
+        footer { position: fixed; bottom: 10px; width: 100%; opacity: 0.5; pointer-events: none; text-align: center; }
+    </style>
+</head>
+<body>
+
+    <div id="flashLayer" class="lightning-flash"></div>
+    <audio id="bgMusic" src="{% if wish.custom_music %}{{ wish.custom_music.url }}{% else %}{{ wish.selected_music.audio_file.url }}{% endif %}" loop></audio>
+
+    <div class="sunburst"></div>
+    <div id="emoji-layer"></div>
+
+    <div id="overlay" class="fixed inset-0 flex flex-col items-center justify-center">
+        <button id="boomBtn" class="btn-boom px-12 py-6 text-white text-3xl md:text-5xl font-bold uppercase border-4 border-black">
+            HIT THE BOOM! 💥
+        </button>
+        <p class="mt-4 text-yellow-400 animate-pulse tracking-widest text-sm uppercase">STAY TUNED FOR {{ wish.wish_type }}</p>
+    </div>
+
+    <main id="scene">
+        <div class="message-section">
+            <div class="wish-tag">Cake is the Only Reason FOR WISHING You HAPPY {{ wish.wish_type|upper }}!</div>
+            <h1 class="text-5xl md:text-7xl mb-4 leading-none" style="filter: drop-shadow(4px 4px 0px var(--neon-pink))">
+                {{ wish.receiver_name|upper }}
+            </h1>
+            <div class="message-bubble -rotate-1">
+                <p id="rainbow-message"></p>
+            </div>
+        </div>
+
+        <div id="photo-container">
+            {% for img_obj in wish.images.all|slice:":4" %}
+            <div class="comic-card" onclick="createBurst(event)" style="transform: rotate({% cycle '-4deg' '4deg' %});">
+                <div class="bubble">{% cycle 'POW!' 'BOOM!' 'ZAP!' 'WOW!' %}</div>
+                <img src="{{ img_obj.image.url }}" alt="memory">
+                <div class="mt-1 text-center text-black text-[10px] font-bold uppercase tracking-tighter">#SCENE_{{ forloop.counter }}</div>
+            </div>
+            {% endfor %}
+        </div>
+
+        <footer>
+            <p class="text-[9px] tracking-widest text-gray-400 uppercase">With Love From {{ wish.sender_name }}</p>
+        </footer>
+    </main>
+
+    <script>
+        const messageText = "{{ wish.message|escapejs }}";
+        const emojis = ['😂', '🤣', '😆', '😏', '😉', '😁', '🔥', '💥', '😎'];
+
+        function triggerLightning() {
+            if (Math.random() > 0.92) {
+                const flash = document.getElementById('flashLayer');
+                flash.classList.add('boom-flash');
+                setTimeout(() => flash.classList.remove('boom-flash'), 300);
+            }
+        }
+        setInterval(triggerLightning, 2500);
+
+        function createFloatingEmojis() {
+            const layer = document.getElementById('emoji-layer');
+            for(let i = 0; i < 20; i++) {
+                const span = document.createElement('span');
+                span.className = 'emoji';
+                span.innerText = emojis[Math.floor(Math.random() * emojis.length)];
+                span.style.left = Math.random() * 100 + 'vw';
+                span.style.setProperty('--d', (Math.random() * 4 + 4) + 's');
+                span.style.animationDelay = (Math.random() * 5) + 's';
+                layer.appendChild(span);
+            }
+        }
+
+        function createBurst(e) {
+            const rect = e.currentTarget.getBoundingClientRect();
+            const centerX = rect.left + rect.width / 2;
+            const centerY = rect.top + rect.height / 2;
+            for (let i = 0; i < 6; i++) {
+                const emo = document.createElement('div');
+                emo.style.position = 'fixed';
+                emo.style.zIndex = '1000';
+                emo.style.pointerEvents = 'none';
+                emo.innerText = emojis[Math.floor(Math.random() * 5)];
+                emo.style.fontSize = '1.5rem';
+                
+                const angle = (i / 6) * Math.PI * 2;
+                const dist = 50 + Math.random() * 40;
+                const tx = Math.cos(angle) * dist;
+                const ty = Math.sin(angle) * dist;
+                
+                emo.style.left = centerX + 'px';
+                emo.style.top = centerY + 'px';
+                
+                document.body.appendChild(emo);
+                
+                emo.animate([
+                    { transform: 'translate(-50%, -50%) scale(0)', opacity: 1 },
+                    { transform: `translate(calc(-50% + ${tx}px), calc(-50% + ${ty}px)) scale(1.2)`, opacity: 0 }
+                ], { duration: 600, easing: 'ease-out', fill: 'forwards' });
+
+                setTimeout(() => emo.remove(), 600);
+            }
+        }
+
+        function typeMessage() {
+            const container = document.getElementById('rainbow-message');
+            let i = 0; container.innerHTML = '';
+            function nextChar() {
+                if (i < messageText.length) {
+                    container.innerHTML += messageText.charAt(i);
+                    i++; setTimeout(nextChar, 40);
+                }
+            }
+            nextChar();
+        }
+
+        document.getElementById('boomBtn').addEventListener('click', () => {
+            const music = document.getElementById('bgMusic');
+            if(music) music.play().catch(e => {});
+
+            document.getElementById('overlay').style.opacity = "0";
+            document.getElementById('overlay').style.pointerEvents = "none";
+            
+            setTimeout(() => {
+                document.getElementById('overlay').style.display = 'none';
+                const scene = document.getElementById('scene');
+                scene.style.display = 'flex';
+                createFloatingEmojis();
+                typeMessage();
+            }, 400);
+        });
+    </script>
+</body>
+</html>

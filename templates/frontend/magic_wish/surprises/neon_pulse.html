@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <title>A Special Surprise for {{ wish.receiver_name }}! ✨</title>
+    <meta name="description" content="{{ wish.sender_name }} has sent you a magical {{ wish.wish_type }} surprise. Click to unlock the magic!">
+    
+    <meta property="og:title" content="A Special Surprise for {{ wish.receiver_name }}! ✨">
+    <meta property="og:description" content="Open the link to see a magical surprise from {{ wish.sender_name }}.">
+    <meta property="og:url" content="{{ request.build_absolute_uri }}">
+    
+    {% if wish.images.exists %}
+    <meta property="og:image" content="{{ request.scheme }}://{{ request.get_host }}{{ wish.images.first.image.url }}">
+    {% endif %}
+    
+    <meta property="og:type" content="website">
+    <title>Neon Pulse | {{ wish.receiver_name }}</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Syncopate:wght@700&family=Rajdhani:wght@500;700&family=Fira+Code:wght@400&display=swap" rel="stylesheet">
+    
+    <style>
+        :root { 
+            --neon-pink: #ff00ff; 
+            --neon-blue: #00f3ff; 
+            --bg-dark: #08080c; 
+        }
+
+        body, html { 
+            margin: 0; padding: 0; background: var(--bg-dark);
+            color: white; overflow: hidden; font-family: 'Rajdhani', sans-serif;
+            height: 100dvh; width: 100%; position: fixed;
+        }
+
+        /* Particle Background Area */
+        #particles { position: fixed; inset: 0; z-index: 0; pointer-events: none; }
+        .particle { position: absolute; background: var(--neon-blue); border-radius: 50%; opacity: 0.3; }
+
+        .grid-bg {
+            position: fixed; inset: 0;
+            background-image: 
+                linear-gradient(to right, rgba(0, 243, 255, 0.03) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(0, 243, 255, 0.03) 1px, transparent 1px);
+            background-size: 40px 40px;
+            z-index: -1;
+            mask-image: radial-gradient(circle at center, black, transparent 90%);
+        }
+
+        .neon-box {
+            background: rgba(10, 10, 15, 0.9);
+            border: 1px solid var(--neon-blue);
+            box-shadow: 0 0 15px rgba(0, 243, 255, 0.3);
+            position: relative;
+            clip-path: polygon(5% 0, 100% 0, 100% 95%, 95% 100%, 0 100%, 0 5%);
+        }
+
+        .neon-title {
+            font-family: 'Syncopate', sans-serif;
+            background: linear-gradient(90deg, var(--neon-blue), var(--neon-pink));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            filter: drop-shadow(0 0 8px var(--neon-blue));
+            animation: text-pulse 2s ease-in-out infinite alternate;
+        }
+
+        @keyframes text-pulse {
+            from { filter: drop-shadow(0 0 8px var(--neon-blue)); }
+            to { filter: drop-shadow(0 0 15px var(--neon-pink)); }
+        }
+
+        .cyber-card {
+            width: 85px; height: 110px;
+            position: relative; opacity: 0;
+            border: 1px solid var(--neon-pink);
+            overflow: hidden;
+        }
+        @media (min-width: 768px) { .cyber-card { width: 150px; height: 180px; } }
+
+        .btn-pulse {
+            background: transparent;
+            border: 1px solid var(--neon-pink);
+            color: var(--neon-pink);
+            font-family: 'Fira Code', monospace;
+            padding: 0.8rem 2rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            position: relative;
+            overflow: hidden;
+            cursor: pointer;
+        }
+
+        .btn-pulse::after {
+            content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(255,0,255,0.3), transparent);
+            transform: rotate(45deg); transition: 0.5s;
+        }
+        .btn-pulse:hover::after { left: 100%; }
+
+        #scene { height: 100dvh; display: flex; flex-direction: column; justify-content: space-between; padding: 1.5rem 0; z-index: 10; position: relative; }
+    </style>
+</head>
+<body>
+
+    <audio id="bg-music" loop>
+        {% if wish.custom_music or wish.selected_music %}
+            <source src="{% if wish.custom_music %}{{ wish.custom_music.url }}{% else %}{{ wish.selected_music.audio_file.url }}{% endif %}" type="audio/mpeg">
+        {% endif %}
+    </audio>
+
+    <div class="grid-bg"></div>
+    <div id="particles"></div>
+
+    <div id="overlay" class="fixed inset-0 z-[500] flex items-center justify-center bg-black">
+        <div class="text-center px-6">
+            <div class="mb-6 text-[10px] font-mono text-cyan-500 tracking-[0.4em] animate-pulse">SYSTEM READY...</div>
+            <button id="powerBtn" class="btn-pulse">ACTIVATE SIGNAL</button>
+            <p class="mt-8 text-[8px] text-gray-600 tracking-[0.5em] uppercase">Private Signal from {{ wish.sender_name }}</p>
+        </div>
+    </div>
+
+    <main id="scene" class="hidden opacity-0">
+        <div class="w-full px-6 text-center">
+            <p id="wish-label" class="text-[9px] text-cyan-400 font-mono mb-2 tracking-[0.5em] uppercase">
+                {% with w_type=wish.wish_type|lower %}
+                    {% if w_type == 'love' %}Yours, Now and Forever 💓
+                    {% elif w_type == 'good luck' %}Best wishes for you 
+                    {% elif w_type == 'new year' %}
+                        <span class="block text-xl md:text-2xl mb-2 font-medium opacity-90 tracking-[0.2em] uppercase">
+                            Step into <span id="year-display"></span> 🚀
+                        </span>
+                        New Beginnings, Endless Possibilities! ✨
+                    {% elif w_type == 'friendship' %}To a great friend
+                    {% else %}A special gift for you{% endif %}
+                {% endwith %}
+            </p>
+            <div class="neon-box p-6 md:p-10 mx-auto max-w-lg">
+                <h1 class="neon-title text-2xl md:text-5xl mb-4 uppercase font-black tracking-tighter">
+                    {{ wish.receiver_name }}
+                </h1>
+                <p id="msg-body" class="text-sm md:text-xl font-medium text-gray-200 italic leading-relaxed">
+                    "{{ wish.message }}"
+                </p>
+            </div>
+        </div>
+
+        {% if wish.images.exists %}
+        <div class="flex justify-center gap-4 px-4">
+            {% for img_obj in wish.images.all|slice:":3" %}
+            <div class="cyber-card group">
+                <img src="{{ img_obj.image.url }}" class="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-500">
+                <div class="absolute top-0 left-0 w-full h-full bg-cyan-500/10 pointer-events-none"></div>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <div class="text-center">
+            <div class="text-[8px] text-pink-500 font-mono tracking-widest mb-4">ENCRYPTED BY: {{ wish.sender_name|upper }}</div>
+            <a href="{% url 'home' %}" class="inline-block text-[9px] border border-cyan-500/30 px-6 py-2 rounded-full text-cyan-500 uppercase tracking-widest hover:bg-cyan-500/20 hover:border-cyan-500 transition-all">
+                Create Your Own Wish
+            </a>
+        </div>
+    </main>
+
+    <script>
+        // Particle Engine
+        const pContainer = document.getElementById('particles');
+        function createParticles() {
+            for(let i=0; i<30; i++) {
+                const p = document.createElement('div');
+                p.className = 'particle';
+                let size = Math.random() * 3;
+                p.style.width = size + 'px';
+                p.style.height = size + 'px';
+                p.style.left = Math.random() * 100 + '%';
+                p.style.top = Math.random() * 100 + '%';
+                pContainer.appendChild(p);
+                
+                gsap.to(p, {
+                    y: (Math.random() - 0.5) * 200,
+                    x: (Math.random() - 0.5) * 200,
+                    opacity: 0,
+                    duration: Math.random() * 3 + 2,
+                    repeat: -1,
+                    yoyo: true,
+                    ease: "sine.inOut"
+                });
+            }
+        }
+
+        document.getElementById('powerBtn').addEventListener('click', function() {
+            // MUSIC INITIATION
+            const music = document.getElementById('bg-music');
+            if (music) {
+                music.volume = 0;
+                music.play().catch(e => console.log("Audio system blocked", e));
+                gsap.to(music, { volume: 0.5, duration: 4 });
+            }
+
+            createParticles();
+            const tl = gsap.timeline();
+            
+            tl.to("#overlay", { backgroundColor: "#fff", duration: 0.05 })
+              .to("#overlay", { 
+                  opacity: 0, 
+                  scale: 3, 
+                  rotate: 5,
+                  duration: 0.6, 
+                  ease: "expo.in", 
+                  onComplete: () => {
+                    document.getElementById('overlay').style.display = 'none';
+                    document.getElementById('scene').classList.remove('hidden');
+              }})
+              .to("#scene", { opacity: 1, duration: 1 })
+              .from("#wish-label", { y: -20, opacity: 0, duration: 0.5 })
+              .from(".neon-box", { 
+                  scale: 0.8,
+                  opacity: 0, 
+                  duration: 1, 
+                  ease: "elastic.out(1, 0.8)" 
+              }, "-=0.5")
+              .to(".cyber-card", { 
+                  opacity: 1, 
+                  y: 0, 
+                  rotation: (i) => i % 2 === 0 ? 5 : -5,
+                  duration: 0.8, 
+                  stagger: 0.2, 
+                  ease: "power2.out" 
+              }, "-=0.5");
+        });
+
+        // Mouse Parallax
+        document.addEventListener('mousemove', (e) => {
+            if(document.getElementById('scene').classList.contains('hidden')) return;
+            const x = (e.clientX / window.innerWidth - 0.5) * 30;
+            const y = (e.clientY / window.innerHeight - 0.5) * 30;
+            gsap.to(".neon-box", { rotationY: x/2, rotationX: -y/2, duration: 1.5 });
+            gsap.to(".cyber-card", { x: x, y: y, duration: 2 });
+        });
+        const year = new Date().getFullYear();
+            if(document.getElementById('year-display')) {
+                document.getElementById('year-display').textContent = year;
+        }
+    </script>
+</body>
+</html>
