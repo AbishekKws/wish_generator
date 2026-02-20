@@ -155,6 +155,22 @@
         "documentation": {}
     },
     {
+        "label": "migrations",
+        "importPath": "django.db",
+        "description": "django.db",
+        "isExtraImport": true,
+        "detail": "django.db",
+        "documentation": {}
+    },
+    {
+        "label": "models",
+        "importPath": "django.db",
+        "description": "django.db",
+        "isExtraImport": true,
+        "detail": "django.db",
+        "documentation": {}
+    },
+    {
         "label": "models",
         "importPath": "django.db",
         "description": "django.db",
@@ -596,6 +612,14 @@
     },
     {
         "label": "Q",
+        "importPath": "django.db.models",
+        "description": "django.db.models",
+        "isExtraImport": true,
+        "detail": "django.db.models",
+        "documentation": {}
+    },
+    {
+        "label": "Avg",
         "importPath": "django.db.models",
         "description": "django.db.models",
         "isExtraImport": true,
@@ -1093,6 +1117,15 @@
         "documentation": {}
     },
     {
+        "label": "Migration",
+        "kind": 6,
+        "importPath": "magic_wish.migrations.0002_visitorip",
+        "description": "magic_wish.migrations.0002_visitorip",
+        "peekOfCode": "class Migration(migrations.Migration):\n    dependencies = [\n        ('magic_wish', '0001_initial'),\n    ]\n    operations = [\n        migrations.CreateModel(\n            name='VisitorIP',\n            fields=[\n                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),\n                ('ip_address', models.GenericIPAddressField()),",
+        "detail": "magic_wish.migrations.0002_visitorip",
+        "documentation": {}
+    },
+    {
         "label": "CelebrationTemplateAdminForm",
         "kind": 6,
         "importPath": "magic_wish.admin",
@@ -1237,6 +1270,15 @@
         "documentation": {}
     },
     {
+        "label": "VisitorIP",
+        "kind": 6,
+        "importPath": "magic_wish.models",
+        "description": "magic_wish.models",
+        "peekOfCode": "class VisitorIP(models.Model):\n    ip_address = models.GenericIPAddressField()\n    visited_at = models.DateTimeField(auto_now_add=True)\n    def __str__(self):\n        return f\"{self.ip_address} on {self.visited_at}\"\nclass VisitorCount(models.Model):\n    total_visits = models.PositiveIntegerField(default=0)\nclass Rating(models.Model):\n    score = models.IntegerField(default=5) \n    created_at = models.DateTimeField(auto_now_add=True)",
+        "detail": "magic_wish.models",
+        "documentation": {}
+    },
+    {
         "label": "VisitorCount",
         "kind": 6,
         "importPath": "magic_wish.models",
@@ -1264,11 +1306,20 @@
         "documentation": {}
     },
     {
+        "label": "get_client_ip",
+        "kind": 2,
+        "importPath": "magic_wish.views",
+        "description": "magic_wish.views",
+        "peekOfCode": "def get_client_ip(request):\n    x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')\n    if x_forwarded_for:\n        ip = x_forwarded_for.split(',')[0]\n    else:\n        ip = request.META.get('REMOTE_ADDR')\n    return ip\ndef landing_page(request):\n    if request.method == \"POST\" and request.headers.get('x-requested-with') == 'XMLHttpRequest':\n        score = request.POST.get('score')",
+        "detail": "magic_wish.views",
+        "documentation": {}
+    },
+    {
         "label": "landing_page",
         "kind": 2,
         "importPath": "magic_wish.views",
         "description": "magic_wish.views",
-        "peekOfCode": "def landing_page(request):\n    if request.method == \"POST\" and request.headers.get('x-requested-with') == 'XMLHttpRequest':\n        score = request.POST.get('score')\n        Rating.objects.create(score=int(score))\n        return JsonResponse({'status': 'success'})\n    # Update Visitors\n    counter, _ = VisitorCount.objects.get_or_create(id=1)\n    counter.total_visits += 1 \n    counter.save()\n    # Get Real Stats",
+        "peekOfCode": "def landing_page(request):\n    if request.method == \"POST\" and request.headers.get('x-requested-with') == 'XMLHttpRequest':\n        score = request.POST.get('score')\n        Rating.objects.create(score=int(score))\n        return JsonResponse({'status': 'success'})\n    # --- UNIQUE VISITOR LOGIC START ---\n    user_ip = get_client_ip(request)\n    if not VisitorIP.objects.filter(ip_address=user_ip).exists():\n        VisitorIP.objects.create(ip_address=user_ip)\n        counter, _ = VisitorCount.objects.get_or_create(id=1)",
         "detail": "magic_wish.views",
         "documentation": {}
     },
@@ -1385,7 +1436,7 @@
         "kind": 5,
         "importPath": "magic_wish.views",
         "description": "magic_wish.views",
-        "peekOfCode": "WISH_TYPES_LIST = [\n    'Birthday', 'Anniversary', 'Love', 'Sorry', \n    'Friendship', 'Good Luck', 'Graduation', 'Thank You', \n    'New Year', 'Miss You', 'Proposal', 'Festival'\n]\n#--- FRONTEND VIEWS ---#\ndef landing_page(request):\n    if request.method == \"POST\" and request.headers.get('x-requested-with') == 'XMLHttpRequest':\n        score = request.POST.get('score')\n        Rating.objects.create(score=int(score))",
+        "peekOfCode": "WISH_TYPES_LIST = [\n    'Birthday', 'Anniversary', 'Love', 'Sorry', \n    'Friendship', 'Good Luck', 'Graduation', 'Thank You', \n    'New Year', 'Miss You', 'Proposal', 'Festival'\n]\n#--- FRONTEND VIEWS ---#\nfrom django.db.models import Avg\ndef get_client_ip(request):\n    x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')\n    if x_forwarded_for:",
         "detail": "magic_wish.views",
         "documentation": {}
     },

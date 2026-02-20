@@ -1,4 +1,4 @@
-from .models import Wish, WishImage, VisitorCount, Rating, CelebrationTemplate
+from .models import Wish, WishImage, VisitorCount, Rating, CelebrationTemplate, VisitorIP
 from django.contrib.admin.views.decorators import staff_member_required
 from django.shortcuts import render, redirect, get_object_or_404
 from magical_wishes.models import InteractiveWish
@@ -40,16 +40,34 @@ WISH_TYPES_LIST = [
 ]
 
 #--- FRONTEND VIEWS ---#
+from django.db.models import Avg
+
+def get_client_ip(request):
+    x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
+    if x_forwarded_for:
+        ip = x_forwarded_for.split(',')[0]
+    else:
+        ip = request.META.get('REMOTE_ADDR')
+    return ip
+
 def landing_page(request):
     if request.method == "POST" and request.headers.get('x-requested-with') == 'XMLHttpRequest':
         score = request.POST.get('score')
         Rating.objects.create(score=int(score))
         return JsonResponse({'status': 'success'})
 
-    # Update Visitors
-    counter, _ = VisitorCount.objects.get_or_create(id=1)
-    counter.total_visits += 1 
-    counter.save()
+    # --- UNIQUE VISITOR LOGIC START ---
+    user_ip = get_client_ip(request)
+    
+    if not VisitorIP.objects.filter(ip_address=user_ip).exists():
+        VisitorIP.objects.create(ip_address=user_ip)
+        
+        counter, _ = VisitorCount.objects.get_or_create(id=1)
+        counter.total_visits += 1 
+        counter.save()
+    else:
+        counter, _ = VisitorCount.objects.get_or_create(id=1)
+    # --- UNIQUE VISITOR LOGIC END ---
 
     # Get Real Stats
     count_wish = Wish.objects.count()
@@ -61,7 +79,7 @@ def landing_page(request):
 
     context = {
         'types': WISH_TYPES_LIST,
-        'count': counter.total_visits,
+        'count': counter.total_visits, 
         'surprises_count': total_surprises,
         'avg_rating': round(avg_rating, 1)
     }

@@ -97,6 +97,13 @@ class WishImage(models.Model):
         return f"Image for {self.wish.receiver_name}"
 
 
+class VisitorIP(models.Model):
+    ip_address = models.GenericIPAddressField()
+    visited_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.ip_address} on {self.visited_at}"
+
 class VisitorCount(models.Model):
     total_visits = models.PositiveIntegerField(default=0)
 
