@@ -76,3 +76,18 @@ def admin_interactive_delete(request, slug):
     messages.success(request, f"Interactive wish from {sender} deleted successfully.")
 
     return redirect('admin_interactive_list')
+
+from django.views.decorators.http import require_POST
+@staff_member_required
+@require_POST
+def admin_interactive_bulk_delete(request):
+    slugs = request.POST.getlist('selected_slugs')
+    
+    if slugs:
+        # DB bata ekai choti filter garera delete garchha (Cascade deletes images as well)
+        deleted_count, _ = InteractiveWish.objects.filter(slug__in=slugs).delete()
+        messages.success(request, f"Successfully deleted {deleted_count} selected wish(es).")
+    else:
+        messages.warning(request, "No wishes were selected for deletion.")
+
+    return redirect('admin_interactive_list')
