@@ -12,4 +12,5 @@ urlpatterns = [
     # -- BACKEND URLs -- #
     path('admin-panel/wishes/', views.admin_wish_list, name='admin_wish_list'),
     path('admin-panel/wishes/delete/<int:pk>/', views.admin_wish_delete, name='admin_wish_delete'),
+    path('admin-panel/wishes/bulk-delete/', views.admin_wish_bulk_delete, name='admin_wish_bulk_delete'),
 ]
