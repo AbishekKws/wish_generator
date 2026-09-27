@@ -1,4 +1,4 @@
-from .models import Wish, MusicLibrary, CelebrationTemplate
+from .models import MusicCategory, Wish, MusicLibrary, CelebrationTemplate
 from .models import Wish, MusicLibrary
 from django import forms
 
@@ -40,11 +40,16 @@ class WishForm(forms.ModelForm):
             })
 
 class MusicLibraryForm(forms.ModelForm):
+    category = forms.ModelMultipleChoiceField(
+        queryset=MusicCategory.objects.all(),
+        widget=forms.CheckboxSelectMultiple,
+        required=False,
+    )
+
     class Meta:
         model = MusicLibrary
         fields = ['category', 'audio_file']  # title hataayo
         widgets = {
-            'category': forms.Select(attrs={'class': 'form-select'}),
             'audio_file': forms.FileInput(attrs={'class': 'form-control'}),
         }
 
