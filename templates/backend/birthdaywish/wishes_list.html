@@ -1,141 +1,358 @@
 {% extends 'backend/base.html' %}
 
 {% block content %}
-<div class="container-fluid py-3">
-    <div class="card shadow-sm border-0 rounded-4 overflow-hidden">
-        <div class="card-header bg-white py-3 d-flex align-items-center justify-content-between border-bottom">
-            <h5 class="m-0 fw-bold text-primary">
+<div class="container-fluid py-4">
+    <!-- Header Section -->
+    <div class="row align-items-center mb-4 g-3">
+        <div class="col-12 col-md-6 text-center text-md-start">
+            <h3 class="fw-bold m-0 text-primary">
                 <i class="fas fa-birthday-cake me-2"></i>Lover's Special Wish
-            </h5>
-            <span class="badge bg-primary-subtle text-primary border border-primary-subtle rounded-pill px-3">
+            </h3>
+            <p class="text-muted small mb-0">Manage special birthday wishes and photos</p>
+        </div>
+        <div class="col-12 col-md-6 text-center text-md-end">
+            <span class="badge bg-primary-subtle text-primary border border-primary-subtle rounded-pill px-3 py-2 fs-6">
                 Total: {{ wishes.count }}
             </span>
         </div>
+    </div>
 
-        <div class="card-body p-0">
-            <div class="table-responsive d-none d-md-block">
-                <table class="table table-hover align-middle mb-0">
-                    <thead class="bg-light text-secondary">
-                        <tr>
-                            <th class="ps-4 border-0">Date</th>
-                            <th class="border-0">Sender</th>
-                            <th class="border-0">Receiver</th>
-                            <th class="border-0 text-center">Music</th>
-                            <th class="border-0 text-center">Images</th>
-                            <th class="border-0 text-center pe-4">Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for wish in wishes %}
-                        <tr>
-                            <td class="ps-4">
-                                <span class="text-dark fw-medium">{{ wish.created_at|date:"M d, Y" }}</span>
-                            </td>
-                            <td>{{ wish.sender_name }}</td>
-                            <td class="fw-bold text-dark">{{ wish.receiver_name }}</td>
-                            <td class="text-center">
-                                {% if wish.music %} 
-                                    <span class="p-2 bg-success-subtle text-success rounded-circle">
-                                        <i class="fas fa-music small"></i>
+    <!-- Search Bar -->
+    <div class="card border-0 shadow-sm mb-4 rounded-3">
+        <div class="card-body p-3">
+            <form method="GET" class="row g-2">
+                <div class="col-12 col-md-10">
+                    <div class="input-group">
+                        <span class="input-group-text bg-white border-end-0 text-muted ps-3">
+                            <i class="fas fa-search"></i>
+                        </span>
+                        <input type="text" name="q" class="form-control border-start-0 ps-0 py-2" 
+                               placeholder="Search by Sender or Receiver name..." value="{{ request.GET.q }}">
+                    </div>
+                </div>
+                <div class="col-12 col-md-2">
+                    <button type="submit" class="btn btn-primary w-100 fw-bold py-2 shadow-sm transition-all">Search</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Bulk Delete Form -->
+    <form id="bulkDeleteForm" method="POST" action="{% url 'birthday:admin_wish_bulk_delete' %}">
+        {% csrf_token %}
+        <div class="card border-0 shadow-sm overflow-hidden rounded-3">
+            <div class="card-body p-0">
+                
+                <!-- Desktop Table View -->
+                <div class="table-responsive d-none d-md-block">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="bg-light border-bottom">
+                            <tr>
+                                <th class="ps-4 py-3" style="width: 40px;">
+                                    <input class="form-check-input" type="checkbox" id="selectAllDesktop">
+                                </th>
+                                <th class="py-3 text-uppercase small fw-bold text-secondary">Date</th>
+                                <th class="py-3 text-uppercase small fw-bold text-secondary">Sender</th>
+                                <th class="py-3 text-uppercase small fw-bold text-secondary">Receiver</th>
+                                <th class="py-3 text-uppercase small fw-bold text-secondary text-center">Music</th> 
+                                <th class="py-3 text-uppercase small fw-bold text-secondary text-center">Images</th>
+                                <th class="py-3 text-uppercase small fw-bold text-secondary text-center">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for wish in wishes %}
+                            <tr class="wish-row transition-all">
+                                <td class="ps-4 py-3">
+                                    <input class="form-check-input wish-checkbox desktop-cb" type="checkbox" name="selected_ids" value="{{ wish.pk }}">
+                                </td>
+                                <td class="py-3">
+                                    <span class="text-dark fw-medium">{{ wish.created_at|date:"M d, Y" }}</span>
+                                </td>
+                                <td class="py-3">{{ wish.sender_name }}</td>
+                                <td class="py-3 fw-bold text-dark">{{ wish.receiver_name }}</td>
+                                <td class="py-3 text-center">
+                                    {% if wish.music %} 
+                                        <span class="p-2 bg-success-subtle text-success rounded-circle d-inline-flex align-items-center justify-content-center" style="width: 28px; height: 28px;">
+                                            <i class="fas fa-music small"></i>
+                                        </span>
+                                    {% else %} 
+                                        <span class="text-muted small">-</span> 
+                                    {% endif %}
+                                </td>
+                                <td class="py-3 text-center">
+                                    <span class="badge rounded-pill bg-info-subtle text-info border border-info-subtle px-3">
+                                        {{ wish.images.count }}
                                     </span>
-                                {% else %} 
-                                    <span class="text-muted small">-</span> 
-                                {% endif %}
-                            </td>
-                            <td class="text-center">
-                                <span class="badge rounded-pill bg-info-subtle text-info border border-info-subtle px-3">
-                                    {{ wish.images.count }}
-                                </span>
-                            </td>
-                            <td class="text-center pe-4">
-                                <button type="button" class="btn btn-sm btn-outline-danger border-0 rounded-circle" 
-                                        data-bs-toggle="modal" data-bs-target="#deleteModal{{ wish.pk }}"
-                                        style="width: 35px; height: 35px;">
-                                    <i class="fas fa-trash"></i>
-                                </button>
-                            </td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
+                                </td>
+                                <td class="py-3 text-center">
+                                    <button type="button" class="btn btn-sm btn-outline-danger border-0 rounded-circle action-btn" 
+                                            onclick="confirmSingleDelete('{{ wish.pk }}', '{{ wish.receiver_name|escapejs }}')">
+                                        <i class="fas fa-trash-alt"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="7" class="text-center py-5">
+                                    <i class="fas fa-folder-open fa-3x text-muted opacity-50 mb-3"></i>
+                                    <p class="text-muted mb-0">No birthday wishes found in database.</p>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
 
-            <div class="d-md-none">
-                {% for wish in wishes %}
-                <div class="p-3 border-bottom">
-                    <div class="d-flex justify-content-between align-items-center mb-3">
-                        <div class="d-flex align-items-center">
-                            <div class="bg-primary-subtle text-primary rounded-3 p-2 me-3 text-center" style="min-width: 50px;">
-                                <div class="small fw-bold">{{ wish.created_at|date:"d" }}</div>
-                                <div class="small" style="font-size: 0.65rem;">{{ wish.created_at|date:"M" }}</div>
-                            </div>
-                            <div>
-                                <h6 class="mb-0 fw-bold text-dark">{{ wish.receiver_name }}</h6>
-                                <small class="text-muted">From: {{ wish.sender_name }}</small>
-                            </div>
+                <!-- Mobile Card View -->
+                <div class="d-md-none">
+                    <div class="p-3 bg-light border-bottom d-flex align-items-center justify-content-between">
+                        <div class="form-check m-0">
+                            <input class="form-check-input" type="checkbox" id="selectAllMobile">
+                            <label class="form-check-label small text-muted fw-bold ms-1" for="selectAllMobile">Select All</label>
                         </div>
-                        <button type="button" class="btn btn-light text-danger rounded-circle shadow-sm" 
-                                data-bs-toggle="modal" data-bs-target="#deleteModal{{ wish.pk }}"
-                                style="width: 38px; height: 38px;">
-                            <i class="fas fa-trash"></i>
-                        </button>
                     </div>
 
-                    <div class="d-flex gap-3 mt-2">
-                        <div class="small">
-                            <i class="fas fa-image text-info me-1"></i> 
-                            <span class="fw-bold">{{ wish.images.count }}</span> <span class="text-muted">Images</span>
+                    {% for wish in wishes %}
+                    <div class="p-3 border-bottom wish-card transition-all position-relative">
+                        <div class="d-flex justify-content-between align-items-start mb-2">
+                            <div class="d-flex align-items-center gap-2">
+                                <input class="form-check-input wish-checkbox mobile-cb" type="checkbox" name="selected_ids" value="{{ wish.pk }}">
+                                <div class="bg-primary-subtle text-primary rounded-3 p-2 text-center ms-1" style="min-width: 45px;">
+                                    <div class="small fw-bold lh-1">{{ wish.created_at|date:"d" }}</div>
+                                    <div class="small lh-1" style="font-size: 0.65rem;">{{ wish.created_at|date:"M" }}</div>
+                                </div>
+                                <div>
+                                    <h6 class="mb-0 fw-bold text-dark">{{ wish.receiver_name }}</h6>
+                                    <small class="text-muted">From: {{ wish.sender_name }}</small>
+                                </div>
+                            </div>
+                            <button type="button" class="btn btn-light text-danger btn-sm rounded-circle shadow-sm" 
+                                    onclick="confirmSingleDelete('{{ wish.pk }}', '{{ wish.receiver_name|escapejs }}')"
+                                    style="width: 35px; height: 35px;">
+                                <i class="fas fa-trash-alt"></i>
+                            </button>
                         </div>
-                        <div class="small">
-                            <i class="fas fa-music {% if wish.music %}text-success{% else %}text-light{% endif %} me-1"></i> 
-                            <span class="text-muted">Music:</span> 
-                            <span class="fw-bold">{% if wish.music %}Yes{% else %}No{% endif %}</span>
+
+                        <div class="d-flex gap-3 mt-2 ms-4 ps-2">
+                            <div class="small">
+                                <i class="fas fa-image text-info me-1"></i> 
+                                <span class="fw-bold">{{ wish.images.count }}</span> <span class="text-muted">Images</span>
+                            </div>
+                            <div class="small">
+                                <i class="fas fa-music {% if wish.music %}text-success{% else %}text-muted{% endif %} me-1"></i> 
+                                <span class="text-muted">Music:</span> 
+                                <span class="fw-bold">{% if wish.music %}Yes{% else %}No{% endif %}</span>
+                            </div>
                         </div>
                     </div>
+                    {% empty %}
+                    <div class="text-center py-5">
+                        <i class="fas fa-folder-open fa-3x text-muted opacity-50 mb-3"></i>
+                        <p class="text-muted small">No wishes found in database.</p>
+                    </div>
+                    {% endfor %}
                 </div>
-                {% empty %}
-                <div class="text-center py-5">
-                    <i class="fas fa-search fa-3x text-light mb-3"></i>
-                    <p class="text-muted">No wishes found in database.</p>
-                </div>
-                {% endfor %}
             </div>
         </div>
+    </form>
+
+    <!-- Pagination -->
+    {% if wishes.has_other_pages %}
+    <nav class="mt-4 mb-5">
+        <ul class="pagination pagination-sm justify-content-center flex-wrap gap-1">
+            {% if wishes.has_previous %}
+                <li class="page-item"><a class="page-link rounded border-0 text-dark shadow-sm" href="?page=1&q={{ request.GET.q }}"><i class="fas fa-angle-double-left"></i></a></li>
+                <li class="page-item"><a class="page-link rounded border-0 text-dark shadow-sm px-3" href="?page={{ wishes.previous_page_number }}&q={{ request.GET.q }}">Prev</a></li>
+            {% endif %}
+
+            <li class="page-item active"><span class="page-link rounded border-0 bg-primary shadow px-3">{{ wishes.number }}</span></li>
+
+            {% if wishes.has_next %}
+                <li class="page-item"><a class="page-link rounded border-0 text-dark shadow-sm px-3" href="?page={{ wishes.next_page_number }}&q={{ request.GET.q }}">Next</a></li>
+                <li class="page-item"><a class="page-link rounded border-0 text-dark shadow-sm" href="?page={{ wishes.paginator.num_pages }}&q={{ request.GET.q }}"><i class="fas fa-angle-double-right"></i></a></li>
+            {% endif %}
+        </ul>
+    </nav>
+    {% endif %}
+</div>
+
+<!-- Floating Bulk Action Bar -->
+<div id="bulkActionBar" class="floating-action-bar card border-0 shadow-lg rounded-pill px-4 py-2 bg-dark text-white">
+    <div class="d-flex align-items-center justify-content-between gap-3">
+        <div class="d-flex align-items-center gap-2">
+            <span class="badge bg-danger rounded-pill" id="selectedCount">0</span>
+            <span class="small text-white-50">items selected</span>
+        </div>
+        <button type="button" class="btn btn-danger btn-sm rounded-pill fw-bold px-3 transition-all" onclick="showBulkDeleteModal()">
+            <i class="fas fa-trash-alt me-1"></i> Delete Selected
+        </button>
     </div>
 </div>
 
-{% for wish in wishes %}
-<div class="modal fade" id="deleteModal{{ wish.pk }}" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered modal-sm">
-        <div class="modal-content border-0 shadow-lg rounded-4">
+<!-- Reusable Delete Modal (Single & Bulk) -->
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" style="max-width: 360px;">
+        <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
             <div class="modal-body text-center p-4">
-                <div class="mb-3 text-danger">
-                    <i class="fas fa-exclamation-circle fa-4x opacity-75"></i>
+                <div class="icon-circle bg-danger-subtle text-danger mx-auto mb-3">
+                    <i class="fas fa-exclamation-triangle fa-2x"></i>
                 </div>
-                <h5 class="fw-bold">Confirm Delete</h5>
-                <p class="text-muted small px-2">
-                    Delete birthday wish for <strong>{{ wish.receiver_name }}</strong>?
-                </p>
+                <h5 class="fw-bold mb-2" id="deleteModalTitle">Remove Wish?</h5>
+                <p class="text-muted small px-2 mb-0" id="deleteModalText">This action cannot be undone.</p>
                 <div class="d-grid gap-2 mt-4">
-                    <a href="{% url 'birthday:admin_wish_delete' wish.pk %}" class="btn btn-danger py-2 fw-bold shadow-sm">Delete Now</a>
-                    <button type="button" class="btn btn-light py-2 text-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button id="confirmDeleteBtn" type="button" class="btn btn-danger py-2 fw-bold shadow-sm rounded-3">Confirm Delete</button>
+                    <button type="button" class="btn btn-light py-2 text-secondary rounded-3" data-bs-dismiss="modal">Cancel</button>
                 </div>
             </div>
         </div>
     </div>
 </div>
-{% endfor %}
 
 <style>
+    .transition-all { transition: all 0.2s ease-in-out; }
     .table td { white-space: nowrap; font-size: 0.9rem; }
-    .table thead th { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.5px; }
+    .table thead th { font-size: 0.75rem; letter-spacing: 0.5px; }
+    .page-link:hover { background-color: #f8f9fa; }
     
-    /* Row hover effect */
-    .table-hover tbody tr:hover { background-color: #f8f9ff; }
+    .wish-row.selected { background-color: rgba(13, 110, 253, 0.05) !important; }
+    .wish-card.selected { background-color: rgba(13, 110, 253, 0.05); }
 
-    /* Custom scrollbar for mobile just in case */
+    .floating-action-bar {
+        position: fixed;
+        bottom: -80px;
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: 1050;
+        transition: bottom 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+    .floating-action-bar.show {
+        bottom: 24px;
+    }
+
+    .icon-circle {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
     @media (max-width: 768px) {
-        .container-fluid { padding-bottom: 80px; }
+        .container-fluid { padding-bottom: 90px; }
     }
 </style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const selectAllDesktop = document.getElementById('selectAllDesktop');
+    const selectAllMobile = document.getElementById('selectAllMobile');
+    const desktopCheckboxes = document.querySelectorAll('.desktop-cb');
+    const mobileCheckboxes = document.querySelectorAll('.mobile-cb');
+    const bulkActionBar = document.getElementById('bulkActionBar');
+    const selectedCountSpan = document.getElementById('selectedCount');
+    let singleDeletePk = null;
+
+    function isMobileView() {
+        return window.innerWidth < 768;
+    }
+
+    function getActiveCheckboxes() {
+        return isMobileView() ? mobileCheckboxes : desktopCheckboxes;
+    }
+
+    function updateSelectionState() {
+        const activeCbs = getActiveCheckboxes();
+        let count = 0;
+
+        activeCbs.forEach(cb => {
+            const row = cb.closest('.wish-row') || cb.closest('.wish-card');
+            if (cb.checked) {
+                count++;
+                if (row) row.classList.add('selected');
+            } else {
+                if (row) row.classList.remove('selected');
+            }
+        });
+
+        if (selectedCountSpan) selectedCountSpan.innerText = count;
+
+        if (count > 0) {
+            bulkActionBar.classList.add('show');
+        } else {
+            bulkActionBar.classList.remove('show');
+        }
+    }
+
+    function syncCheckboxes(id, isChecked) {
+        document.querySelectorAll(`.wish-checkbox[value="${id}"]`).forEach(cb => {
+            cb.checked = isChecked;
+        });
+    }
+
+    // Select All Handlers
+    if (selectAllDesktop) {
+        selectAllDesktop.addEventListener('change', (e) => {
+            desktopCheckboxes.forEach(cb => {
+                cb.checked = e.target.checked;
+                syncCheckboxes(cb.value, e.target.checked);
+            });
+            updateSelectionState();
+        });
+    }
+
+    if (selectAllMobile) {
+        selectAllMobile.addEventListener('change', (e) => {
+            mobileCheckboxes.forEach(cb => {
+                cb.checked = e.target.checked;
+                syncCheckboxes(cb.value, e.target.checked);
+            });
+            updateSelectionState();
+        });
+    }
+
+    // Individual Checkbox Event Listener
+    document.querySelectorAll('.wish-checkbox').forEach(cb => {
+        cb.addEventListener('change', (e) => {
+            syncCheckboxes(e.target.value, e.target.checked);
+            updateSelectionState();
+        });
+    });
+
+    // Single Delete Trigger Function
+    window.confirmSingleDelete = function(pk, receiverName) {
+        singleDeletePk = pk;
+        document.getElementById('deleteModalTitle').innerText = "Remove Birthday Wish?";
+        document.getElementById('deleteModalText').innerHTML = `Wish for <strong class="text-dark">${receiverName}</strong> will be deleted permanently.`;
+        
+        const confirmBtn = document.getElementById('confirmDeleteBtn');
+        confirmBtn.onclick = function() {
+            let url = "{% url 'birthday:admin_wish_delete' 0 %}".replace('0', singleDeletePk);
+            window.location.href = url;
+        };
+
+        new bootstrap.Modal(document.getElementById('deleteModal')).show();
+    };
+
+    // Bulk Delete Trigger Function
+    window.showBulkDeleteModal = function() {
+        const inactiveCbs = isMobileView() ? desktopCheckboxes : mobileCheckboxes;
+        inactiveCbs.forEach(cb => cb.disabled = true);
+
+        const activeChecked = Array.from(getActiveCheckboxes()).filter(cb => cb.checked);
+        
+        document.getElementById('deleteModalTitle').innerText = "Bulk Delete Wishes?";
+        document.getElementById('deleteModalText').innerHTML = `Are you sure you want to delete <strong class="text-danger">${activeChecked.length}</strong> selected wish(es)?`;
+
+        const confirmBtn = document.getElementById('confirmDeleteBtn');
+        confirmBtn.onclick = function() {
+            document.getElementById('bulkDeleteForm').submit();
+        };
+
+        new bootstrap.Modal(document.getElementById('deleteModal')).show();
+    };
+
+    window.addEventListener('resize', updateSelectionState);
+});
+</script>
 {% endblock %}
