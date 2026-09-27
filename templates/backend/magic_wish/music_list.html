@@ -134,17 +134,13 @@
                 {% csrf_token %}
                 <div class="modal-body p-4">
                     <div class="mb-3">
-                        <label class="form-label fw-bold small text-secondary">Song Title</label>
-                        {{ form.title }}
-                    </div>
-                    <div class="mb-3">
                         <label class="form-label fw-bold small text-secondary">Wish Category</label>
                         {{ form.category }}
                     </div>
                     <div class="mb-4">
                         <label class="form-label fw-bold small text-secondary">Audio File (MP3)</label>
                         <div class="bg-light p-3 border rounded-3">
-                             {{ form.audio_file }}
+                            {{ form.audio_file }}
                         </div>
                     </div>
                 </div>
