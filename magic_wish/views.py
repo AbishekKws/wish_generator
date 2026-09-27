@@ -13,6 +13,7 @@ from django.contrib import messages
 from .models import MusicLibrary
 from .forms import WishForm
 from .models import Wish
+import os
 
 
 
@@ -274,36 +275,40 @@ def admin_music_list(request):
     for t_name in WISH_TYPES_LIST:
         MusicCategory.objects.get_or_create(name=t_name)
 
-    if request.method == "POST":
+    if request.method == 'POST':
         form = MusicLibraryForm(request.POST, request.FILES)
         if form.is_valid():
-            form.save()
-            messages.success(request, "New song added successfully!")
+            instance = form.save(commit=False)
+            # audio file ko naam bata title auto banaune
+            file_name = os.path.splitext(instance.audio_file.name)[0]
+            instance.title = file_name.replace('_', ' ').replace('-', ' ').strip()
+            instance.save()
             return redirect('admin_music_list')
-    
+    else:
+        form = MusicLibraryForm()
+
     query = request.GET.get('q', '')
     cat_filter = request.GET.get('category', '')
-    music_list = MusicLibrary.objects.all().order_by('-id')
-    
+
+    music_qs = MusicLibrary.objects.all().order_by('-id')
     if query:
-        music_list = music_list.filter(Q(title__icontains=query))
+        music_qs = music_qs.filter(title__icontains=query)
     if cat_filter:
-        music_list = music_list.filter(category__name=cat_filter)
+        music_qs = music_qs.filter(category__name=cat_filter)
 
-    paginator = Paginator(music_list, 10)
+    from django.core.paginator import Paginator
+    paginator = Paginator(music_qs, 15)
     page_number = request.GET.get('page')
-    page_obj = paginator.get_page(page_number)
+    music = paginator.get_page(page_number)
 
-    form = MusicLibraryForm()
-    form.fields['category'].queryset = MusicCategory.objects.filter(name__in=WISH_TYPES_LIST)
-    form.fields['category'].widget.attrs.update({'class': 'form-select'})
+    wish_types = WISH_TYPES_LIST
 
     return render(request, 'backend/magic_wish/music_list.html', {
-        'music': page_obj,
+        'music': music,
         'form': form,
-        'wish_types': WISH_TYPES_LIST,
         'query': query,
-        'cat_filter': cat_filter
+        'cat_filter': cat_filter,
+        'wish_types': wish_types,
     })
 
 @staff_member_required
