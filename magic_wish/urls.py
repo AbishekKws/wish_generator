@@ -30,4 +30,7 @@ urlpatterns = [
     # Template Management
     path('backend/templates/', views.admin_template_list, name='admin_template_list'),
     path('backend/templates/delete/<int:pk>/', views.admin_template_delete, name='admin_template_delete'),
+    path('backend/wishes/bulk-delete/', views.quick_wish_bulk_delete, name='quick_wish_bulk_delete'),
+    path('backend/music/bulk-delete/', views.music_bulk_delete, name='music_bulk_delete'),
+    path('backend/templates/update-image/', views.update_template_image, name='update_template_image'),
 ]
