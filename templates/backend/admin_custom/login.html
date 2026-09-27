@@ -3,92 +3,164 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WishGen Admin | Login</title>
+    <title>WishGen Admin | Secure Login</title>
+    <!-- Bootstrap 5.3 -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- FontAwesome 6 -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
     <style>
-        :root { --primary-color: #4e73df; --bg-gradient: linear-gradient(135deg, #4e73df 0%, #224abe 100%); }
-        
+        :root {
+            --primary-gradient: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+            --body-bg: #0f172a;
+            --card-bg: rgba(30, 41, 59, 0.7);
+            --border-color: rgba(255, 255, 255, 0.08);
+            --text-muted: #94a3b8;
+        }
+
         body { 
-            background: #f8f9fa; 
+            background-color: var(--body-bg);
+            background-image: 
+                radial-gradient(at 0% 0%, rgba(99, 102, 241, 0.15) 0px, transparent 50%),
+                radial-gradient(at 100% 100%, rgba(79, 70, 229, 0.15) 0px, transparent 50%);
             min-height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            color: #f8fafc;
+            overflow-x: hidden;
         }
 
         .login-wrapper {
             width: 100%;
-            padding: 20px;
+            padding: 24px;
         }
 
-        .login-container { 
-            max-width: 420px; 
+        .login-card { 
+            max-width: 440px; 
             margin: auto;
-            background: white; 
-            padding: 40px; 
-            border-radius: 15px; 
-            box-shadow: 0px 10px 30px rgba(0,0,0,0.1); 
-            transition: transform 0.3s ease;
+            background: var(--card-bg); 
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            padding: 44px 36px; 
+            border-radius: 24px; 
+            border: 1px solid var(--border-color);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5); 
+            transition: all 0.3s ease;
         }
 
         .brand-logo {
-            width: 60px;
-            height: 60px;
-            background: var(--bg-gradient);
+            width: 68px;
+            height: 68px;
+            background: var(--primary-gradient);
             color: white;
-            border-radius: 12px;
+            border-radius: 18px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 24px;
-            margin: 0 auto 20px;
-            box-shadow: 0 4px 15px rgba(78, 115, 223, 0.3);
+            font-size: 28px;
+            margin: 0 auto 24px;
+            box-shadow: 0 10px 25px -5px rgba(99, 102, 241, 0.5);
+        }
+
+        .input-group-text {
+            background-color: rgba(15, 23, 42, 0.6);
+            border: 1px solid var(--border-color);
+            border-end: none;
+            color: var(--text-muted);
+            padding-left: 16px;
+            padding-right: 12px;
+            border-top-left-radius: 12px;
+            border-bottom-left-radius: 12px;
         }
 
         .form-control {
-            padding: 12px 15px;
-            border-radius: 8px;
-            border: 1px solid #d1d3e2;
+            background-color: rgba(15, 23, 42, 0.6);
+            border: 1px solid var(--border-color);
+            border-start: none;
+            color: #f8fafc;
+            padding: 12px 16px;
+            font-size: 0.95rem;
+            border-top-right-radius: 12px;
+            border-bottom-right-radius: 12px;
+        }
+
+        .password-toggle {
+            background-color: rgba(15, 23, 42, 0.6);
+            border: 1px solid var(--border-color);
+            border-start: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            border-top-right-radius: 12px;
+            border-bottom-right-radius: 12px;
+            padding-right: 16px;
+        }
+
+        .input-group:focus-within .input-group-text,
+        .input-group:focus-within .form-control,
+        .input-group:focus-within .password-toggle {
+            border-color: #6366f1;
         }
 
         .form-control:focus {
-            border-color: var(--primary-color);
-            box-shadow: 0 0 0 0.2rem rgba(78, 115, 223, 0.25);
+            background-color: rgba(15, 23, 42, 0.8);
+            color: #ffffff;
+            box-shadow: none;
+        }
+
+        .form-control::placeholder {
+            color: #475569;
         }
 
         .btn-primary { 
-            background: var(--bg-gradient); 
+            background: var(--primary-gradient); 
             border: none; 
-            padding: 12px;
-            border-radius: 8px;
+            padding: 14px;
+            border-radius: 12px;
             font-weight: 600;
-            letter-spacing: 0.5px;
-            transition: all 0.3s;
+            font-size: 0.95rem;
+            letter-spacing: 0.3px;
+            color: white;
+            box-shadow: 0 10px 20px -5px rgba(79, 70, 229, 0.4);
+            transition: all 0.25s ease;
         }
 
         .btn-primary:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 5px 15px rgba(78, 115, 223, 0.4);
-            opacity: 0.95;
+            transform: translateY(-2px);
+            box-shadow: 0 15px 25px -5px rgba(79, 70, 229, 0.6);
+            opacity: 0.98;
+        }
+
+        .btn-primary:active {
+            transform: translateY(0);
         }
 
         .footer-text {
-            color: #858796;
-            font-size: 0.85rem;
-            margin-top: 25px;
+            color: var(--text-muted);
+            font-size: 0.8rem;
         }
 
-        /* Responsive Adjustments */
+        /* Alert Styling */
+        .alert {
+            border-radius: 12px;
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.2);
+            color: #fca5a5;
+            font-size: 0.875rem;
+        }
+
         @media (max-width: 480px) {
-            .login-container {
-                padding: 30px 20px;
+            .login-card {
+                padding: 32px 20px;
+                border-radius: 20px;
             }
             .brand-logo {
-                width: 50px;
-                height: 50px;
-                font-size: 20px;
+                width: 58px;
+                height: 58px;
+                font-size: 22px;
             }
         }
     </style>
@@ -96,41 +168,56 @@
 <body>
 
     <div class="login-wrapper">
-        <div class="login-container">
+        <div class="login-card">
             <div class="brand-logo">
-                <i class="fas fa-magic"></i>
+                <i class="fas fa-wand-magic-sparkles"></i>
             </div>
             
-            <h3 class="text-center fw-bold mb-2" style="color: #3a3b45;">SURPRISE ME ADMIN</h3>
-            <p class="text-center text-muted mb-4 small">Welcome back! Please login to continue.</p>
+            <h4 class="text-center fw-bold mb-1 text-white" style="letter-spacing: -0.5px;">SURPRISE ME ADMIN</h4>
+            <p class="text-center mb-4 small" style="color: var(--text-muted);">Welcome back! Please login to continue.</p>
 
-            <form method="post">
+            <!-- Django Alert Messages -->
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert alert-dismissible fade show d-flex align-items-center gap-2 mb-4" role="alert">
+                        <i class="fas fa-circle-exclamation me-1"></i>
+                        <div>{{ message }}</div>
+                        <button type="button" class="btn-close btn-close-white ms-auto shadow-none" data-bs-dismiss="alert" aria-label="Close" style="font-size: 0.75rem;"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+
+            <form method="post" autocomplete="off">
                 {% csrf_token %}
+                
                 <div class="mb-3">
-                    <label class="form-label fw-semibold small text-secondary">Username</label>
+                    <label class="form-label fw-semibold small" style="color: #cbd5e1;">Username</label>
                     <div class="input-group">
-                        <span class="input-group-text bg-light border-end-0 text-muted"><i class="fas fa-user small"></i></span>
-                        <input type="text" name="username" class="form-control border-start-0 ps-0" placeholder="Enter username" required>
+                        <span class="input-group-text"><i class="fas fa-user-gear"></i></span>
+                        <input type="text" name="username" class="form-control" placeholder="Enter username" required autofocus>
                     </div>
                 </div>
 
                 <div class="mb-4">
-                    <div class="d-flex justify-content-between">
-                        <label class="form-label fw-semibold small text-secondary">Password</label>
+                    <div class="d-flex justify-content-between align-items-center mb-1">
+                        <label class="form-label fw-semibold small mb-0" style="color: #cbd5e1;">Password</label>
                     </div>
                     <div class="input-group">
-                        <span class="input-group-text bg-light border-end-0 text-muted"><i class="fas fa-lock small"></i></span>
-                        <input type="password" name="password" class="form-control border-start-0 ps-0" placeholder="••••••••" required>
+                        <span class="input-group-text"><i class="fas fa-lock"></i></span>
+                        <input type="password" id="passwordInput" name="password" class="form-control border-end-0" placeholder="••••••••" required>
+                        <span class="input-group-text password-toggle" id="togglePassword">
+                            <i class="fas fa-eye" id="eyeIcon"></i>
+                        </span>
                     </div>
                 </div>
 
-                <button type="submit" class="btn btn-primary w-100 shadow-sm">
-                    Enter To Login <i class="fas fa-arrow-right ms-2"></i>
+                <button type="submit" class="btn btn-primary w-100 mb-3">
+                    Enter To Login <i class="fas fa-arrow-right-to-bracket ms-2"></i>
                 </button>
             </form>
 
-            <div class="text-center footer-text py-3">
-                <p class="mb-0 text-muted small">
+            <div class="text-center footer-text pt-3 border-top" style="border-color: rgba(255,255,255,0.06) !important;">
+                <p class="mb-0">
                     &copy; {% now "Y" %} Wish Generator Ltd. All Rights Reserved.
                 </p>
             </div>
@@ -138,5 +225,22 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Password Visibility Toggle Logic
+        document.getElementById('togglePassword').addEventListener('click', function () {
+            const passwordInput = document.getElementById('passwordInput');
+            const eyeIcon = document.getElementById('eyeIcon');
+            
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                eyeIcon.classList.remove('fa-eye');
+                eyeIcon.classList.add('fa-eye-slash');
+            } else {
+                passwordInput.type = 'password';
+                eyeIcon.classList.remove('fa-eye-slash');
+                eyeIcon.classList.add('fa-eye');
+            }
+        });
+    </script>
 </body>
 </html>
