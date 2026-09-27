@@ -2,6 +2,7 @@ from django.db import models
 from django.utils.text import slugify
 import uuid
 
+
 # Music Category (e.g., Birthday, Sad, Romantic, Devotional)
 class MusicCategory(models.Model):
     name = models.CharField(max_length=50)
@@ -18,14 +19,19 @@ class MusicCategory(models.Model):
     def __str__(self):
         return self.name
 
+
 # Pre-uploaded songs for users to choose from
 class MusicLibrary(models.Model):
     title = models.CharField(max_length=100)
-    category = models.ForeignKey(MusicCategory, on_delete=models.CASCADE, related_name='musics')
+    category = models.ManyToManyField(MusicCategory, blank=True, related_name='musics')
     audio_file = models.FileField(upload_to='music_collection/')
-    
+
     def __str__(self):
-        return f"{self.title} - ({self.category.name})"
+        return self.title
+
+    def category_names(self):
+        return ", ".join(c.name for c in self.category.all())
+
 
 # The Main Wish Model (Dynamic Version)
 class Wish(models.Model):
