@@ -9,4 +9,7 @@ urlpatterns = [
     # -- BACKEND URLs -- #
     path('backend/interactive-wishes/', views.admin_interactive_wish_list, name='admin_interactive_list'),
     path('backend/interactive-wishes/delete/<path:slug>/', views.admin_interactive_delete, name='admin_interactive_delete'),
+
+    path('magic/backend/interactive-wishes/bulk-delete/', views.admin_interactive_bulk_delete, name='admin_interactive_bulk_delete'),
+
 ]
