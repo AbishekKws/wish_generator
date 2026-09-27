@@ -69,9 +69,13 @@
                                     <small class="text-muted d-md-none">ID: #{{ item.id }}</small>
                                 </td>
                                 <td class="py-3">
-                                    <span class="badge bg-info-subtle text-info border border-info-subtle px-3 rounded-pill">
-                                        {{ item.category.name }}
+                                    {% for cat in item.category.all %}
+                                    <span class="badge bg-info-subtle text-info border border-info-subtle px-3 rounded-pill me-1">
+                                        {{ cat.name }}
                                     </span>
+                                    {% empty %}
+                                    <span class="text-muted small">No category</span>
+                                    {% endfor %}
                                 </td>
                                 <td class="py-3">
                                     <audio controls class="custom-audio-player">
@@ -133,14 +137,21 @@
             <form method="POST" enctype="multipart/form-data">
                 {% csrf_token %}
                 <div class="modal-body p-4">
-                    <div class="mb-3">
-                        <label class="form-label fw-bold small text-secondary">Wish Category</label>
-                        {{ form.category }}
+                    <div class="mb-4">
+                        <label class="form-label fw-bold small text-secondary">Wish Categories</label>
+                        <div class="bg-light p-3 border rounded-3 d-flex flex-wrap gap-3">
+                            {% for checkbox in form.category %}
+                            <div class="form-check">
+                                {{ checkbox.tag }}
+                                <label class="form-check-label small" for="{{ checkbox.id_for_label }}">{{ checkbox.choice_label }}</label>
+                            </div>
+                            {% endfor %}
+                        </div>
                     </div>
                     <div class="mb-4">
                         <label class="form-label fw-bold small text-secondary">Audio File (MP3)</label>
                         <div class="bg-light p-3 border rounded-3">
-                            {{ form.audio_file }}
+                             {{ form.audio_file }}
                         </div>
                     </div>
                 </div>
