@@ -2,11 +2,13 @@
 
 {% block content %}
 <div class="container-fluid py-3">
+    <!-- Header -->
     <div class="mb-4">
-        <h3 class="fw-bold text-dark mb-1"> Quick Wish</h3>
+        <h3 class="fw-bold text-dark mb-1">Quick Wish</h3>
         <p class="text-muted small">Monitor and manage all wishes with full visibility.</p>
     </div>
 
+    <!-- Filter Form -->
     <div class="card border-0 shadow-sm mb-4">
         <div class="card-body p-3">
             <form method="GET" class="row g-2 align-items-end">
@@ -33,83 +35,117 @@
         </div>
     </div>
 
-    <div class="card border-0 shadow-sm overflow-hidden">
-        <div class="card-body p-0">
-            <div class="table-responsive d-none d-md-block">
-                <table class="table table-hover align-middle mb-0">
-                    <thead class="bg-light">
-                        <tr>
-                            <th class="ps-4 py-3 text-uppercase small fw-bold text-secondary border-0">Sender</th>
-                            <th class="py-3 text-uppercase small fw-bold text-secondary border-0">Receiver</th>
-                            <th class="py-3 text-uppercase small fw-bold text-secondary border-0">Type</th>
-                            <th class="py-3 text-uppercase small fw-bold text-secondary border-0">Created At</th>
-                            <th class="py-3 text-uppercase small fw-bold text-secondary border-0 text-center">Action</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for wish in wishes %}
-                        <tr>
-                            <td class="ps-4 py-3 fw-bold text-dark">{{ wish.sender_name }}</td>
-                            <td class="py-3 text-secondary">{{ wish.receiver_name }}</td>
-                            <td class="py-3">
-                                <span class="badge rounded-pill bg-primary-subtle text-primary border border-primary-subtle px-3">
-                                    {{ wish.wish_type|title }}
-                                </span>
-                            </td>
-                            <td class="py-3 small text-muted">
-                                {{ wish.created_at|date:"M d, Y" }} <br>
-                                <span style="font-size: 0.7rem;">{{ wish.created_at|date:"H:i" }}</span>
-                            </td>
-                            <td class="py-3 text-center">
-                                <button class="btn btn-sm btn-outline-danger border-0 rounded-circle" 
-                                        onclick="confirmDeleteWish('{{ wish.id }}', '{{ wish.sender_name }}')">
-                                    <i class="fas fa-trash"></i>
-                                </button>
-                            </td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
+    <!-- Bulk Delete Form -->
+    <form id="bulkDeleteForm" method="POST" action="{% url 'quick_wish_bulk_delete' %}">
+        {% csrf_token %}
+        <div class="card border-0 shadow-sm overflow-hidden">
+            <div class="card-body p-0">
+                
+                <!-- Desktop Table View -->
+                <div class="table-responsive d-none d-md-block">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="bg-light">
+                            <tr>
+                                <th class="ps-4 py-3" style="width: 40px;">
+                                    <input class="form-check-input" type="checkbox" id="selectAllDesktop">
+                                </th>
+                                <th class="py-3 text-uppercase small fw-bold text-secondary border-0">Sender</th>
+                                <th class="py-3 text-uppercase small fw-bold text-secondary border-0">Receiver</th>
+                                <th class="py-3 text-uppercase small fw-bold text-secondary border-0">Type</th>
+                                <th class="py-3 text-uppercase small fw-bold text-secondary border-0">Created At</th>
+                                <th class="py-3 text-uppercase small fw-bold text-secondary border-0 text-center">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for wish in wishes %}
+                            <tr class="wish-row transition-all">
+                                <td class="ps-4 py-3">
+                                    <input class="form-check-input wish-checkbox desktop-cb" type="checkbox" name="selected_ids" value="{{ wish.id }}">
+                                </td>
+                                <td class="py-3 fw-bold text-dark">{{ wish.sender_name }}</td>
+                                <td class="py-3 text-secondary">{{ wish.receiver_name }}</td>
+                                <td class="py-3">
+                                    <span class="badge rounded-pill bg-primary-subtle text-primary border border-primary-subtle px-3">
+                                        {{ wish.wish_type|title }}
+                                    </span>
+                                </td>
+                                <td class="py-3 small text-muted">
+                                    {{ wish.created_at|date:"M d, Y" }} <br>
+                                    <span style="font-size: 0.7rem;">{{ wish.created_at|date:"H:i" }}</span>
+                                </td>
+                                <td class="py-3 text-center">
+                                    <button type="button" class="btn btn-sm btn-outline-danger border-0 rounded-circle" 
+                                            onclick="confirmDeleteWish('{{ wish.id }}', '{{ wish.sender_name|escapejs }}')">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="6" class="text-center py-5">
+                                    <p class="text-muted mb-0">No wishes found.</p>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
 
-            <div class="d-md-none">
-                {% for wish in wishes %}
-                <div class="p-3 border-bottom position-relative">
-                    <div class="row g-0">
-                        <div class="col-9">
-                            <div class="small text-uppercase fw-bold text-muted mb-1" style="font-size: 0.65rem;">Sender</div>
-                            <div class="fw-bold text-dark mb-2">{{ wish.sender_name }}</div>
-                            
-                            <div class="small text-uppercase fw-bold text-muted mb-1" style="font-size: 0.65rem;">Receiver</div>
-                            <div class="text-secondary mb-3">{{ wish.receiver_name }}</div>
-                            
-                            <div class="d-flex gap-2 align-items-center">
-                                <span class="badge bg-primary-subtle text-primary border border-primary-subtle px-2">
-                                    {{ wish.wish_type|title }}
-                                </span>
-                                <span class="small text-muted" style="font-size: 0.75rem;">
-                                    <i class="far fa-calendar-alt me-1"></i> {{ wish.created_at|date:"M d" }}
-                                </span>
-                            </div>
-                        </div>
-                        <div class="col-3 text-end d-flex flex-column justify-content-center">
-                            <button class="btn btn-light text-danger rounded-circle p-2 shadow-sm ms-auto" 
-                                    onclick="confirmDeleteWish('{{ wish.id }}', '{{ wish.sender_name }}')"
-                                    style="width: 40px; height: 40px;">
-                                <i class="fas fa-trash"></i>
-                            </button>
+                <!-- Mobile Card View -->
+                <div class="d-md-none">
+                    <div class="p-3 bg-light border-bottom d-flex align-items-center justify-content-between">
+                        <div class="form-check m-0">
+                            <input class="form-check-input" type="checkbox" id="selectAllMobile">
+                            <label class="form-check-label small text-muted fw-bold ms-1" for="selectAllMobile">Select All</label>
                         </div>
                     </div>
+
+                    {% for wish in wishes %}
+                    <div class="p-3 border-bottom wish-card position-relative transition-all">
+                        <div class="row g-0">
+                            <div class="col-9">
+                                <div class="d-flex align-items-center gap-2 mb-2">
+                                    <input class="form-check-input wish-checkbox mobile-cb" type="checkbox" name="selected_ids" value="{{ wish.id }}">
+                                    <div>
+                                        <div class="small text-uppercase fw-bold text-muted" style="font-size: 0.65rem;">Sender</div>
+                                        <div class="fw-bold text-dark">{{ wish.sender_name }}</div>
+                                    </div>
+                                </div>
+                                
+                                <div class="ms-4">
+                                    <div class="small text-uppercase fw-bold text-muted mb-1" style="font-size: 0.65rem;">Receiver</div>
+                                    <div class="text-secondary mb-3">{{ wish.receiver_name }}</div>
+                                    
+                                    <div class="d-flex gap-2 align-items-center">
+                                        <span class="badge bg-primary-subtle text-primary border border-primary-subtle px-2">
+                                            {{ wish.wish_type|title }}
+                                        </span>
+                                        <span class="small text-muted" style="font-size: 0.75rem;">
+                                            <i class="far fa-calendar-alt me-1"></i> {{ wish.created_at|date:"M d" }}
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-3 text-end d-flex flex-column justify-content-center">
+                                <button type="button" class="btn btn-light text-danger rounded-circle p-2 shadow-sm ms-auto" 
+                                        onclick="confirmDeleteWish('{{ wish.id }}', '{{ wish.sender_name|escapejs }}')"
+                                        style="width: 40px; height: 40px;">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    {% empty %}
+                    <div class="text-center py-5">
+                        <p class="text-muted mb-0">No wishes found.</p>
+                    </div>
+                    {% endfor %}
                 </div>
-                {% empty %}
-                <div class="text-center py-5">
-                    <p class="text-muted mb-0">No wishes found.</p>
-                </div>
-                {% endfor %}
             </div>
         </div>
-    </div>
+    </form>
 
+    <!-- Pagination -->
     {% if wishes.has_other_pages %}
     <nav class="mt-4 mb-5">
         <ul class="pagination pagination-sm justify-content-center gap-1">
@@ -125,16 +161,30 @@
     {% endif %}
 </div>
 
+<!-- Floating Bulk Action Bar -->
+<div id="bulkActionBar" class="floating-action-bar card border-0 shadow-lg rounded-pill px-4 py-2 bg-dark text-white">
+    <div class="d-flex align-items-center justify-content-between gap-3">
+        <div class="d-flex align-items-center gap-2">
+            <span class="badge bg-danger rounded-pill" id="selectedCount">0</span>
+            <span class="small text-white-50">items selected</span>
+        </div>
+        <button type="button" class="btn btn-danger btn-sm rounded-pill fw-bold px-3 transition-all" onclick="showBulkDeleteModal()">
+            <i class="fas fa-trash-alt me-1"></i> Delete Selected
+        </button>
+    </div>
+</div>
+
+<!-- Reusable Delete Modal -->
 <div class="modal fade" id="deleteWishModal" tabindex="-1">
-    <div class="modal-dialog modal-dialog-centered" style="max-width: 320px;">
+    <div class="modal-dialog modal-dialog-centered" style="max-width: 340px;">
         <div class="modal-content border-0 shadow-lg rounded-4">
             <div class="modal-body text-center p-4">
                 <i class="fas fa-trash-alt fa-3x text-danger opacity-75 mb-3"></i>
-                <h5 class="fw-bold mb-2">Delete Wish?</h5>
-                <p class="text-muted small">Wish from <strong id="sender_display" class="text-dark"></strong> will be gone forever.</p>
+                <h5 class="fw-bold mb-2" id="deleteModalTitle">Delete Wish?</h5>
+                <p class="text-muted small" id="deleteModalText">This wish will be deleted permanently.</p>
                 <div class="d-grid gap-2 mt-4">
-                    <a id="delete_link" href="#" class="btn btn-danger py-2 fw-bold shadow-sm">Delete Permanently</a>
-                    <button type="button" class="btn btn-light py-2 text-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button id="confirmDeleteBtn" type="button" class="btn btn-danger py-2 fw-bold shadow-sm rounded-3">Delete Permanently</button>
+                    <button type="button" class="btn btn-light py-2 text-secondary rounded-3" data-bs-dismiss="modal">Cancel</button>
                 </div>
             </div>
         </div>
@@ -142,17 +192,136 @@
 </div>
 
 <style>
-    /* Styling for the Mobile Cards */
-    .d-md-none .border-bottom:last-child { border-bottom: none !important; }
+    .transition-all { transition: all 0.2s ease-in-out; }
     .page-link:hover { background: #f8f9fa; }
+    
+    .wish-row.selected { background-color: rgba(13, 110, 253, 0.05) !important; }
+    .wish-card.selected { background-color: rgba(13, 110, 253, 0.05); }
+
+    .floating-action-bar {
+        position: fixed;
+        bottom: -80px;
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: 1050;
+        transition: bottom 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+    .floating-action-bar.show {
+        bottom: 24px;
+    }
+
+    @media (max-width: 768px) {
+        .container-fluid { padding-bottom: 90px; }
+    }
 </style>
 
 <script>
-function confirmDeleteWish(id, sender) {
-    const url = `/backend/wishes/delete/${id}/`;
-    document.getElementById('sender_display').innerText = sender;
-    document.getElementById('delete_link').setAttribute('href', url);
-    new bootstrap.Modal(document.getElementById('deleteWishModal')).show();
-}
+document.addEventListener('DOMContentLoaded', function () {
+    const selectAllDesktop = document.getElementById('selectAllDesktop');
+    const selectAllMobile = document.getElementById('selectAllMobile');
+    const desktopCheckboxes = document.querySelectorAll('.desktop-cb');
+    const mobileCheckboxes = document.querySelectorAll('.mobile-cb');
+    const bulkActionBar = document.getElementById('bulkActionBar');
+    const selectedCountSpan = document.getElementById('selectedCount');
+    let singleDeleteId = null;
+
+    function isMobileView() {
+        return window.innerWidth < 768;
+    }
+
+    function getActiveCheckboxes() {
+        return isMobileView() ? mobileCheckboxes : desktopCheckboxes;
+    }
+
+    function updateSelectionState() {
+        const activeCbs = getActiveCheckboxes();
+        let count = 0;
+
+        activeCbs.forEach(cb => {
+            const row = cb.closest('.wish-row') || cb.closest('.wish-card');
+            if (cb.checked) {
+                count++;
+                if (row) row.classList.add('selected');
+            } else {
+                if (row) row.classList.remove('selected');
+            }
+        });
+
+        if (selectedCountSpan) selectedCountSpan.innerText = count;
+
+        if (count > 0) {
+            bulkActionBar.classList.add('show');
+        } else {
+            bulkActionBar.classList.remove('show');
+        }
+    }
+
+    function syncCheckboxes(id, isChecked) {
+        document.querySelectorAll(`.wish-checkbox[value="${id}"]`).forEach(cb => {
+            cb.checked = isChecked;
+        });
+    }
+
+    if (selectAllDesktop) {
+        selectAllDesktop.addEventListener('change', (e) => {
+            desktopCheckboxes.forEach(cb => {
+                cb.checked = e.target.checked;
+                syncCheckboxes(cb.value, e.target.checked);
+            });
+            updateSelectionState();
+        });
+    }
+
+    if (selectAllMobile) {
+        selectAllMobile.addEventListener('change', (e) => {
+            mobileCheckboxes.forEach(cb => {
+                cb.checked = e.target.checked;
+                syncCheckboxes(cb.value, e.target.checked);
+            });
+            updateSelectionState();
+        });
+    }
+
+    document.querySelectorAll('.wish-checkbox').forEach(cb => {
+        cb.addEventListener('change', (e) => {
+            syncCheckboxes(e.target.value, e.target.checked);
+            updateSelectionState();
+        });
+    });
+
+    // Single Delete
+    window.confirmDeleteWish = function(id, sender) {
+        singleDeleteId = id;
+        document.getElementById('deleteModalTitle').innerText = "Delete Wish?";
+        document.getElementById('deleteModalText').innerHTML = `Wish from <strong class="text-dark">${sender}</strong> will be gone forever.`;
+        
+        const confirmBtn = document.getElementById('confirmDeleteBtn');
+        confirmBtn.onclick = function() {
+            window.location.href = `/backend/wishes/delete/${singleDeleteId}/`;
+        };
+
+        new bootstrap.Modal(document.getElementById('deleteWishModal')).show();
+    };
+
+    // Bulk Delete
+    window.showBulkDeleteModal = function() {
+        const inactiveCbs = isMobileView() ? desktopCheckboxes : mobileCheckboxes;
+        inactiveCbs.forEach(cb => cb.disabled = true);
+
+        const activeChecked = Array.from(getActiveCheckboxes()).filter(cb => cb.checked);
+        
+        document.getElementById('deleteModalTitle').innerText = "Delete Selected Wishes?";
+        document.getElementById('deleteModalText').innerHTML = `Are you sure you want to delete <strong class="text-danger">${activeChecked.length}</strong> selected wish(es)?`;
+
+        const confirmBtn = document.getElementById('confirmDeleteBtn');
+        confirmBtn.onclick = function() {
+            document.getElementById('bulkDeleteForm').submit();
+        };
+
+        new bootstrap.Modal(document.getElementById('deleteWishModal')).show();
+    };
+
+    window.addEventListener('resize', updateSelectionState);
+});
 </script>
 {% endblock %}
