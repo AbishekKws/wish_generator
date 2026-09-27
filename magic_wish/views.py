@@ -5,11 +5,16 @@ from magical_wishes.models import InteractiveWish
 from .models import MusicLibrary, MusicCategory
 from birthdaywish.models import BirthdayWish
 from django.core.paginator import Paginator
+from .models import CelebrationTemplate
 from django.http import JsonResponse
+from django.db.models import Avg, Q
 from .forms import MusicLibraryForm
 from django.contrib import messages
-from django.db.models import Avg, Q
+from .models import MusicLibrary
 from .forms import WishForm
+from .models import Wish
+
+
 
 #--- GLOBAL CONFIG ---#
 ALL_TEMPLATES_CONFIG = {
@@ -198,6 +203,17 @@ def admin_wish_delete(request, pk):
     messages.warning(request, "Wish has been permanently deleted.")
     return redirect('admin_wish_list')
 
+def quick_wish_bulk_delete(request):
+    if request.method == 'POST':
+        selected_ids = request.POST.getlist('selected_ids')
+        if selected_ids:
+            deleted_count, _ = Wish.objects.filter(id__in=selected_ids).delete()
+            messages.success(request, f'Successfully deleted {deleted_count} wish(es).')
+        else:
+            messages.warning(request, 'No wishes were selected for deletion.')
+            
+    return redirect(request.META.get('HTTP_REFERER', '/'))
+
 @staff_member_required
 def admin_template_list(request):
     if request.method == "POST":
@@ -223,6 +239,29 @@ def admin_template_list(request):
         })
 
     return render(request, 'backend/magic_wish/templates_list.html', {'templates': final_list})
+
+def update_template_image(request):
+    if request.method == 'POST':
+        template_id = request.POST.get('template_id')
+        name = request.POST.get('name')
+        preview_image = request.FILES.get('preview_image')
+
+        if template_id and preview_image:
+            # Model name CelebrationTemplate use gareko chha
+            obj, created = CelebrationTemplate.objects.get_or_create(
+                template_id=template_id,
+                defaults={'name': name}
+            )
+            obj.preview_image = preview_image
+            if name:
+                obj.name = name
+            obj.save()
+
+            messages.success(request, f"Preview image for '{name}' updated successfully!")
+        else:
+            messages.error(request, "Please select a valid image file to upload.")
+
+    return redirect(request.META.get('HTTP_REFERER', '/'))
 
 @staff_member_required
 def admin_template_delete(request, pk):
@@ -256,7 +295,6 @@ def admin_music_list(request):
     page_obj = paginator.get_page(page_number)
 
     form = MusicLibraryForm()
-    # SEO slug logic match garna category lookup
     form.fields['category'].queryset = MusicCategory.objects.filter(name__in=WISH_TYPES_LIST)
     form.fields['category'].widget.attrs.update({'class': 'form-select'})
 
@@ -272,3 +310,14 @@ def admin_music_list(request):
 def admin_music_delete(request, pk):
     get_object_or_404(MusicLibrary, pk=pk).delete()
     return redirect('admin_music_list')
+
+def music_bulk_delete(request):
+    if request.method == 'POST':
+        selected_ids = request.POST.getlist('selected_ids')
+        if selected_ids:
+            deleted_count, _ = MusicLibrary.objects.filter(id__in=selected_ids).delete()
+            messages.success(request, f'Successfully deleted {deleted_count} song(s).')
+        else:
+            messages.warning(request, 'No music items were selected for deletion.')
+            
+    return redirect(request.META.get('HTTP_REFERER', '/'))
