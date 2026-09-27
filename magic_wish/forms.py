@@ -42,9 +42,8 @@ class WishForm(forms.ModelForm):
 class MusicLibraryForm(forms.ModelForm):
     class Meta:
         model = MusicLibrary
-        fields = ['title', 'category', 'audio_file']
+        fields = ['category', 'audio_file']  # title hataayo
         widgets = {
-            'title': forms.TextInput(attrs={'class': 'form-control'}),
             'category': forms.Select(attrs={'class': 'form-select'}),
             'audio_file': forms.FileInput(attrs={'class': 'form-control'}),
         }
