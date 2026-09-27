@@ -60,3 +60,17 @@ def admin_wish_delete(request, pk):
     wish = get_object_or_404(BirthdayWish, pk=pk)
     wish.delete()
     return redirect('birthday:admin_wish_list')
+
+from django.shortcuts import redirect
+from django.contrib import messages
+from .models import BirthdayWish
+
+def admin_wish_bulk_delete(request):
+    if request.method == 'POST':
+        selected_ids = request.POST.getlist('selected_ids')
+        if selected_ids:
+            deleted_count, _ = BirthdayWish.objects.filter(pk__in=selected_ids).delete()
+            messages.success(request, f'Successfully deleted {deleted_count} wishes.')
+        else:
+            messages.warning(request, 'No items were selected for deletion.')
+    return redirect('birthday:admin_wish_list')
