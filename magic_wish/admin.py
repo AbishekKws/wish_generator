@@ -66,12 +66,15 @@ class MusicCategoryAdmin(admin.ModelAdmin):
     list_display = ('name',)
     search_fields = ('name',)
 
-
 @admin.register(MusicLibrary)
 class MusicLibraryAdmin(admin.ModelAdmin):
-    list_display = ('title', 'category')
+    list_display = ('title', 'get_categories')
     list_filter = ('category',)
     search_fields = ('title',)
+
+    def get_categories(self, obj):
+        return ", ".join(c.name for c in obj.category.all())
+    get_categories.short_description = 'Category'
 
 @admin.register(Wish)
 class WishAdmin(admin.ModelAdmin):
