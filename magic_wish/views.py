@@ -283,6 +283,7 @@ def admin_music_list(request):
             file_name = os.path.splitext(instance.audio_file.name)[0]
             instance.title = file_name.replace('_', ' ').replace('-', ' ').strip()
             instance.save()
+            form.save_m2m()  # multiple category haru save garne line
             return redirect('admin_music_list')
     else:
         form = MusicLibraryForm()
@@ -294,9 +295,8 @@ def admin_music_list(request):
     if query:
         music_qs = music_qs.filter(title__icontains=query)
     if cat_filter:
-        music_qs = music_qs.filter(category__name=cat_filter)
+        music_qs = music_qs.filter(category__name=cat_filter).distinct()
 
-    from django.core.paginator import Paginator
     paginator = Paginator(music_qs, 15)
     page_number = request.GET.get('page')
     music = paginator.get_page(page_number)
