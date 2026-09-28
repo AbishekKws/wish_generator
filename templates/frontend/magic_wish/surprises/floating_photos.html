@@ -1,30 +1,29 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    
+
     <title>A Special Surprise for {{ wish.receiver_name }}! ✨</title>
     <meta name="description" content="{{ wish.sender_name }} has sent you a magical {{ wish.wish_type }} surprise. Click to unlock the magic!">
-    
+
     <meta property="og:title" content="A Special Surprise for {{ wish.receiver_name }}! ✨">
     <meta property="og:description" content="Open the link to see a magical surprise from {{ wish.sender_name }}.">
     <meta property="og:url" content="{{ request.build_absolute_uri }}">
-    
+
     {% if wish.images.exists %}
     <meta property="og:image" content="{{ request.scheme }}://{{ request.get_host }}{{ wish.images.first.image.url }}">
     {% endif %}
-    
+
     <meta property="og:type" content="website">
-    <title>Floating Memories | {{ wish.receiver_name }}</title>
-    
+
+    <!-- CSS Frameworks & Fonts -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300;500;700&family=Dancing+Script:wght@700&display=swap" rel="stylesheet">
-    
+    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300;500;700;900&family=Dancing+Script:wght@700&display=swap" rel="stylesheet">
+
     <style>
         :root {
             {% if wish.wish_type|lower == 'love' or wish.wish_type|lower == 'anniversary' or wish.wish_type|lower == 'proposal' %}
@@ -40,115 +39,208 @@
             {% endif %}
         }
 
-        body, html { 
-            margin: 0; padding: 0; width: 100%; height: 100%; 
-            overflow: hidden; background: #01040f; 
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+        body, html {
+            margin: 0; padding: 0; width: 100%; height: 100%;
+            overflow: hidden; background: radial-gradient(ellipse at 50% 0%, #0c0a1e 0%, #05040f 60%, #030209 100%);
             font-family: 'Quicksand', sans-serif; color: white;
-            position: fixed; /* Prevents bounce on mobile */
+            position: fixed;
+            user-select: none;
         }
 
-        .light-spot {
-            position: fixed; width: 70vw; height: 70vw;
-            border-radius: 50%; filter: blur(140px);
-            z-index: 0; opacity: 0.25; pointer-events: none;
-            animation: move-light 25s infinite alternate ease-in-out;
+        /* Aurora — soft drifting color blobs instead of static blurred spotlights */
+        .aurora-layer { position: fixed; inset: 0; z-index: 0; pointer-events: none; overflow: hidden; }
+        .aurora-blob {
+            position: absolute; width: 62vw; height: 62vw; border-radius: 50%;
+            filter: blur(120px); opacity: 0.32; mix-blend-mode: screen;
+            animation: auroraDrift 24s ease-in-out infinite alternate;
         }
-        @keyframes move-light {
-            0% { transform: translate(-15%, -15%) scale(1); }
-            100% { transform: translate(35%, 25%) scale(1.1); }
-        }
-
-        .blink-light {
-            position: absolute; background: white; border-radius: 50%;
-            filter: blur(1px); pointer-events: none; z-index: 2;
-            animation: blink-fast var(--speed) infinite ease-in-out;
-            box-shadow: 0 0 10px white, 0 0 20px var(--primary-glow);
-        }
-        @keyframes blink-fast {
-            0%, 100% { opacity: 0; transform: scale(0.5) translateY(0); }
-            50% { opacity: 1; transform: scale(1.2) translateY(-20px); }
+        .aurora-blob:nth-child(1) { background: var(--primary-glow); top: -18%; left: -12%; }
+        .aurora-blob:nth-child(2) { background: var(--accent-glow); bottom: -22%; right: -14%; animation-delay: -9s; }
+        .aurora-blob:nth-child(3) { background: var(--primary-glow); top: 28%; left: 42%; width: 45vw; height: 45vw; opacity: 0.16; animation-delay: -15s; }
+        @keyframes auroraDrift {
+            0% { transform: translate(0, 0) scale(1); }
+            100% { transform: translate(6%, 8%) scale(1.15); }
         }
 
-        .stars-container { position: fixed; inset: 0; z-index: 1; }
+        .stars-container { position: fixed; inset: 0; z-index: 1; pointer-events: none; }
         .star {
             position: absolute; background: white; border-radius: 50%;
             opacity: 0.3; animation: twinkle var(--d) infinite ease-in-out;
         }
-        @keyframes twinkle { 0%, 100% { opacity: 0.3; transform: scale(1); } 50% { opacity: 0.8; transform: scale(1.3); } }
+        @keyframes twinkle { 0%, 100% { opacity: 0.25; transform: scale(1); } 50% { opacity: 0.9; transform: scale(1.4); } }
 
+        .dust-layer { position: fixed; inset: 0; z-index: 2; pointer-events: none; overflow: hidden; }
+        .dust-mote {
+            position: absolute; border-radius: 50%;
+            background: radial-gradient(circle, rgba(255,255,255,0.85), rgba(255,255,255,0) 70%);
+            opacity: 0; animation: motesFloat linear infinite;
+        }
+        @keyframes motesFloat {
+            0% { opacity: 0; transform: translateY(0) scale(0.6); }
+            15% { opacity: .7; }
+            85% { opacity: .35; }
+            100% { opacity: 0; transform: translateY(-90vh) scale(1); }
+        }
+
+        /* Message hub — no visible box; the glass fades into the scene */
         .message-hub {
             position: relative; z-index: 100;
-            text-align: center; 
-            width: 90%; 
-            max-width: 400px; /* Adjusted to fit all screens */
-            padding: 1.5rem 1rem;
-            border-radius: 30px;
-            background: rgba(255, 255, 255, 0.04);
-            backdrop-filter: blur(15px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.6);
-            transition: opacity 0.6s ease;
+            text-align: center;
+            width: 92%; max-width: 440px;
+            padding: 2.6rem 1.7rem;
+            border-radius: 44px;
+            background: radial-gradient(ellipse at center, rgba(255,255,255,0.07) 0%, rgba(255,255,255,0.02) 55%, transparent 80%);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            -webkit-mask-image: radial-gradient(ellipse 80% 86% at center, black 55%, transparent 100%);
+            mask-image: radial-gradient(ellipse 80% 86% at center, black 55%, transparent 100%);
+            border: none;
+            box-shadow: none;
             margin: auto;
+            pointer-events: auto;
+            transition: opacity 0.5s ease;
+            animation: hubBreathe 6s ease-in-out infinite;
+        }
+        @keyframes hubBreathe {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.012); }
+        }
+        .message-hub::after {
+            content: "";
+            position: absolute; inset: -25%; z-index: -1;
+            background: radial-gradient(ellipse at center, var(--primary-glow) 0%, transparent 70%);
+            opacity: 0.14; filter: blur(32px); pointer-events: none;
+        }
+
+        .badge-pill {
+            display: inline-block; padding: 0.6rem 1.35rem; border-radius: 999px;
+            background: rgba(255,255,255,0.08); backdrop-filter: blur(10px);
+            box-shadow: 0 8px 24px -8px rgba(0,0,0,0.5);
         }
 
         .neon-name {
             font-family: 'Dancing Script', cursive;
-            filter: drop-shadow(0 0 15px var(--primary-glow));
             line-height: 1.1;
+            animation: neonBreathe 3.2s ease-in-out infinite;
+        }
+        @keyframes neonBreathe {
+            0%, 100% { text-shadow: 0 0 10px var(--primary-glow), 0 0 22px var(--primary-glow), 0 4px 18px rgba(0,0,0,0.6); }
+            50% { text-shadow: 0 0 16px var(--primary-glow), 0 0 36px var(--primary-glow), 0 4px 18px rgba(0,0,0,0.6); }
         }
 
-        .float-box {
-            position: absolute; perspective: 1000px;
-            z-index: 50; transition: all 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
-            transform: translate(-50%, -50%);
+        .sender-pill {
+            display: inline-block; padding: 0.4rem 1.2rem; border-radius: 999px;
+            background: rgba(0,0,0,0.28); backdrop-filter: blur(10px);
+        }
+
+        .whatsapp-btn {
+            display: inline-flex; align-items: center; gap: 0.5rem;
+            font-size: 9px; font-weight: 700; color: #4ade80;
+            background: rgba(34,197,94,0.12);
+            padding: 0.55rem 1.1rem; border-radius: 999px;
+            box-shadow: 0 8px 20px -10px rgba(0,0,0,0.5);
+            transition: all 0.25s ease;
+        }
+        .whatsapp-btn:hover { background: #16a34a; color: #fff; }
+
+        /* Floating photos — outer element handles position + mouse parallax,
+           inner element handles the gentle organic bob so the two transforms
+           never fight each other. */
+        .photo-parallax {
+            position: absolute; z-index: 40;
+            --mx: 0px; --my: 0px;
+            transform: translate(calc(-50% + var(--mx)), calc(-50% + var(--my))) scale(var(--depth-scale, 1));
+            transition: transform 0.4s ease-out;
+            will-change: transform;
+        }
+        .photo-orb {
+            position: relative;
+            border-radius: 28px;
+            overflow: hidden;
             cursor: pointer;
-            will-change: left, top, transform;
+            background: rgba(255,255,255,0.04);
+            box-shadow: 0 25px 55px -15px rgba(0,0,0,0.7);
+            transition: box-shadow 0.35s ease, transform 0.35s ease;
+            animation: photoFloat var(--dur, 14s) ease-in-out infinite;
         }
-        .photo-card {
-            background: rgba(255, 255, 255, 0.1); 
-            backdrop-filter: blur(4px); 
-            border: 2px solid rgba(255, 255, 255, 0.4); 
-            padding: 4px; border-radius: 12px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.8);
-            width: 85px; /* Compact for mobile first */
-            transition: all 0.4s ease;
+        .photo-orb::after {
+            content: "";
+            position: absolute; inset: 0;
+            background: linear-gradient(115deg, transparent 40%, rgba(255,255,255,0.35) 50%, transparent 60%);
+            transform: translateX(-120%);
+            transition: transform 0.7s ease;
+            pointer-events: none;
         }
-        @media (min-width: 768px) { .photo-card { width: 140px; } }
-        .photo-card img { width: 100%; aspect-ratio: 1/1; object-fit: cover; border-radius: 8px; display: block; }
-
-        .float-box.active {
-            z-index: 1000 !important;
-            left: 50% !important; top: 50% !important;
-            transform: translate(-50%, -50%) scale(2.2) rotate(0deg) !important;
+        .photo-orb:hover::after { transform: translateX(120%); }
+        .photo-orb:hover {
+            transform: scale(1.07);
+            box-shadow: 0 30px 65px -10px var(--primary-glow);
         }
-
-        @keyframes float-around {
-            0%, 100% { transform: translate(-50%, -50%) rotate(var(--r)); }
-            50% { transform: translate(calc(-50% + var(--mx)), calc(-50% + var(--my))) rotate(calc(var(--r) + 8deg)); }
+        .photo-orb img {
+            display: block; width: 108px; height: 108px; object-fit: cover;
         }
-        .animate-floating { animation: float-around var(--duration) infinite ease-in-out; }
-
-        .rainbow-char { display: inline-block; transition: transform 0.3s; }
-
-        @keyframes float-slow {
-            0%, 100% { transform: translateY(0) rotateX(5deg); }
-            50% { transform: translateY(-10px) rotateX(-5deg); }
+        @media (min-width: 768px) {
+            .photo-orb img { width: 152px; height: 152px; }
+        }
+        @keyframes photoFloat {
+            0%, 100% { transform: translate(0, 0) rotate(0deg); }
+            50% { transform: translate(var(--amp-x), var(--amp-y)) rotate(var(--rot)); }
         }
 
-        .animate-float-slow {
-            animation: float-slow 4s ease-in-out infinite;
-            transform-style: preserve-3d;
+        /* Lightbox — reliable full-view instead of fragile in-place scaling */
+        #lightbox {
+            position: fixed; inset: 0; z-index: 3000;
+            background: rgba(2, 1, 10, 0.93);
+            backdrop-filter: blur(20px);
+            display: flex; align-items: center; justify-content: center;
+            opacity: 0; pointer-events: none;
+            transition: opacity 0.4s ease;
+        }
+        #lightbox.active { opacity: 1; pointer-events: auto; }
+        #lightbox img {
+            max-width: 88vw; max-height: 80vh; border-radius: 26px;
+            box-shadow: 0 40px 90px -20px rgba(0,0,0,0.8), 0 0 70px -12px var(--primary-glow);
+        }
+        #lightbox .close-btn {
+            position: absolute; top: 22px; right: 22px; z-index: 10;
+            width: 44px; height: 44px; border-radius: 50%;
+            background: rgba(255,255,255,0.1); backdrop-filter: blur(10px);
+            display: flex; align-items: center; justify-content: center;
+            color: #fff; cursor: pointer; font-size: 1rem;
         }
 
-        .perspective-1000 {
-            perspective: 1000px;
+        .music-toggle {
+            position: fixed; top: 20px; right: 20px; z-index: 1100;
+            width: 44px; height: 44px; border-radius: 50%;
+            background: rgba(255,255,255,0.1); backdrop-filter: blur(10px);
+            border: none;
+            display: flex; align-items: center; justify-content: center;
+            color: #fff; font-size: 1rem; cursor: pointer;
+            box-shadow: 0 8px 20px -8px rgba(0,0,0,0.5);
+            transition: transform .25s ease, background .25s ease;
+        }
+        .music-toggle:hover { transform: scale(1.1); background: rgba(255,255,255,0.25); }
+
+        /* Opening screen */
+        .portal-ring {
+            position: absolute; inset: -12px;
+            border: 2px solid var(--primary-glow);
+            border-radius: 9999px;
+            opacity: 0.6;
+            animation: pulse-ring 2.2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+        @keyframes pulse-ring {
+            0% { transform: scale(0.92); opacity: 0.7; }
+            100% { transform: scale(1.4); opacity: 0; }
         }
 
-        .neon-name {
-            /* Depth effect for the name */
-            text-shadow: 0 0 10px var(--primary-glow),
-                        0 0 20px var(--primary-glow),
-                        2px 2px 0px #000;
+        #bloom {
+            position: fixed; top: 50%; left: 50%; width: 120px; height: 120px;
+            margin: -60px 0 0 -60px; border-radius: 50%;
+            background: radial-gradient(circle, var(--primary-glow), transparent 72%);
+            z-index: 1500; pointer-events: none; opacity: 0;
         }
     </style>
 </head>
@@ -156,134 +248,118 @@
 
     {% if wish.custom_music or wish.selected_music %}
         <audio id="bgMusic" src="{% if wish.custom_music %}{{ wish.custom_music.url }}{% else %}{{ wish.selected_music.audio_file.url }}{% endif %}" loop></audio>
+        <div class="music-toggle hidden" id="musicToggle" onclick="toggleMusic()">
+            <i class="fas fa-volume-high" id="musicIcon"></i>
+        </div>
     {% endif %}
 
-    <div class="light-spot" style="background: var(--primary-glow); top: -10%; left: -10%;"></div>
-    <div class="light-spot" style="background: var(--accent-glow); bottom: -10%; right: -10%; animation-delay: -5s;"></div>
+    <div class="aurora-layer">
+        <div class="aurora-blob"></div>
+        <div class="aurora-blob"></div>
+        <div class="aurora-blob"></div>
+    </div>
     <div class="stars-container" id="stars"></div>
-    <div id="blink-container" class="fixed inset-0 pointer-events-none z-10"></div>
+    <div class="dust-layer" id="dust"></div>
+    <div id="bloom"></div>
 
-    <div id="overlay" class="fixed inset-0 z-[2000] flex flex-col items-center justify-center bg-[#01040f] transition-all duration-1000">
-        <button onclick="startDream()" class="relative px-12 py-5 bg-white/5 border-2 border-[var(--primary-glow)] text-[var(--primary-glow)] font-black rounded-full tracking-[0.2em] uppercase hover:bg-[var(--primary-glow)] hover:text-white transition-all duration-500 active:scale-95 group overflow-hidden">
-            <span class="relative z-10 flex items-center gap-3">Open Memories <i class="fa-solid fa-sparkles"></i></span>
-            <span class="absolute inset-0 bg-[var(--primary-glow)] scale-x-0 group-hover:scale-x-100 transition-transform origin-left duration-500"></span>
-        </button>
+    <!-- Opening Screen -->
+    <div id="overlay" class="fixed inset-0 z-[2000] flex flex-col items-center justify-center bg-[#05040f] transition-all duration-1000 px-6">
+        <div class="relative">
+            <div class="portal-ring"></div>
+            <button onclick="startDream()" class="relative px-10 py-5 bg-white/5 text-white font-black rounded-full tracking-[0.2em] uppercase transition-all duration-500 active:scale-95 overflow-hidden shadow-[0_0_50px_rgba(255,255,255,0.12)]">
+                <span class="relative z-10 flex items-center gap-3 text-base sm:text-lg" style="color: var(--primary-glow);">
+                    Open Memories <i class="fa-solid fa-sparkles"></i>
+                </span>
+            </button>
+        </div>
+        <p class="mt-7 text-white/40 text-[10px] tracking-[0.4em] uppercase animate-pulse">Tap to unlock the memory realm</p>
     </div>
 
+    <!-- Main Floating Scene -->
     <main id="scene" class="hidden opacity-0 w-full h-screen flex items-center justify-center relative overflow-hidden transition-opacity duration-1000">
-        
-        <div id="hub" class="message-hub">
-            <div class="mb-6 perspective-1000"> 
-                <div class="relative inline-block px-6 py-2 rounded-xl 
-                            bg-white/10 backdrop-blur-md 
-                            border border-white/20 shadow-[0_10px_30px_rgba(0,0,0,0.5)] 
-                            transform -rotate-1 hover:rotate-0 transition-all duration-500
-                            animate-float-slow">
-                    
-                    <div class="absolute inset-0 bg-gradient-to-r from-pink-500/20 to-purple-500/20 blur-xl rounded-xl"></div>
 
-                    <div class="relative text-[10px] md:text-xs tracking-[0.4em] uppercase font-black italic" 
-                        style="color: var(--primary-glow); text-shadow: 2px 2px 0px rgba(0,0,0,0.3), 0 0 10px var(--primary-glow);">
-                        
+        <div id="hub" class="message-hub">
+            <div class="mb-5">
+                <div class="badge-pill">
+                    <span class="text-[10px] md:text-xs tracking-[0.3em] uppercase font-black italic"
+                         style="color: var(--primary-glow); text-shadow: 0 0 10px var(--primary-glow);">
                         {% if wish.wish_type|lower == 'birthday' %}
-                            <i class="fas fa-birthday-cake mr-2"></i> May Your Birthday Be Full Of Happiness 🎂!
+                            <i class="fas fa-birthday-cake mr-2"></i> Happy Birthday 🎂
                         {% elif wish.wish_type|lower == 'anniversary' %}
-                            <i class="fas fa-ring mr-2"></i> Made for Each Other, Happy Anniversary
+                            <i class="fas fa-ring mr-2"></i> Happy Anniversary 💕
                         {% elif wish.wish_type|lower == 'love' %}
-                            <i class="fas fa-heart mr-2"></i> Today, Tomorrow, Always
+                            <i class="fas fa-heart mr-2"></i> Today, Tomorrow, Always ❤️
                         {% elif wish.wish_type|lower == 'sorry' %}
-                            <i class="fas fa-sad-tear mr-2"></i> So Sorry for Everything
+                            <i class="fas fa-sad-tear mr-2"></i> So Sorry
                         {% elif wish.wish_type|lower == 'friendship' %}
-                            <i class="fas fa-user-friends mr-2"></i> Better Together
+                            <i class="fas fa-user-friends mr-2"></i> Best Friends Forever 🌟
                         {% elif wish.wish_type|lower == 'thank you' %}
-                            <i class="fas fa-hand-holding-heart mr-2"></i> Heartfelt Thanks to You ✨
+                            <i class="fas fa-hand-holding-heart mr-2"></i> Heartfelt Thanks ✨
                         {% elif wish.wish_type|lower == 'miss you' %}
-                            <i class="fas fa-cloud mr-2"></i> Thinking of You
+                            <i class="fas fa-cloud mr-2"></i> Thinking of You 💭
                         {% else %}
-                            <i class="fas fa-star mr-2"></i> A Special Memory
+                            <i class="fas fa-star mr-2"></i> A Special Memory ✨
                         {% endif %}
-                    </div>
+                    </span>
                 </div>
             </div>
 
-            <h1 class="text-4xl md:text-7xl font-black mb-4 neon-name tracking-tighter transform hover:scale-105 transition-transform">
+            <h1 class="text-4xl md:text-6xl font-black mb-3 neon-name tracking-tight">
                 {{ wish.receiver_name }}
             </h1>
 
-            <div id="rainbow-message" class="text-sm md:text-xl font-medium leading-relaxed mb-8 px-6 text-white/90 max-w-2xl mx-auto italic">
+            <p class="text-sm md:text-lg font-medium leading-relaxed mb-6 px-2 text-white/90 italic">
                 "{{ wish.message }}"
-            </div>
+            </p>
 
-            <div class="inline-block px-5 py-2 rounded-full border border-white/10 bg-black/20 backdrop-blur-md shadow-inner">
+            <div class="sender-pill">
                 <p class="text-[9px] md:text-[10px] uppercase tracking-[0.3em] text-white/70">
-                    With Love, <span class="font-black" style="color: var(--primary-glow); text-shadow: 0 0 5px var(--primary-glow);">{{ wish.sender_name }}</span>
+                    With Love, <span class="font-black" style="color: var(--primary-glow);">{{ wish.sender_name }}</span>
                 </p>
             </div>
         </div>
 
         {% for img_obj in wish.images.all %}
-        <div class="float-box animate-floating" 
-            onclick="focusImage(this)"
-            style="--r: {{ forloop.counter|add:5 }}deg; 
-                    --duration: {{ forloop.counter|add:8 }}s; 
-                    --mx: {{ forloop.counter|add:10 }}px; 
-                    --my: {{ forloop.counter|add:15 }}px;">
-            <div class="photo-card">
+        <div class="photo-parallax">
+            <div class="photo-orb">
                 <img src="{{ img_obj.image.url }}" alt="Memory" loading="lazy">
             </div>
         </div>
         {% endfor %}
-        
-        <footer class="absolute bottom-4 w-full flex justify-center opacity-60">
-            <a href="{% url 'home' %}" class="flex flex-col items-center gap-1 group">
+
+        <footer class="absolute bottom-3 w-full flex justify-center opacity-60 pointer-events-auto z-[60]">
+            <a href="{% url 'home' %}" class="flex flex-col items-center gap-0.5 group">
                 <span class="text-[7px] tracking-[0.3em] uppercase text-gray-400">Created With</span>
-                <span class="text-[9px] font-black tracking-widest text-white hover:text-[var(--primary-glow)] transition-colors">SURPRISE ME</span>
+                <span class="text-[9px] font-black tracking-widest text-white transition-colors" style="--tw-text-opacity:1;">SURPRISE ME</span>
             </a>
         </footer>
     </main>
 
+    <!-- Lightbox -->
+    <div id="lightbox" onclick="closeLightbox()">
+        <div class="close-btn" onclick="closeLightbox()"><i class="fas fa-times"></i></div>
+        <img id="lightboxImg" src="" alt="Memory">
+    </div>
+
+    <!-- Interactive Scripts -->
     <script>
-        let activeImg = null;
-
-        function createBlinkLights() {
-            const container = document.getElementById('blink-container');
-            for (let i = 0; i < 40; i++) {
-                const light = document.createElement('div');
-                light.className = 'blink-light';
-                const size = Math.random() * 4 + 2 + 'px';
-                light.style.width = size; light.style.height = size;
-                light.style.left = Math.random() * 100 + '%';
-                light.style.top = Math.random() * 100 + '%';
-                light.style.setProperty('--speed', Math.random() * 2 + 1 + 's');
-                container.appendChild(light);
-            }
-        }
-
-        function focusImage(el) {
-            const hub = document.getElementById('hub');
-            if (activeImg === el) {
-                el.classList.remove('active');
-                hub.style.opacity = '1';
-                activeImg = null;
+        function toggleMusic() {
+            const music = document.getElementById('bgMusic');
+            const icon = document.getElementById('musicIcon');
+            if (!music) return;
+            if (music.paused) {
+                music.play().catch(() => {});
+                icon.className = 'fas fa-volume-high';
             } else {
-                if (activeImg) activeImg.classList.remove('active');
-                el.classList.add('active');
-                hub.style.opacity = '0.05';
-                activeImg = el;
+                music.pause();
+                icon.className = 'fas fa-volume-xmark';
             }
         }
-
-        window.addEventListener('mousedown', (e) => {
-            if (activeImg && !activeImg.contains(e.target)) {
-                activeImg.classList.remove('active');
-                document.getElementById('hub').style.opacity = '1';
-                activeImg = null;
-            }
-        });
 
         function createStars() {
             const container = document.getElementById('stars');
-            for (let i = 0; i < 80; i++) {
+            if (container.childElementCount) return;
+            for (let i = 0; i < 90; i++) {
                 const star = document.createElement('div');
                 star.className = 'star';
                 const size = Math.random() * 2 + 1 + 'px';
@@ -295,56 +371,128 @@
             }
         }
 
-        function applyRainbowEffect() {
-            const container = document.getElementById('rainbow-message');
-            const text = container.innerText;
-            container.innerHTML = '';
-            const colorList = ['#ffffff', 'var(--primary-glow)', '#f1f5f9', 'var(--accent-glow)'];
-            [...text].forEach((char, i) => {
-                const span = document.createElement('span');
-                span.innerText = char;
-                span.className = 'rainbow-char';
-                span.style.color = colorList[i % colorList.length];
-                container.appendChild(span);
-            });
+        function createDust() {
+            const layer = document.getElementById('dust');
+            if (layer.childElementCount) return;
+            const count = window.innerWidth < 640 ? 14 : 26;
+            for (let i = 0; i < count; i++) {
+                const d = document.createElement('div');
+                d.className = 'dust-mote';
+                const size = Math.random() * 3 + 1.5;
+                d.style.width = size + 'px';
+                d.style.height = size + 'px';
+                d.style.left = Math.random() * 100 + 'vw';
+                d.style.bottom = (Math.random() * 20 - 10) + 'vh';
+                d.style.animationDuration = (Math.random() * 14 + 12) + 's';
+                d.style.animationDelay = (Math.random() * 12) + 's';
+                layer.appendChild(d);
+            }
         }
 
-        function randomizePhotos() {
-            const boxes = document.querySelectorAll('.float-box');
+        // Scatters photos around the hub with light collision-avoidance so
+        // they never all pile up in the same spot, and assigns each a
+        // depth tier (far / mid / near) so the scene reads with real parallax.
+        function placePhotos() {
+            const nodes = document.querySelectorAll('.photo-parallax');
+            if (!nodes.length) return;
             const isMobile = window.innerWidth < 768;
-            
-            // Adjust radius to keep boxes within viewport
-            const rx = isMobile ? 38 : 42; 
-            const ry = isMobile ? 42 : 38;
+            const centerExclude = isMobile ? 27 : 23;
+            const minGap = isMobile ? 17 : 13;
+            const depths = ['far', 'mid', 'near'];
+            const scaleMap = { far: 0.6, mid: 0.82, near: 1.06 };
+            const blurMap = { far: '1.4px', mid: '0.3px', near: '0' };
+            const opMap = { far: 0.6, mid: 0.85, near: 1 };
+            const zMap = { far: 30, mid: 45, near: 60 };
+            const parallaxMap = { far: 0.18, mid: 0.45, near: 0.9 };
+            const placed = [];
 
-            boxes.forEach((box, index) => {
-                if (box.classList.contains('active')) return;
-                const angle = (index / boxes.length) * Math.PI * 2;
-                const x = 50 + Math.cos(angle) * rx;
-                const y = 50 + Math.sin(angle) * ry;
-                box.style.left = x + '%';
-                box.style.top = y + '%';
+            nodes.forEach((node, i) => {
+                const depth = depths[i % 3];
+                let x, y, tries = 0, ok = false;
+                while (!ok && tries < 30) {
+                    x = 8 + Math.random() * 84;
+                    y = 12 + Math.random() * 74;
+                    const dx = x - 50, dy = (y - 50) * 1.3;
+                    ok = Math.sqrt(dx * dx + dy * dy) > centerExclude;
+                    if (ok) {
+                        for (const p of placed) {
+                            if (Math.hypot(p.x - x, p.y - y) < minGap) { ok = false; break; }
+                        }
+                    }
+                    tries++;
+                }
+                placed.push({ x, y });
+
+                node.style.left = x + '%';
+                node.style.top = y + '%';
+                node.style.setProperty('--depth-scale', scaleMap[depth]);
+                node.style.opacity = opMap[depth];
+                node.style.zIndex = zMap[depth];
+                node.dataset.parallax = parallaxMap[depth];
+
+                const orb = node.querySelector('.photo-orb');
+                orb.style.filter = blurMap[depth] !== '0' ? `blur(${blurMap[depth]})` : 'none';
+                orb.style.setProperty('--dur', (11 + Math.random() * 8) + 's');
+                orb.style.setProperty('--amp-x', (14 + Math.random() * 22) + 'px');
+                orb.style.setProperty('--amp-y', (14 + Math.random() * 22) + 'px');
+                orb.style.setProperty('--rot', (Math.random() * 10 - 5) + 'deg');
+                orb.style.animationDelay = (-Math.random() * 10) + 's';
             });
         }
+
+        // Gentle depth-aware parallax on pointer move
+        document.addEventListener('mousemove', (e) => {
+            const nx = (e.clientX / window.innerWidth - 0.5) * 2;
+            const ny = (e.clientY / window.innerHeight - 0.5) * 2;
+            document.querySelectorAll('.photo-parallax').forEach(node => {
+                const depth = parseFloat(node.dataset.parallax || 0.3);
+                node.style.setProperty('--mx', (nx * 20 * depth) + 'px');
+                node.style.setProperty('--my', (ny * 16 * depth) + 'px');
+            });
+            document.querySelectorAll('.aurora-blob').forEach((b, i) => {
+                b.style.transform = `translate(${nx * (i + 1) * 5}px, ${ny * (i + 1) * 5}px)`;
+            });
+        });
+
+        function openLightbox(src) {
+            document.getElementById('lightboxImg').src = src;
+            document.getElementById('lightbox').classList.add('active');
+        }
+        function closeLightbox() {
+            document.getElementById('lightbox').classList.remove('active');
+        }
+        document.querySelectorAll('.photo-orb').forEach(orb => {
+            orb.addEventListener('click', (e) => {
+                e.stopPropagation();
+                openLightbox(orb.querySelector('img').src);
+            });
+        });
 
         function startDream() {
             const music = document.getElementById('bgMusic');
-            if(music) music.play().catch(e => {});
+            const toggle = document.getElementById('musicToggle');
+            if (music) {
+                music.play().then(() => { if (toggle) toggle.classList.remove('hidden'); }).catch(() => {});
+            }
+
             createStars();
-            createBlinkLights();
-            applyRainbowEffect();
-            randomizePhotos();
+            createDust();
+            placePhotos();
+
+            gsap.fromTo('#bloom', { scale: 0, opacity: 0.9 }, { scale: 8, opacity: 0, duration: 1.3, ease: 'power2.out' });
+
             document.getElementById('overlay').classList.add('opacity-0');
             setTimeout(() => {
                 document.getElementById('overlay').style.display = 'none';
                 const scene = document.getElementById('scene');
                 scene.classList.remove('hidden');
-                setTimeout(() => scene.classList.add('opacity-100'), 100);
-                gsap.from(".message-hub", { scale: 0.8, opacity: 0, duration: 1.2, ease: "back.out(1.7)" });
-            }, 800);
+                setTimeout(() => scene.classList.add('opacity-100'), 50);
+                gsap.from('.message-hub', { scale: 0.85, opacity: 0, y: 30, duration: 1.1, ease: 'back.out(1.6)' });
+                gsap.from('.photo-parallax', { scale: 0, opacity: 0, duration: 0.9, stagger: 0.08, ease: 'back.out(1.7)', delay: 0.3 });
+            }, 700);
         }
 
-        window.addEventListener('resize', randomizePhotos);
+        window.addEventListener('resize', () => { if (!document.getElementById('scene').classList.contains('hidden')) placePhotos(); });
     </script>
 </body>
 </html>
