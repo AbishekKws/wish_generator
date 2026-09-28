@@ -4,133 +4,306 @@
 {% block title %}Magic Link Ready! ✨{% endblock %}
 
 {% block content %}
-<div class="min-h-[calc(100vh-80px)] flex items-center justify-center p-4 relative overflow-hidden my-2 lg:my-6">
-    
-    <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 lg:w-96 lg:h-96 bg-pink-500/10 rounded-full blur-[100px] pointer-events-none animate-pulse"></div>
+<style>
+    .lr-shell {
+        min-height: calc(100vh - 64px);
+        min-height: calc(100dvh - 64px);
+        display: flex; align-items: center; justify-content: center;
+        padding: 1rem;
+        padding-bottom: max(1rem, env(safe-area-inset-bottom));
+        position: relative; overflow: hidden; margin: 0.5rem 0;
+    }
+    @media (min-width: 1024px) { .lr-shell { margin: 1.5rem 0; } }
+    .lr-glow { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 14rem; height: 14rem; border-radius: 999px; background: rgba(255,107,74,0.12); filter: blur(80px); pointer-events: none; animation: lr-pulse 3s ease-in-out infinite; }
+    @media (min-width: 640px) { .lr-glow { width: 18rem; height: 18rem; } }
+    @media (min-width: 1024px) { .lr-glow { width: 24rem; height: 24rem; } }
+    @keyframes lr-pulse { 0%, 100% { opacity: 0.6; } 50% { opacity: 1; } }
 
-    <div class="w-full max-w-lg z-10 transition-all duration-500">
-        <div class="transition-all duration-500 mx-auto text-center
-            md:bg-white/5 md:backdrop-blur-2xl md:border md:border-white/10 md:p-8 md:rounded-[2.5rem] md:shadow-2xl 
-            p-4 bg-transparent border-none shadow-none">
-            
-            <div class="relative inline-block mb-4">
-                <div class="text-6xl lg:text-7xl animate-bounce">🎉</div>
-                <div class="absolute -top-1 -right-1 w-6 h-6 bg-green-500 rounded-full border-4 border-slate-900 flex items-center justify-center shadow-lg">
-                    <i class="fas fa-check text-[8px] text-white"></i>
-                </div>
+    .lr-wrap { width: 100%; max-width: 30rem; z-index: 1; text-align: center; }
+    .lr-card { padding: 1.25rem 1rem; }
+    @media (max-width: 359px) { .lr-card { padding: 1rem 0.75rem; } }
+    @media (min-width: 768px) {
+        .lr-card {
+            background: rgba(31,27,40,0.55); backdrop-filter: blur(24px);
+            border: 1px solid var(--panel-line); padding: 2rem; border-radius: 2.25rem;
+            box-shadow: 0 30px 60px -25px rgba(0,0,0,0.6);
+        }
+    }
+
+    .lr-icon-wrap { position: relative; display: inline-block; margin-bottom: 1rem; }
+    .lr-icon-wrap .lr-emoji { font-size: clamp(3rem, 12vw, 4.5rem); line-height: 1; }
+    .lr-check { position: absolute; top: -0.15rem; right: -0.15rem; width: 1.5rem; height: 1.5rem; border-radius: 999px; background: #6FCF97; border: 4px solid var(--ink); display: flex; align-items: center; justify-content: center; }
+    .lr-check i { font-size: 8px; color: #0E1F17; }
+
+    .lr-title { font-family: 'Fraunces', serif; font-weight: 600; font-size: clamp(1.5rem, 6vw, 2.25rem); color: var(--text); margin-bottom: 0.5rem; }
+    .lr-sub { color: var(--text-muted); margin-bottom: 1.5rem; font-size: clamp(0.85rem, 2.6vw, 0.95rem); line-height: 1.6; max-width: 20rem; margin-left: auto; margin-right: auto; }
+    .lr-sub .lr-name { color: var(--coral); font-weight: 700; }
+
+    .lr-copy-btn {
+        width: 100%; padding: 1rem; border-radius: 1.1rem;
+        background: var(--text); color: var(--ink); font-weight: 800; font-size: 0.9rem;
+        display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.15rem;
+        transition: transform 0.25s ease, background 0.25s ease, color 0.25s ease;
+        box-shadow: 0 16px 34px -16px rgba(0,0,0,0.5);
+    }
+    .lr-copy-btn:hover { transform: scale(1.02); }
+    .lr-copy-btn:active { transform: scale(0.96); }
+    .lr-copy-btn.is-copied { background: var(--coral); color: #1A1210; }
+    .lr-copy-btn-row { display: flex; align-items: center; gap: 0.5rem; }
+    .lr-copy-hint { font-size: 0.6rem; text-transform: uppercase; letter-spacing: 0.14em; font-weight: 700; color: var(--text-muted); }
+
+    .lr-manual-copy { display: none; margin-top: 0.75rem; }
+    .lr-manual-copy.is-shown { display: block; }
+    .lr-manual-copy input {
+        width: 100%; background: rgba(0,0,0,0.3); border: 1px solid var(--panel-line);
+        border-radius: 0.75rem; padding: 0.7rem 0.9rem; color: var(--text); font-size: 0.78rem;
+        text-align: center;
+    }
+    .lr-manual-copy p { font-size: 0.66rem; color: var(--text-muted); margin-top: 0.4rem; }
+
+    .lr-share-row { display: flex; align-items: center; justify-content: center; gap: clamp(1rem, 5vw, 1.5rem); margin-top: 1.5rem; }
+    .lr-share-btn {
+        width: 3rem; height: 3rem; border-radius: 999px; color: #fff;
+        display: flex; align-items: center; justify-content: center;
+        box-shadow: 0 10px 22px -10px rgba(0,0,0,0.5);
+        transition: transform 0.2s ease;
+    }
+    .lr-share-btn:hover { transform: scale(1.1); }
+    .lr-share-btn:active { transform: scale(0.92); }
+    .lr-share-caption { font-size: 0.6rem; color: var(--text-muted); text-transform: uppercase; font-weight: 800; letter-spacing: 0.2em; margin-top: 0.75rem; }
+
+    .lr-preview-link {
+        width: 100%; padding: 0.85rem; border-radius: 0.9rem; margin-top: 1.25rem;
+        background: rgba(245,241,234,0.04); border: 1px solid var(--panel-line); color: var(--text);
+        font-weight: 700; font-size: 0.72rem; display: flex; align-items: center; justify-content: center; gap: 0.5rem;
+        transition: background 0.2s ease, border-color 0.2s ease;
+    }
+    .lr-preview-link:hover { background: rgba(245,241,234,0.08); border-color: rgba(255,107,74,0.3); }
+    .lr-preview-link i { color: var(--coral); }
+
+    .lr-tip { margin-top: 2rem; padding-top: 1rem; border-top: 1px solid var(--panel-line); }
+    .lr-tip p { font-size: 0.7rem; color: var(--text-muted); font-style: italic; }
+    .lr-tip i { color: var(--coral); margin-right: 0.3rem; }
+
+    .lr-toast {
+        position: fixed; left: 50%; bottom: 1.5rem; transform: translate(-50%, 0.5rem);
+        bottom: max(1.5rem, calc(env(safe-area-inset-bottom) + 0.75rem));
+        background: var(--panel); border: 1px solid var(--panel-line); color: var(--text);
+        padding: 0.7rem 1.2rem; border-radius: 1.2rem; font-size: 0.78rem; font-weight: 600;
+        box-shadow: 0 14px 30px -12px rgba(0,0,0,0.6);
+        opacity: 0; pointer-events: none; transition: opacity 0.25s ease, transform 0.25s ease;
+        z-index: 200;
+        max-width: calc(100vw - 2rem);
+        width: max-content;
+        text-align: center;
+        white-space: normal;
+    }
+    .lr-toast.is-shown { opacity: 1; transform: translate(-50%, 0); }
+</style>
+
+<div class="lr-shell">
+    <div class="lr-glow" aria-hidden="true"></div>
+
+    <div class="lr-wrap">
+        <div class="lr-card">
+
+            <div class="lr-icon-wrap">
+                <div class="lr-emoji animate-bounce">🎉</div>
+                <div class="lr-check"><i class="fas fa-check"></i></div>
             </div>
 
-            <h1 class="text-3xl md:text-4xl font-black bg-gradient-to-r from-yellow-400 via-orange-500 to-pink-500 bg-clip-text text-transparent mb-2">
-                Link Created!
-            </h1>
-            <p class="text-gray-400 mb-6 text-sm md:text-base leading-relaxed max-w-xs mx-auto">
-                Your magical surprise for <span class="text-pink-400 font-bold">{{ wish.receiver_name }}</span> is ready. Send it now!
-            </p>
-
-            <p id="magicLink" class="hidden">
-                {{ request.scheme }}://{{ request.get_host }}{% url 'surprise_view' slug=wish.slug %}
+            <h1 class="lr-title">Link created!</h1>
+            <p class="lr-sub">
+                Your magical surprise for <span class="lr-name">{{ wish.receiver_name }}</span> is ready. Send it now!
             </p>
 
             <div class="space-y-6">
-                <button onclick="copyLink()" id="copyBtn" 
-                        class="w-full py-4 rounded-2xl bg-white text-black font-extrabold text-sm hover:scale-[1.02] active:scale-[0.95] transition-all duration-300 flex flex-col items-center justify-center gap-1 shadow-xl relative overflow-hidden group">
-                    
-                    <div class="flex items-center gap-2 relative z-10">
+                <button onclick="copyLink()" id="copyBtn" class="lr-copy-btn">
+                    <div class="lr-copy-btn-row">
                         <i class="fas fa-copy" id="copyIcon"></i>
-                        <span id="copyBtnText">Copy Magic Link</span>
+                        <span id="copyBtnText">Copy magic link</span>
                     </div>
-                    
-                    <p id="copyHint" class="text-[9px] text-gray-400 uppercase tracking-widest font-bold group-hover:text-pink-500 transition-colors">
-                        Click to copy magic
-                    </p>
+                    <p id="copyHint" class="lr-copy-hint">Click to copy magic</p>
                 </button>
 
-                <div class="flex flex-col items-center gap-4">
-                    <div class="flex items-center justify-center gap-6">
-                        <button onclick="sharePlatform('whatsapp')" class="w-12 h-12 rounded-full bg-[#25D366] text-white flex items-center justify-center shadow-lg shadow-green-500/20 hover:scale-110 active:scale-90 transition-all">
-                            <i class="fab fa-whatsapp text-xl"></i>
-                        </button>
-                        
-                        <button onclick="sharePlatform('messenger')" class="w-12 h-12 rounded-full bg-[#0084FF] text-white flex items-center justify-center shadow-lg shadow-blue-500/20 hover:scale-110 active:scale-90 transition-all">
-                            <i class="fab fa-facebook-messenger text-xl"></i>
-                        </button>
-
-                        <button onclick="sharePlatform('instagram')" class="w-12 h-12 rounded-full bg-gradient-to-tr from-[#f9ce34] via-[#ee2a7b] to-[#6228d7] text-white flex items-center justify-center shadow-lg shadow-purple-500/20 hover:scale-110 active:scale-90 transition-all">
-                            <i class="fab fa-instagram text-xl"></i>
-                        </button>
-                    </div>
-                    <p class="text-[8px] text-white/30 uppercase font-black tracking-[0.3em]">Share Directly On DM</p>
+                <div id="manualCopy" class="lr-manual-copy">
+                    <input type="text" id="manualCopyInput" readonly onclick="this.select()">
+                    <p>Couldn't copy automatically — tap the link above to select it, then copy.</p>
                 </div>
 
-                <a href="{% url 'surprise_view' slug=wish.slug %}" target="_blank"
-                   class="w-full py-3 rounded-xl bg-white/5 border border-white/10 text-white font-bold hover:bg-white/10 active:scale-95 transition-all text-center text-xs flex items-center justify-center gap-2 mt-2 backdrop-blur-sm">
-                    <i class="fas fa-eye text-pink-400"></i> View Before Send
+                <div>
+                    <div class="lr-share-row">
+                        <button onclick="sharePlatform('whatsapp')" class="lr-share-btn" style="background: #25D366;" aria-label="Share on WhatsApp">
+                            <i class="fab fa-whatsapp text-xl"></i>
+                        </button>
+                        <button onclick="sharePlatform('share')" class="lr-share-btn" style="background: linear-gradient(135deg, #FF6B4A, #A855F7);" aria-label="Share">
+                            <i class="fas fa-share-nodes text-xl"></i>
+                        </button>
+                    </div>
+                    <p class="lr-share-caption">Share directly on DM</p>
+                </div>
+
+                <a href="{% url 'surprise_view' slug=wish.slug %}" target="_blank" class="lr-preview-link">
+                    <i class="fas fa-eye"></i> View before send
                 </a>
             </div>
 
-            <div class="mt-8 pt-4 border-t border-white/5">
-                <p class="text-[10px] text-gray-500 italic">
-                    <i class="fas fa-magic mr-1 text-pink-500"></i> Tip: Send it when they are free for the best surprise!
-                </p>
+            <div class="lr-tip">
+                <p><i class="fas fa-wand-magic-sparkles"></i>Tip: Send it when they're free for the best surprise!</p>
             </div>
         </div>
     </div>
 </div>
+
+<div id="toast" class="lr-toast"></div>
 {% endblock %}
 
 {% block scripts %}
 <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
-<script>
-    // 1. Page Load Confetti
-    window.onload = function() {
-        const duration = 2.5 * 1000;
-        const end = Date.now() + duration;
-        (function frame() {
-            confetti({ particleCount: 3, angle: 60, spread: 55, origin: { x: 0, y: 0.8 }, colors: ['#ec4899', '#8b5cf6'] });
-            confetti({ particleCount: 3, angle: 120, spread: 55, origin: { x: 1, y: 0.8 }, colors: ['#ec4899', '#00f2ff'] });
-            if (Date.now() < end) requestAnimationFrame(frame);
-        }());
-    };
 
-    // 2. Copy Function
-    function copyLink() {
-        const linkText = document.getElementById('magicLink').innerText.trim();
+<script>
+    const magicLinkURL = "{{ request.scheme }}://{{ request.get_host }}{% url 'surprise_view' slug=wish.slug %}";
+    const shareMessage = "Hey! I have a special surprise for you. ✨ Open this: ";
+
+    // ---------- Confetti on load ----------
+    const duration = 2.5 * 1000;
+    const end = Date.now() + duration;
+    (function frame() {
+        confetti({ particleCount: 3, angle: 60, spread: 55, origin: { x: 0, y: 0.8 }, colors: ['#FF6B4A', '#FFC857'] });
+        confetti({ particleCount: 3, angle: 120, spread: 55, origin: { x: 1, y: 0.8 }, colors: ['#FF6B4A', '#FFC857'] });
+        if (Date.now() < end) requestAnimationFrame(frame);
+    }());
+
+    // ---------- Toast ----------
+    let toastTimer = null;
+    function showToast(message) {
+        const toast = document.getElementById('toast');
+        toast.textContent = message;
+        toast.classList.add('is-shown');
+        clearTimeout(toastTimer);
+        toastTimer = setTimeout(() => toast.classList.remove('is-shown'), 2600);
+    }
+
+    function setCopiedState() {
         const btn = document.getElementById('copyBtn');
         const btnText = document.getElementById('copyBtnText');
         const btnHint = document.getElementById('copyHint');
 
-        navigator.clipboard.writeText(linkText).then(() => {
-            btnText.innerText = 'Copied! ✨';
-            btnHint.innerText = 'Paste it in DMs';
-            btn.classList.replace('bg-white', 'bg-pink-600');
-            btn.classList.replace('text-black', 'text-white');
-            
-            confetti({ particleCount: 40, spread: 70, origin: { y: 0.8 }, colors: ['#ec4899', '#ffffff'] });
+        btnText.textContent = 'Copied! ✨';
+        btnHint.textContent = 'Paste it in DMs';
+        btn.classList.add('is-copied');
 
-            setTimeout(() => {
-                btnText.innerText = 'Copy Magic Link';
-                btnHint.innerText = 'Click to copy magic';
-                btn.classList.replace('bg-pink-600', 'bg-white');
-                btn.classList.replace('text-white', 'text-black');
-            }, 3000);
+        confetti({ particleCount: 40, spread: 70, origin: { y: 0.8 }, colors: ['#FF6B4A', '#FFC857', '#F5F1EA'] });
+
+        setTimeout(() => {
+            btnText.textContent = 'Copy magic link';
+            btnHint.textContent = 'Click to copy magic';
+            btn.classList.remove('is-copied');
+        }, 3000);
+    }
+
+    function showManualCopyFallback() {
+        const wrap = document.getElementById('manualCopy');
+        const input = document.getElementById('manualCopyInput');
+        input.value = magicLinkURL;
+        wrap.classList.add('is-shown');
+        input.focus();
+        input.select();
+    }
+
+    function legacyCopy(text) {
+        const temp = document.createElement('textarea');
+        temp.value = text;
+        temp.style.position = 'fixed';
+        temp.style.opacity = '0';
+        document.body.appendChild(temp);
+        temp.focus();
+        temp.select();
+        let ok = false;
+        try { ok = document.execCommand('copy'); } catch (err) { ok = false; }
+        document.body.removeChild(temp);
+        return ok;
+    }
+
+    function copyLink() {
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(magicLinkURL).then(setCopiedState).catch(() => {
+                if (legacyCopy(magicLinkURL)) {
+                    setCopiedState();
+                } else {
+                    showManualCopyFallback();
+                }
+            });
+        } else if (legacyCopy(magicLinkURL)) {
+            setCopiedState();
+        } else {
+            showManualCopyFallback();
+        }
+    }
+
+    // Same copy logic, but returns a promise so callers (like Instagram share)
+    // can wait for the actual result instead of assuming success.
+    function copyLinkAsync() {
+        return new Promise((resolve) => {
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(magicLinkURL)
+                    .then(() => { setCopiedState(); resolve(true); })
+                    .catch(() => {
+                        const ok = legacyCopy(magicLinkURL);
+                        if (ok) setCopiedState(); else showManualCopyFallback();
+                        resolve(ok);
+                    });
+            } else {
+                const ok = legacyCopy(magicLinkURL);
+                if (ok) setCopiedState(); else showManualCopyFallback();
+                resolve(ok);
+            }
         });
     }
 
-    // 3. Sharing Logic
-    function sharePlatform(platform) {
-        const linkText = document.getElementById('magicLink').innerText.trim();
-        const message = "Hey! I have a special surprise for you. ✨ Open this: ";
-        const fullMessage = message + linkText;
+    // ---------- Native share (everything except WhatsApp) ----------
+    // There's no public API from Meta/Instagram that opens their DM
+    // contact-picker with prefilled text from an outside website — only
+    // WhatsApp offers that. The real equivalent here is the OS-level share
+    // sheet (Web Share API): the user picks whichever app they want
+    // (Messenger, Instagram, SMS, etc.), and that app runs its own native
+    // share/DM flow — which is what actually gives a contact list.
+    //
+    // IMPORTANT for mobile reliability: navigator.share() must be called
+    // synchronously from the click handler (a real user gesture) or iOS
+    // Safari silently refuses it. sharePlatform() below calls it directly,
+    // with nothing awaited beforehand.
+    async function sharePlatform(platform) {
+        const fullMessage = shareMessage + magicLinkURL;
 
         if (platform === 'whatsapp') {
+            // WhatsApp's own deep link reliably opens with a prefilled
+            // message AND a contact picker, so it stays as its own link
+            // instead of going through the generic share sheet.
             window.open("https://api.whatsapp.com/send?text=" + encodeURIComponent(fullMessage), "_blank");
-        } else if (platform === 'messenger') {
-            window.open("https://www.facebook.com/sharer/sharer.php?u=" + encodeURIComponent(linkText), "_blank", "width=600,height=400");
-        } else if (platform === 'instagram') {
-            copyLink();
-            alert("Link Copied! Paste it in Instagram DMs. 🚀");
-            window.open("https://www.instagram.com/direct/inbox/", "_blank");
+            return;
         }
+
+        // platform === 'share': everything else, via the native share sheet.
+        if (navigator.share) {
+            try {
+                await navigator.share({
+                    title: 'Surprise Me',
+                    text: shareMessage,
+                    url: magicLinkURL,
+                });
+                return; // user picked an app and the OS handled it
+            } catch (err) {
+                if (err.name === 'AbortError') return; // user closed the sheet on purpose
+                // any other error (e.g. blocked, unsupported here) — fall through to copy
+            }
+        }
+
+        // Desktop / unsupported browsers: no native share sheet exists, so
+        // the honest fallback is to copy the link and let the person paste
+        // it wherever they want (Messenger, Instagram, email, anywhere).
+        const ok = await copyLinkAsync();
+        showToast(ok ? "Link copied — paste it anywhere you like 🚀" : "Couldn't copy automatically — use the field below");
     }
 </script>
 {% endblock %}
