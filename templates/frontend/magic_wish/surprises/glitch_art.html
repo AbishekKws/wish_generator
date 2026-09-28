@@ -1,65 +1,101 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover">
+
     <title>A Special Surprise for {{ wish.receiver_name }}! ✨</title>
     <meta name="description" content="{{ wish.sender_name }} has sent you a magical {{ wish.wish_type }} surprise. Click to unlock the magic!">
-    
+
     <meta property="og:title" content="A Special Surprise for {{ wish.receiver_name }}! ✨">
     <meta property="og:description" content="Open the link to see a magical surprise from {{ wish.sender_name }}.">
     <meta property="og:url" content="{{ request.build_absolute_uri }}">
-    
+
     {% if wish.images.exists %}
     <meta property="og:image" content="{{ request.scheme }}://{{ request.get_host }}{{ wish.images.first.image.url }}">
     {% endif %}
-    
     <meta property="og:type" content="website">
-    <title>Cyber Glitch | {{ wish.receiver_name }}</title>
-    
+
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Major+Mono+Display&family=Share+Tech+Mono&display=swap" rel="stylesheet">
-    
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
     <style>
         :root {
             {% if wish.wish_type|lower == 'friendship' %}
-                --g-red: #00ff00; --g-cyan: #ffff00;
+                --g-red: #00ff66; --g-cyan: #ffea00; --g-accent: #00ffff;
             {% elif wish.wish_type|lower == 'birthday' %}
-                --g-red: #ff00ff; --g-cyan: #00ffff;
+                --g-red: #ff007f; --g-cyan: #00f0ff; --g-accent: #7928ca;
             {% else %}
-                --g-red: #ff0000; --g-cyan: #00ffff;
+                --g-red: #ff003c; --g-cyan: #00f0ff; --g-accent: #fab710;
             {% endif %}
-            --bg: #050505;
+            --bg: #030308;
+            --safe-t: env(safe-area-inset-top, 0px);
+            --safe-b: env(safe-area-inset-bottom, 0px);
+            --safe-l: env(safe-area-inset-left, 0px);
+            --safe-r: env(safe-area-inset-right, 0px);
         }
 
-        body, html { 
+        * { box-sizing: border-box; }
+
+        body, html {
             margin: 0; padding: 0; background: var(--bg);
-            color: #fff; overflow: hidden; font-family: 'Share Tech Mono', monospace;
-            height: 100vh; width: 100vw;
-        }
-
-        /* NEW: Digital Celebration Particles */
-        .cyber-particle {
-            position: absolute; width: 2px; height: 15px;
-            background: var(--g-cyan); opacity: 0.5;
-            pointer-events: none; z-index: 5;
+            color: #fff; font-family: 'Share Tech Mono', monospace;
+            min-height: 100vh; min-height: 100dvh; width: 100vw; 
+            overflow-x: hidden; user-select: none;
         }
 
         .noise-bg {
             position: fixed; inset: 0;
-            background: url('https://media.giphy.com/media/oEI9uWUic9ZIs/giphy.gif');
-            opacity: 0.03; z-index: -1; pointer-events: none;
+            background: radial-gradient(circle at center, rgba(10,15,30,0.8) 0%, rgba(3,3,8,1) 100%);
+            z-index: -3;
         }
 
+        .grid-overlay {
+            position: fixed; inset: 0;
+            background-image: linear-gradient(rgba(0, 240, 255, 0.05) 1px, transparent 1px),
+                              linear-gradient(90deg, rgba(0, 240, 255, 0.05) 1px, transparent 1px);
+            background-size: clamp(20px, 4vw, 30px) clamp(20px, 4vw, 30px); z-index: -2; pointer-events: none;
+        }
+
+        .crt-vignette {
+            position: fixed; inset: 0; z-index: 150; pointer-events: none;
+            background: radial-gradient(ellipse at center, transparent 55%, rgba(0,0,0,0.55) 100%);
+        }
+        .crt-flicker {
+            position: fixed; inset: 0; z-index: 151; pointer-events: none;
+            background: rgba(0, 240, 255, 0.015);
+            animation: crtFlicker 6s infinite;
+        }
+        @keyframes crtFlicker {
+            0%, 96%, 100% { opacity: 0; }
+            97% { opacity: 1; }
+            98% { opacity: 0; }
+            99% { opacity: 0.6; }
+        }
+
+        #rain-canvas { position: fixed; inset: 0; z-index: -1; pointer-events: none; opacity: 0.55; }
+
+        /* Glitch name — clip regions are percentage-based (clip-path: inset)
+           instead of fixed pixel rects, so the split effect scales correctly
+           whatever the font-size clamp resolves to, and still lines up even
+           if a long name wraps onto two lines on a narrow screen. */
         .glitch {
             position: relative;
-            font-family: 'Major Mono Display', monospace;
-            font-size: clamp(2.5rem, 8vw, 5rem);
-            text-transform: lowercase; line-height: 1;
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 900;
+            font-size: clamp(1.3rem, 6vw, 4rem);
+            text-transform: uppercase;
+            letter-spacing: clamp(0.5px, 0.3vw, 2px);
+            text-shadow: 0 0 15px rgba(0, 240, 255, 0.6);
+            word-break: break-word;
+            overflow-wrap: break-word;
+            max-width: 100%;
+            padding: 0 0.25rem;
+            line-height: 1.2;
         }
 
         .glitch::before, .glitch::after {
@@ -69,61 +105,177 @@
 
         .glitch::before {
             left: 2px; text-shadow: -2px 0 var(--g-red);
-            clip: rect(44px, 450px, 56px, 0);
-            animation: glitch-anim-2 3s infinite linear alternate-reverse;
+            clip-path: inset(10% 0 60% 0);
+            animation: glitch-anim-2 2.5s infinite linear alternate-reverse;
         }
 
         .glitch::after {
             left: -2px; text-shadow: -2px 0 var(--g-cyan);
-            clip: rect(100px, 450px, 120px, 0);
+            clip-path: inset(60% 0 8% 0);
             animation: glitch-anim-3 2s infinite linear alternate-reverse;
         }
 
         @keyframes glitch-anim-2 {
-            0% { clip: rect(10px, 9999px, 20px, 0); transform: translateX(-2px); }
-            100% { clip: rect(80px, 9999px, 90px, 0); transform: translateX(2px); }
+            0% { clip-path: inset(8% 0 62% 0); transform: translateX(-2px); }
+            50% { clip-path: inset(48% 0 18% 0); transform: translateX(2px); }
+            100% { clip-path: inset(30% 0 40% 0); transform: translateX(-1px); }
+        }
+
+        @keyframes glitch-anim-3 {
+            0% { clip-path: inset(68% 0 6% 0); transform: translateX(2px); }
+            50% { clip-path: inset(8% 0 58% 0); transform: translateX(-2px); }
+            100% { clip-path: inset(38% 0 32% 0); transform: translateX(1px); }
         }
 
         .photo-container {
-            display: flex; gap: 1rem; justify-content: center;
-            width: 100%; overflow-x: auto; padding: 10px;
-            scrollbar-width: none; z-index: 10;
+            display: flex; 
+            gap: clamp(0.75rem, 2vw, 1.5rem); 
+            justify-content: flex-start;
+            align-items: center;
+            width: 100%; max-width: 1200px; 
+            overflow-x: auto; 
+            padding: 15px 10px;
+            scrollbar-width: thin;
+            scrollbar-color: var(--g-cyan) transparent;
+            z-index: 10;
+            margin-left: auto;
+            margin-right: auto;
+            -webkit-overflow-scrolling: touch;
         }
-        .photo-container::-webkit-scrollbar { display: none; }
+        @media (min-width: 768px) {
+            .photo-container { justify-content: center; }
+        }
+        .photo-container::-webkit-scrollbar { height: 4px; }
+        .photo-container::-webkit-scrollbar-thumb { background: var(--g-cyan); border-radius: 4px; }
 
-        .distorted-card {
+        .cyber-card {
             flex: 0 0 auto; position: relative;
-            width: 140px; height: 180px;
-            background: #111; padding: 3px; border: 1px solid #333;
-            opacity: 0; filter: grayscale(1); transition: 0.3s;
+            width: clamp(120px, 30vw, 210px); 
+            height: clamp(160px, 40vw, 280px);
+            background: rgba(15, 15, 25, 0.8);
+            border: 1px solid rgba(0, 240, 255, 0.3);
+            border-radius: 8px; padding: 5px;
+            opacity: 0; transform: translateY(30px) scale(0.9);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            cursor: pointer; overflow: hidden;
+            backdrop-filter: blur(5px);
         }
-        @media (min-width: 768px) { .distorted-card { width: 200px; height: 260px; } }
 
-        .distorted-card:hover {
-            filter: grayscale(0); border-color: var(--g-cyan);
-            box-shadow: 4px 0 var(--g-red), -4px 0 var(--g-cyan);
-            transform: translateY(-5px) skewX(-2deg);
+        .cyber-card:hover {
+            border-color: var(--g-cyan);
+            box-shadow: 0 0 20px var(--g-cyan), inset 0 0 10px var(--g-cyan);
+            transform: translateY(-8px) scale(1.03);
+        }
+        .cyber-card:hover img { animation: rgbSplit 0.35s steps(2, end) 1; }
+        
+        @keyframes rgbSplit {
+            0% { filter: none; }
+            25% { filter: drop-shadow(2px 0 0 var(--g-red)) drop-shadow(-2px 0 0 var(--g-cyan)); }
+            50% { filter: drop-shadow(-2px 0 0 var(--g-red)) drop-shadow(2px 0 0 var(--g-cyan)); }
+            100% { filter: none; }
         }
 
-        .distorted-card img { width: 100%; height: 100%; object-fit: cover; }
+        .cyber-card img { width: 100%; height: 100%; object-fit: cover; border-radius: 4px; }
 
         .scanline {
-            width: 100%; height: 100px;
-            background: linear-gradient(0deg, rgba(0,255,255,0.05) 0%, transparent 100%);
-            position: fixed; bottom: 100%; left: 0;
-            animation: scan 3s linear infinite; z-index: 100; pointer-events: none;
+            width: 100%; height: 8px;
+            background: linear-gradient(90deg, transparent, var(--g-cyan), transparent);
+            position: fixed; top: 0; left: 0; opacity: 0.6;
+            animation: scan 4s linear infinite; z-index: 100; pointer-events: none;
         }
-        @keyframes scan { 0% { bottom: 100%; } 100% { bottom: -100px; } }
+        @keyframes scan { 0% { top: 0%; } 100% { top: 100%; } }
 
         .btn-glitch {
-            background: white; color: black;
-            padding: 0.8rem 2.5rem; font-weight: bold;
-            border: none; position: relative; cursor: pointer;
+            background: transparent; color: var(--g-cyan);
+            padding: clamp(0.7rem, 2.5vw, 1rem) clamp(1.2rem, 5vw, 2.5rem);
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 700; border: 2px solid var(--g-cyan);
+            position: relative; cursor: pointer; text-transform: uppercase;
+            letter-spacing: clamp(1px, 0.5vw, 3px);
+            font-size: clamp(0.7rem, 2.5vw, 1rem);
+            transition: 0.3s;
+            box-shadow: 0 0 15px rgba(0, 240, 255, 0.3);
+            clip-path: polygon(10% 0, 100% 0, 90% 100%, 0 100%);
+            animation: btnGlowPulse 2.2s ease-in-out infinite;
+            max-width: 100%;
+            white-space: nowrap;
         }
-        .btn-glitch::after {
-            content: "DECRYPT"; position: absolute; top: 4px; left: 4px;
-            width: 100%; height: 100%; background: var(--g-cyan);
-            z-index: -1; transition: 0.2s;
+        @keyframes btnGlowPulse {
+            0%, 100% { box-shadow: 0 0 15px rgba(0, 240, 255, 0.3); }
+            50% { box-shadow: 0 0 30px rgba(0, 240, 255, 0.6); }
+        }
+
+        .btn-glitch:hover {
+            background: var(--g-cyan); color: #000;
+            box-shadow: 0 0 30px var(--g-cyan);
+        }
+
+        .hud-border {
+            position: absolute; border: 2px solid var(--g-cyan);
+            width: clamp(12px, 3vw, 20px); height: clamp(12px, 3vw, 20px); pointer-events: none;
+            animation: hudPulse 2.4s ease-in-out infinite;
+        }
+        @keyframes hudPulse { 0%, 100% { opacity: 0.5; } 50% { opacity: 1; } }
+        .hud-tl { top: calc(10px + var(--safe-t)); left: calc(10px + var(--safe-l)); border-right: none; border-bottom: none; }
+        .hud-tr { top: calc(10px + var(--safe-t)); right: calc(10px + var(--safe-r)); border-left: none; border-bottom: none; }
+        .hud-bl { bottom: calc(10px + var(--safe-b)); left: calc(10px + var(--safe-l)); border-right: none; border-top: none; }
+        .hud-br { bottom: calc(10px + var(--safe-b)); right: calc(10px + var(--safe-r)); border-left: none; border-top: none; }
+
+        .hex-noise { color: rgba(0,240,255,0.4); font-size: 10px; }
+
+        main#scene {
+            min-height: 100vh;
+            min-height: 100dvh;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: calc(1.5rem + var(--safe-t));
+            padding-bottom: calc(1.5rem + var(--safe-b));
+            padding-left: calc(1rem + var(--safe-l));
+            padding-right: calc(1rem + var(--safe-r));
+            position: relative;
+            z-index: 10;
+            overflow-y: auto;
+        }
+
+        #overlay {
+            padding-top: calc(1.5rem + var(--safe-t));
+            padding-bottom: calc(1.5rem + var(--safe-b));
+            padding-left: calc(1rem + var(--safe-l));
+            padding-right: calc(1rem + var(--safe-r));
+        }
+
+        #audio-control {
+            top: calc(1rem + var(--safe-t));
+            right: calc(1rem + var(--safe-r));
+        }
+
+        #terminal-box {
+            max-height: 35vh;
+            overflow-y: auto;
+        }
+
+        .message-font {
+            font-size: clamp(0.8rem, 2vh, 1.15rem);
+            line-height: 1.5;
+            width: 100%;
+            min-width: 0;
+            overflow-wrap: anywhere;
+            word-break: break-word;
+            white-space: normal;
+            overflow-x: hidden;
+        }
+
+        header { overflow-x: hidden; min-width: 0; }
+
+        html, body { -webkit-text-size-adjust: 100%; }
+
+        /* Small-height landscape phones — the terminal log otherwise eats
+           the whole visible area before the DECRYPT button appears */
+        @media (max-height: 480px) {
+            #terminal-box { max-height: 26vh; }
+            .glitch { font-size: clamp(1.1rem, 5vw, 3rem); }
         }
     </style>
 </head>
@@ -134,110 +286,356 @@
     {% endif %}
 
     <div class="noise-bg"></div>
+    <div class="grid-overlay"></div>
+    <canvas id="rain-canvas"></canvas>
     <div class="scanline"></div>
-    <div id="particle-canvas" class="fixed inset-0 pointer-events-none"></div>
+    <div class="crt-vignette"></div>
+    <div class="crt-flicker"></div>
+    <canvas id="bg-canvas" class="fixed inset-0 pointer-events-none z-0"></canvas>
 
-    <div id="overlay" class="fixed inset-0 z-[500] flex items-center justify-center bg-black">
-        <div class="text-center">
-            <div class="mb-6 text-[10px] tracking-[0.8em] text-gray-500 uppercase">Click_{{ wish.wish_type|upper }}_WISH</div>
-            <button id="glitchBtn" onclick="startGlitch()" class="btn-glitch uppercase tracking-widest">OPEN SURPRISE</button>
+    <div id="audio-control" class="fixed z-[600] hidden">
+        <button onclick="toggleAudio()" class="p-2.5 sm:p-3 border border-cyan-500/50 bg-black/60 rounded-full text-cyan-400 hover:text-white hover:border-cyan-400 transition-all backdrop-blur-md">
+            <i id="audio-icon" class="fas fa-volume-up text-sm sm:text-lg"></i>
+        </button>
+    </div>
+
+    <div id="overlay" class="fixed inset-0 z-[500] flex flex-col items-center justify-center bg-black/95 px-4 py-6 overflow-y-auto">
+        <div class="hud-border hud-tl"></div>
+        <div class="hud-border hud-tr"></div>
+        <div class="hud-border hud-bl"></div>
+        <div class="hud-border hud-br"></div>
+
+        <div class="text-center max-w-md w-full my-auto">
+            <div class="mb-2 text-[10px] sm:text-[11px] tracking-[0.4em] sm:tracking-[0.6em] text-cyan-400/80 uppercase">INCOMING_ENCRYPTED_DATA</div>
+            <div class="text-[11px] sm:text-xs text-gray-500 font-mono mb-6 sm:mb-8">// SENDER: {{ wish.sender_name|upper }}</div>
+
+            <div id="terminal-box" class="hidden mb-6 p-3 sm:p-4 border border-cyan-500/30 bg-black/80 font-mono text-left text-xs text-cyan-400 rounded">
+                <div id="terminal-logs"></div>
+                <div class="mt-2 text-white font-bold" id="terminal-progress">INITIALIZING: 0%</div>
+            </div>
+
+            <button id="glitchBtn" onclick="startDecryptSequence()" class="btn-glitch">
+                DECRYPT SURPRISE
+            </button>
         </div>
     </div>
 
-    <main id="scene" class="hidden h-screen flex flex-col items-center justify-between py-12 px-4 overflow-hidden">
-        
-        <div class="text-center z-20">
-            <div class="text-[9px] tracking-[0.5em] mb-2" style="color: var(--g-cyan)">
-                {% if wish.wish_type|lower == 'friendship' %} BEST_FRIENDS_FOREVER
-                {% elif wish.wish_type|lower == 'birthday' %} // SYSTEM_UPDATE: AGE++
-                {% else %} // PROTOCOL: SECURE_WISH {% endif %}
+    <main id="scene" class="hidden">
+
+        <header class="text-center z-20 mt-2 sm:mt-4 w-full max-w-2xl px-2">
+            <div class="text-[9px] sm:text-[10px] md:text-xs tracking-[0.3em] sm:tracking-[0.6em] mb-2 font-bold" style="color: var(--g-cyan)">
+                {% if wish.wish_type|lower == 'friendship' %} // PROTOCOL: PERMANENT_CONNECTION
+                {% elif wish.wish_type|lower == 'birthday' %} // SYSTEM_EVENT: LEVEL_UP_CELEBRATION
+                {% else %} // PROTOCOL: SPECIAL_WISH_DECRYPTED {% endif %}
             </div>
 
-            <h1 id="receiver-name" class="glitch" data-text="{{ wish.receiver_name }}">
+            <h1 id="receiver-name" class="glitch my-2" data-text="{{ wish.receiver_name }}">
                 {{ wish.receiver_name }}
             </h1>
 
-            <p id="message-text" class="text-sm md:text-xl text-gray-400 max-w-lg mt-6 font-mono">
-                {{ wish.message }}
-            </p>
-        </div>
+            <div id="messageWrap" class="flex items-center justify-center my-3 sm:my-4" style="width:100%; min-width:0; overflow-x:hidden;">
+                <p id="message-text" class="message-font text-gray-300 max-w-xl font-mono text-center px-2"></p>
+            </div>
+        </header>
 
-        <div class="photo-container">
+        <div class="photo-container my-auto">
             {% for img_obj in wish.images.all %}
-            <div class="distorted-card">
+            <div class="cyber-card" onclick="openLightbox('{{ img_obj.image.url }}', 'MEMORY_DATA_0{{ forloop.counter }}')">
                 <img src="{{ img_obj.image.url }}" alt="Memory">
-                <div class="absolute bottom-1 right-1 text-[7px] text-white bg-red-600 px-1">DATA_0{{ forloop.counter }}</div>
+                <div class="absolute top-2 left-2 text-[8px] text-black bg-cyan-400 font-bold px-1 rounded">DATA_0{{ forloop.counter }}</div>
+                <div class="absolute bottom-2 right-2 text-[10px] text-cyan-400 bg-black/70 px-1 border border-cyan-500/30"><i class="fas fa-expand"></i></div>
             </div>
             {% endfor %}
         </div>
 
-        <footer class="w-full flex flex-col items-center gap-2 z-20">
-            <div class="flex gap-4 font-mono text-[9px] text-gray-600">
-                <span>FROM : {{ wish.sender_name }}</span>
-                <span class="text-gray-800">|</span>
-                <span>{{ wish.wish_type|upper }}</span>
+        <footer class="w-full flex flex-col items-center gap-2 sm:gap-3 z-20 mt-4 mb-2">
+            <div class="flex items-center gap-3 sm:gap-4 font-mono text-[9px] sm:text-[10px] text-gray-400 bg-black/50 px-3 sm:px-4 py-1.5 border border-white/10 rounded-full backdrop-blur-md">
+                <span>FROM: <strong class="text-white">{{ wish.sender_name }}</strong></span>
+                <span class="text-gray-600">|</span>
+                <span class="text-cyan-400">{{ wish.wish_type|upper }}</span>
             </div>
-            <a href="{% url 'home' %}" class="text-[8px] tracking-[0.5em] text-gray-700 hover:text-white transition-colors uppercase">
-                Created_By_SurpriseMe
+            <a href="{% url 'home' %}" class="text-[8px] sm:text-[9px] tracking-[0.3em] sm:tracking-[0.4em] text-gray-500 hover:text-cyan-400 transition-colors uppercase">
+                CREATED_BY_SURPRISEME
             </a>
         </footer>
     </main>
 
-    <script>
-        function createParticles() {
-            const container = document.getElementById('particle-canvas');
-            const colors = [getComputedStyle(document.documentElement).getPropertyValue('--g-cyan'), 
-                           getComputedStyle(document.documentElement).getPropertyValue('--g-red'), 
-                           '#ffffff'];
-            
-            for (let i = 0; i < 50; i++) {
-                const p = document.createElement('div');
-                p.className = 'cyber-particle';
-                p.style.left = Math.random() * 100 + 'vw';
-                p.style.top = -20 + 'px';
-                p.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
-                container.appendChild(p);
+    <div id="lightbox" class="fixed inset-0 z-[700] hidden bg-black/90 flex items-center justify-center p-3 sm:p-4 backdrop-blur-lg" onclick="closeLightbox()">
+        <div class="relative max-w-3xl w-full max-h-[85vh] border border-cyan-500/50 p-2 bg-black rounded-lg shadow-2xl flex flex-col justify-between" onclick="event.stopPropagation()">
+            <div class="overflow-hidden flex items-center justify-center flex-1">
+                <img id="lightbox-img" src="" class="max-w-full max-h-[70vh] sm:max-h-[75vh] object-contain rounded">
+            </div>
+            <div class="flex justify-between items-center mt-3 px-2 font-mono text-xs text-cyan-400">
+                <span id="lightbox-tag">MEMORY_DATA</span>
+                <button onclick="closeLightbox()" class="text-white hover:text-red-400 text-xs sm:text-sm font-bold uppercase tracking-wider">[ CLOSE ]</button>
+            </div>
+        </div>
+    </div>
 
-                gsap.to(p, {
-                    y: window.innerHeight + 50,
-                    duration: Math.random() * 2 + 1,
-                    delay: Math.random() * 3,
-                    repeat: -1,
-                    ease: "none",
-                    opacity: Math.random()
-                });
+    <script>
+        const fullMessage = "{{ wish.message|escapejs }}";
+        let audioPlaying = false;
+        const bgAudio = document.getElementById('bgMusic');
+
+        let audioCtx = null;
+        function ensureAudioCtx() {
+            if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            if (audioCtx.state === 'suspended') audioCtx.resume().catch(() => {});
+            return audioCtx;
+        }
+
+        function playBeep(freq = 440, type = 'sine', duration = 0.1) {
+            try {
+                const ctx2 = ensureAudioCtx();
+                const osc = ctx2.createOscillator();
+                const gain = ctx2.createGain();
+                osc.type = type;
+                osc.frequency.value = freq;
+                gain.gain.setValueAtTime(0.05, ctx2.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.00001, ctx2.currentTime + duration);
+                osc.connect(gain);
+                gain.connect(ctx2.destination);
+                osc.start();
+                osc.stop(ctx2.currentTime + duration);
+            } catch(e) {}
+        }
+
+        const rainCanvas = document.getElementById('rain-canvas');
+        const rainCtx = rainCanvas.getContext('2d');
+        const rainChars = '01アイウエオカキクケコサシスセソ<>/=+*'.split('');
+        let rainDrops = [];
+        const rainFontSize = 16;
+
+        function resizeRain() {
+            rainCanvas.width = window.innerWidth;
+            rainCanvas.height = window.innerHeight;
+            const cols = Math.floor(rainCanvas.width / rainFontSize);
+            rainDrops = new Array(cols).fill(0).map(() => Math.random() * -50);
+        }
+        window.addEventListener('resize', resizeRain);
+        resizeRain();
+
+        function drawRain() {
+            rainCtx.fillStyle = 'rgba(3,3,8,0.08)';
+            rainCtx.fillRect(0, 0, rainCanvas.width, rainCanvas.height);
+            rainCtx.font = rainFontSize + 'px monospace';
+            for (let i = 0; i < rainDrops.length; i++) {
+                const char = rainChars[Math.floor(Math.random() * rainChars.length)];
+                rainCtx.fillStyle = Math.random() > 0.94 ? '#ffffff' : 'rgba(0,240,255,0.55)';
+                rainCtx.fillText(char, i * rainFontSize, rainDrops[i] * rainFontSize);
+                if (rainDrops[i] * rainFontSize > rainCanvas.height && Math.random() > 0.975) {
+                    rainDrops[i] = 0;
+                }
+                rainDrops[i]++;
+            }
+            requestAnimationFrame(drawRain);
+        }
+        drawRain();
+
+        const canvas = document.getElementById('bg-canvas');
+        const ctx = canvas.getContext('2d');
+        let particles = [];
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        class Particle {
+            constructor() {
+                this.reset();
+            }
+            reset() {
+                this.x = Math.random() * canvas.width;
+                this.y = Math.random() * canvas.height;
+                this.size = Math.random() * 2 + 0.5;
+                this.speedY = Math.random() * 1.5 + 0.5;
+                this.opacity = Math.random() * 0.7 + 0.3;
+                this.color = Math.random() > 0.5 ? '#00f0ff' : '#ff007f';
+            }
+            update() {
+                this.y -= this.speedY;
+                if (this.y < 0) this.reset();
+            }
+            draw() {
+                ctx.fillStyle = this.color;
+                ctx.globalAlpha = this.opacity;
+                ctx.fillRect(this.x, this.y, this.size, this.size * 3);
             }
         }
 
-        function startGlitch() {
-            const music = document.getElementById('bgMusic');
-            if(music) music.play().catch(e => {});
+        for (let i = 0; i < 70; i++) particles.push(new Particle());
 
-            gsap.to("body", { backgroundColor: "#fff", duration: 0.05, repeat: 3, yoyo: true });
-            
+        function animateParticles() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            particles.forEach(p => { p.update(); p.draw(); });
+            requestAnimationFrame(animateParticles);
+        }
+        animateParticles();
+
+        function randomHex(len) {
+            let s = '';
+            for (let i = 0; i < len; i++) s += Math.floor(Math.random() * 16).toString(16);
+            return s.toUpperCase();
+        }
+
+        function startDecryptSequence() {
+            ensureAudioCtx();
+            playBeep(600, 'square', 0.15);
+            document.getElementById('glitchBtn').style.display = 'none';
+            const terminal = document.getElementById('terminal-box');
+            const logs = document.getElementById('terminal-logs');
+            const progress = document.getElementById('terminal-progress');
+            terminal.classList.remove('hidden');
+
+            const steps = [
+                "ESTABLISHING_SECURE_TUNNEL...",
+                "DECRYPTING_PACKETS...",
+                "ALLOCATING_SURPRISE_DATA...",
+                "UNPACKING_MEMORIES..."
+            ];
+
+            let stepIdx = 0;
+            let pct = 0;
+
+            const interval = setInterval(() => {
+                pct += Math.floor(Math.random() * 12) + 5;
+                if (pct > 100) pct = 100;
+                progress.innerText = `INITIALIZING: ${pct}%`;
+                playBeep(200 + pct * 5, 'sawtooth', 0.05);
+
+                if (Math.random() > 0.55) {
+                    const hex = document.createElement('div');
+                    hex.className = 'hex-noise';
+                    hex.innerText = `0x${randomHex(8)} :: BLOCK_OK`;
+                    logs.appendChild(hex);
+                    if (logs.children.length > 6) logs.removeChild(logs.firstChild);
+                }
+
+                if (pct % 25 === 0 && stepIdx < steps.length) {
+                    const p = document.createElement('div');
+                    p.className = 'text-white';
+                    p.innerText = `> ${steps[stepIdx]}`;
+                    logs.appendChild(p);
+                    stepIdx++;
+                }
+
+                if (pct >= 100) {
+                    clearInterval(interval);
+                    setTimeout(revealSurprise, 300);
+                }
+            }, 80);
+        }
+
+        function revealSurprise() {
+            if (bgAudio) {
+                bgAudio.play().then(() => {
+                    audioPlaying = true;
+                    document.getElementById('audio-control').classList.remove('hidden');
+                }).catch(e => {});
+            }
+
+            gsap.to("body", { backgroundColor: "#ffffff", duration: 0.08, repeat: 5, yoyo: true });
+
             setTimeout(() => {
                 document.getElementById('overlay').style.display = 'none';
                 document.getElementById('scene').classList.remove('hidden');
-                createParticles();
 
-                gsap.to(".distorted-card", { 
-                    opacity: 1, duration: 0.1, stagger: 0.1,
-                    onComplete: () => {
-                        gsap.to(".distorted-card", { filter: "grayscale(0.6)", duration: 1 });
-                    }
+                confetti({
+                    particleCount: 100,
+                    spread: 70,
+                    origin: { y: 0.6 },
+                    colors: ['#00f0ff', '#ff007f', '#ffffff']
                 });
 
-                setInterval(() => {
-                    gsap.to("#message-text", { x: Math.random() * 2 - 1, duration: 0.1 });
-                }, 150);
+                gsap.to(".cyber-card", {
+                    opacity: 1, y: 0, scale: 1,
+                    duration: 0.6, stagger: 0.12, ease: "back.out(1.7)"
+                });
 
-            }, 400);
+                typeMessage();
+
+            }, 500);
+        }
+
+        function typeMessage() {
+            const container = document.getElementById('message-text');
+            fitMessageToScreen(container);
+            let idx = 0;
+            container.innerText = "";
+            const interval = setInterval(() => {
+                if (idx < fullMessage.length) {
+                    container.innerText += fullMessage.charAt(idx);
+                    if (idx % 3 === 0) playBeep(800, 'sine', 0.03);
+                    idx++;
+                } else {
+                    clearInterval(interval);
+                }
+            }, 40);
+        }
+
+        // Shrinks the message text (never scrolls it) until the whole
+        // scene actually fits inside the visible screen — checked with the
+        // full message rendered first, so the size never changes mid-typing.
+        function fitMessageToScreen(container) {
+            const scene = document.getElementById('scene');
+            const prevVisibility = container.style.visibility;
+            const prevText = container.innerText;
+            container.style.visibility = 'hidden';
+            container.innerText = fullMessage;
+
+            let fontPx = parseFloat(getComputedStyle(container).fontSize);
+            const floor = 10;
+            let guard = 0;
+            while (scene.scrollHeight > window.innerHeight && fontPx > floor && guard < 40) {
+                fontPx -= 0.6;
+                container.style.fontSize = fontPx + 'px';
+                guard++;
+            }
+
+            container.innerText = prevText;
+            container.style.visibility = prevVisibility;
+        }
+
+        function openLightbox(url, title) {
+            playBeep(500, 'triangle', 0.1);
+            document.getElementById('lightbox-img').src = url;
+            document.getElementById('lightbox-tag').innerText = title;
+            document.getElementById('lightbox').classList.remove('hidden');
+        }
+
+        function closeLightbox() {
+            document.getElementById('lightbox').classList.add('hidden');
+        }
+
+        function toggleAudio() {
+            const icon = document.getElementById('audio-icon');
+            if (bgAudio) {
+                if (audioPlaying) {
+                    bgAudio.pause();
+                    icon.className = "fas fa-volume-mute text-sm sm:text-lg text-red-400";
+                } else {
+                    bgAudio.play();
+                    icon.className = "fas fa-volume-up text-sm sm:text-lg text-cyan-400";
+                }
+                audioPlaying = !audioPlaying;
+            }
         }
 
         document.addEventListener('mousemove', (e) => {
-            const x = (window.innerWidth / 2 - e.pageX) / 40;
-            const y = (window.innerHeight / 2 - e.pageY) / 40;
-            gsap.to(".glitch", { x: x, y: y, duration: 1 });
+            const x = (window.innerWidth / 2 - e.pageX) / 35;
+            const y = (window.innerHeight / 2 - e.pageY) / 35;
+            gsap.to(".glitch", { x: x, y: y, duration: 0.8 });
+        });
+
+        window.addEventListener('resize', () => {
+            const scene = document.getElementById('scene');
+            if (!scene.classList.contains('hidden')) {
+                document.getElementById('message-text').style.fontSize = '';
+                fitMessageToScreen(document.getElementById('message-text'));
+            }
         });
     </script>
 </body>
