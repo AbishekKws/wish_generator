@@ -3,106 +3,218 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    
-    <title>A Special Surprise for {{ wish.receiver_name }}! ✨</title>
+
+    <title>Autumn Whisper | {{ wish.receiver_name }}</title>
     <meta name="description" content="{{ wish.sender_name }} has sent you a magical {{ wish.wish_type }} surprise. Click to unlock the magic!">
-    
+
+    <!-- Open Graph Metadata -->
     <meta property="og:title" content="A Special Surprise for {{ wish.receiver_name }}! ✨">
     <meta property="og:description" content="Open the link to see a magical surprise from {{ wish.sender_name }}.">
     <meta property="og:url" content="{{ request.build_absolute_uri }}">
-    
+
     {% if wish.images.exists %}
     <meta property="og:image" content="{{ request.scheme }}://{{ request.get_host }}{{ wish.images.first.image.url }}">
     {% endif %}
-    
+
     <meta property="og:type" content="website">
-    <title>Autumn Whisper | {{ wish.receiver_name }}</title>
-    
+
+    <!-- External CDNs & Libraries -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@1,600&family=Montserrat:wght@300;500&family=Dancing+Script:wght@700&display=swap" rel="stylesheet">
-    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,600;1,600&family=Montserrat:wght@300;400;500;700&family=Dancing+Script:wght@600;700&display=swap" rel="stylesheet">
+
     <style>
-        :root { --autumn-gold: #e29a43; --leaf-red: #a33b20; --wood-dark: #1a0f0a; }
-        
-        body, html { 
-            margin: 0; padding: 0; background: var(--wood-dark); 
-            color: #f5ebe0; overflow: hidden;
-            font-family: 'Montserrat', sans-serif; height: 100vh; width: 100vw;
+        :root { 
+            --autumn-gold: #e29a43; 
+            --leaf-red: #a33b20; 
+            --wood-dark: #1a0f0a; 
+            --warm-amber: #f4a261;
+            --soft-cream: #f5ebe0;
         }
 
-        /* Ambient Forest Background */
-        .forest-bg { 
-            position: fixed; inset: 0; 
-            background: linear-gradient(to bottom, rgba(26, 15, 10, 0.7), rgba(26, 15, 10, 0.9)), 
-            url('https://images.unsplash.com/photo-1477414348463-c0eb7f1359b6?auto=format&fit=crop&q=80&w=1920'); 
-            background-size: cover; background-position: center; z-index: -1; 
-            filter: saturate(0.8);
+        * {
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body, html {
+            margin: 0; padding: 0; 
+            background: var(--wood-dark);
+            color: var(--soft-cream); 
+            overflow: hidden;
+            font-family: 'Montserrat', sans-serif; 
+            height: 100vh; width: 100vw;
+            user-select: none;
+        }
+
+        /* Forest Background with atmospheric vignette */
+        .forest-bg {
+            position: fixed; inset: 0;
+            background: linear-gradient(to bottom, rgba(26, 15, 10, 0.75), rgba(26, 15, 10, 0.92)),
+            url('https://images.unsplash.com/photo-1477414348463-c0eb7f1359b6?auto=format&fit=crop&q=80&w=1920');
+            background-size: cover; 
+            background-position: center; 
+            z-index: -2;
+            filter: saturate(0.85) contrast(1.05);
+        }
+
+        .vignette {
+            position: fixed; inset: 0; z-index: -1; pointer-events: none;
+            background: radial-gradient(ellipse at center, transparent 35%, rgba(10, 5, 3, 0.8) 100%);
+        }
+
+        /* Atmospheric Ambient God Rays Layer */
+        .god-rays {
+            position: fixed; inset: -50%;
+            background: repeating-conic-gradient(
+                from 0deg at 50% 0%, 
+                rgba(226, 154, 67, 0.08) 0deg 15deg, 
+                transparent 15deg 30deg
+            );
+            pointer-events: none;
+            z-index: 0;
+            animation: rotateRays 120s linear infinite;
+        }
+        @keyframes rotateRays {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
         }
 
         #leaf-canvas { position: fixed; inset: 0; z-index: 20; pointer-events: none; }
 
-        /* Main Autumn Card Design */
-        .autumn-card { 
-            background: rgba(255, 255, 255, 0.03); 
-            backdrop-filter: blur(15px); 
-            border: 1px solid rgba(226, 154, 67, 0.15); 
-            border-radius: 40px 5px 40px 5px; 
-            padding: 2.5rem 1.5rem; 
-            width: 95%; max-width: 500px; 
+        #dust-layer { position: fixed; inset: 0; z-index: 15; pointer-events: none; overflow: hidden; }
+        .dust-mote {
+            position: absolute; border-radius: 50%;
+            background: radial-gradient(circle, rgba(226,154,67,0.9), rgba(226,154,67,0) 70%);
+            opacity: 0; animation: motesFloat linear infinite;
+        }
+        @keyframes motesFloat {
+            0% { opacity: 0; transform: translateY(0) scale(0.5); }
+            15% { opacity: .8; }
+            85% { opacity: .4; }
+            100% { opacity: 0; transform: translateY(-90vh) scale(1); }
+        }
+
+        /*
+          Autumn Glass Panel — no visible box.
+          Instead of a bordered rectangle, the blur + tint fade out at the
+          edges via a mask, so the panel reads as "light gathering in the
+          fog" rather than a card sitting on top of the scene.
+        */
+        .autumn-card {
+            position: relative;
+            background: radial-gradient(ellipse at center, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.02) 55%, transparent 78%);
+            backdrop-filter: blur(22px);
+            -webkit-backdrop-filter: blur(22px);
+            -webkit-mask-image: radial-gradient(ellipse 78% 85% at center, black 55%, transparent 100%);
+            mask-image: radial-gradient(ellipse 78% 85% at center, black 55%, transparent 100%);
+            border: none;
+            border-radius: 48px;
+            padding: 3rem 2.4rem;
+            width: 94%; max-width: 560px;
             z-index: 30;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
+            box-shadow: none;
             transform-style: preserve-3d;
         }
 
-        .recipient-name { 
-            font-family: 'Cormorant Garamond', serif; 
-            color: var(--autumn-gold); 
-            font-size: clamp(2rem, 7vw, 3rem); 
-            line-height: 1.1; 
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
-        }
-
-        .message-font { 
-            font-family: 'Dancing Script', cursive; 
-            color: #d4a373; 
-            font-size: clamp(1.3rem, 4.5vw, 1.9rem); 
-            margin-top: 1rem; 
-        }
-
-        /* Polaroid Memory Orbit */
-        .memory-orbit {
-            position: relative;
-            width: 100%;
-            height: 280px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 25;
-            perspective: 1000px;
-        }
-
-        .polaroid { 
+        /* Soft ambient glow sitting *behind* the panel — feathered, no edge */
+        .autumn-card::after {
+            content: "";
             position: absolute;
-            background: #fffdfa; 
-            padding: 10px 10px 30px 10px; 
-            box-shadow: 0 15px 35px rgba(0,0,0,0.5); 
-            width: 140px; 
-            opacity: 0; 
-            border: 1px solid #eee;
-            transition: transform 0.3s ease;
+            inset: -20%;
+            z-index: -1;
+            background: radial-gradient(ellipse at center, rgba(226,154,67,0.16) 0%, transparent 70%);
+            filter: blur(30px);
+            pointer-events: none;
         }
 
-        .polaroid img { width: 100%; aspect-ratio: 1/1; object-fit: cover; filter: sepia(0.2); }
+        .recipient-name {
+            font-family: 'Cormorant Garamond', serif;
+            color: var(--autumn-gold);
+            font-size: clamp(2.2rem, 7vw, 3.4rem);
+            line-height: 1.1;
+            text-shadow: 0 4px 24px rgba(0,0,0,0.65);
+        }
 
-        .btn-autumn { 
-            background: var(--leaf-red); color: white; 
-            padding: 1.2rem 3rem; font-weight: 700; 
-            letter-spacing: 4px; border: 1px solid var(--autumn-gold); 
-            box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+        .message-font {
+            font-family: 'Dancing Script', cursive;
+            color: #e6b88a;
+            font-size: clamp(1.35rem, 4.5vw, 2rem);
+            margin-top: 1rem;
+            line-height: 1.4;
+            max-height: 25vh;
+            overflow-y: auto;
+        }
+
+        /* Memory Orbit & Polaroid Slideshow */
+        .memory-orbit {
+            position: relative; width: 100%; height: 290px;
+            display: flex; justify-content: center; align-items: center;
+            z-index: 25; perspective: 1000px;
+            touch-action: pan-y;
+        }
+
+        .polaroid {
+            position: absolute;
+            inset: 0; margin: auto;
+            background: #fdfbf7;
+            padding: 10px 10px 32px 10px;
+            box-shadow: 0 25px 55px -10px rgba(0,0,0,0.55);
+            width: 155px;
+            height: max-content;
+            opacity: 0;
+            border: none;
             cursor: pointer;
+            border-radius: 10px;
+            transition: box-shadow 0.35s ease;
+        }
+        .polaroid:hover {
+            box-shadow: 0 28px 60px -8px rgba(226, 154, 67, 0.45);
+        }
+
+        .polaroid::before {
+            content: "";
+            position: absolute; top: -10px; left: 50%;
+            width: 46px; height: 18px;
+            background: rgba(226, 154, 67, 0.55);
+            border-radius: 3px;
+            transform: translateX(-50%) rotate(-3deg);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+            filter: blur(0.2px);
+        }
+
+        .polaroid img { 
+            width: 100%; aspect-ratio: 1/1; 
+            object-fit: cover; filter: sepia(0.18) contrast(1.05); 
+            border: none;
+            border-radius: 4px;
+            pointer-events: none;
+        }
+
+        .orbit-dots { display: flex; gap: 10px; justify-content: center; margin-top: 1.2rem; z-index: 26; }
+        .orbit-dot {
+            width: 8px; height: 8px; border-radius: 50%;
+            background: rgba(226,154,67,0.3);
+            cursor: pointer;
+            transition: all 0.4s ease;
+        }
+        .orbit-dot.is-active { background: var(--autumn-gold); transform: scale(1.5); box-shadow: 0 0 10px var(--autumn-gold); }
+
+        /* Pill-shaped button — smooth, no hard corners, glow instead of a boxed shadow */
+        .btn-autumn {
+            background: linear-gradient(135deg, var(--leaf-red), #80230d);
+            color: white;
+            padding: 1.2rem 3.4rem; font-weight: 700;
+            letter-spacing: 4px; border: none;
+            border-radius: 999px;
+            box-shadow: 0 18px 40px -10px rgba(0,0,0,0.6), 0 0 40px -8px rgba(226,154,67,0.35);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .btn-autumn:hover {
+            transform: translateY(-2px) scale(1.03);
+            box-shadow: 0 22px 48px -10px rgba(0,0,0,0.65), 0 0 55px -6px rgba(226, 154, 67, 0.55);
         }
 
         .blast-text {
@@ -112,13 +224,47 @@
             -webkit-text-fill-color: transparent;
             animation: shine 3s linear infinite;
         }
-
         @keyframes shine { to { background-position: 200% center; } }
 
-        @media (max-height: 600px) {
-            .autumn-card { padding: 1rem; margin-top: -10px; }
-            .memory-orbit { height: 180px; }
-            .polaroid { width: 110px; }
+        .music-toggle {
+            position: fixed; top: 18px; right: 18px; z-index: 60;
+            width: 44px; height: 44px; border-radius: 50%;
+            background: rgba(0,0,0,0.35); backdrop-filter: blur(10px);
+            border: none;
+            display: flex; align-items: center; justify-content: center;
+            color: var(--autumn-gold); font-size: 1rem; cursor: pointer;
+            box-shadow: 0 8px 24px -6px rgba(0,0,0,0.5);
+            transition: transform .25s ease, background .25s ease;
+        }
+        .music-toggle:hover { transform: scale(1.1) rotate(12deg); background: rgba(226,154,67,0.2); }
+
+        /* Custom Scrollbar for Message Box */
+        .custom-scrollbar::-webkit-scrollbar { width: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: var(--autumn-gold); border-radius: 10px; }
+
+        /* Image Modal Preview */
+        #photoModal {
+            position: fixed; inset: 0; z-index: 1000;
+            background: rgba(10, 5, 3, 0.92);
+            backdrop-filter: blur(16px);
+            display: flex; align-items: center; justify-content: center;
+            opacity: 0; pointer-events: none;
+            transition: opacity 0.4s ease;
+        }
+        #photoModal.active { opacity: 1; pointer-events: auto; }
+
+        #photoModal .modal-inner {
+            background: rgba(253, 251, 247, 0.97);
+            border-radius: 20px;
+            border: none;
+            box-shadow: 0 40px 80px -20px rgba(0,0,0,0.7);
+        }
+
+        @media (max-height: 650px) {
+            .autumn-card { padding: 1.6rem 1.4rem; margin-top: -10px; }
+            .memory-orbit { height: 210px; }
+            .polaroid { width: 120px; }
         }
     </style>
 </head>
@@ -129,21 +275,32 @@
             <source src="{% if wish.custom_music %}{{ wish.custom_music.url }}{% else %}{{ wish.selected_music.audio_file.url }}{% endif %}" type="audio/mpeg">
         {% endif %}
     </audio>
+    
+    {% if wish.custom_music or wish.selected_music %}
+    <div class="music-toggle hidden" id="musicToggle" onclick="toggleMusic()">
+        <i class="fas fa-volume-high" id="musicIcon"></i>
+    </div>
+    {% endif %}
 
+    <!-- Background Graphics -->
     <div class="forest-bg"></div>
+    <div class="vignette"></div>
+    <div class="god-rays"></div>
     <canvas id="leaf-canvas"></canvas>
+    <div id="dust-layer"></div>
 
     <div id="overlay" class="fixed inset-0 z-[500] flex items-center justify-center bg-[#1a0f0a]">
-        <div class="text-center">
-            <div id="leaf-icon" class="text-6xl mb-6">🍁</div>
-            <button id="openBtn" class="btn-autumn uppercase">Open Whisper</button>
+        <div class="text-center p-6">
+            <div id="leaf-icon" class="text-7xl mb-6 filter drop-shadow-[0_0_15px_rgba(226,154,67,0.5)]">🍁</div>
+            <button id="openBtn" class="btn-autumn uppercase text-sm md:text-base">Open Whisper</button>
+            <p class="mt-6 text-xs text-amber-200/60 uppercase tracking-[0.3em]">A Special Gift Awaits</p>
         </div>
     </div>
 
-    <main id="scene" class="hidden h-screen w-screen flex flex-col items-center justify-center overflow-hidden">
-        
-        <div class="autumn-card text-center mb-8">
-            <div class="mb-3 text-[10px] tracking-[0.6em] text-orange-400/80 uppercase font-bold">
+    <main id="scene" class="hidden h-screen w-screen flex flex-col items-center justify-center overflow-hidden px-4">
+
+        <div class="autumn-card text-center mb-6">
+            <div class="mb-3 text-[10px] sm:text-[11px] tracking-[0.6em] text-orange-400/90 uppercase font-bold">
                 {% if wish.wish_type|lower == 'sorry' %} Deeply Sorry for Everything
                 {% elif wish.wish_type|lower == 'love' %} My Heart Belongs To You
                 {% elif wish.wish_type|lower == 'miss you' %} MISSING YOU A LOT 🥲
@@ -154,33 +311,46 @@
                 {{ wish.receiver_name|upper }}
             </h1>
 
-            <p id="message-text" class="message-font"></p>
-            
-            <div class="mt-6 flex justify-center items-center gap-5">
-                <div class="h-[1px] w-14 bg-orange-900/50"></div>
-                <span class="text-[10px] tracking-[0.4em] text-orange-200 uppercase font-medium">
+            <div class="custom-scrollbar">
+                <p id="message-text" class="message-font"></p>
+            </div>
+
+            <div class="mt-5 flex justify-center items-center gap-5">
+                <div class="h-[1px] w-12 bg-orange-800/60"></div>
+                <span class="text-[10px] sm:text-[11px] tracking-[0.4em] text-orange-200/90 uppercase font-medium">
                    From {{ wish.sender_name }}
                 </span>
-                <div class="h-[1px] w-14 bg-orange-900/50"></div>
+                <div class="h-[1px] w-12 bg-orange-800/60"></div>
             </div>
         </div>
 
         <div class="memory-orbit" id="orbit">
-            {% for img_obj in wish.images.all %}
-            <div class="polaroid">
-                <img src="{{ img_obj.image.url }}">
+            {% for img_obj in wish.images.all|slice:":6" %}
+            <div class="polaroid" onclick="openPhotoModal('{{ img_obj.image.url }}', {{ forloop.counter }})">
+                <img src="{{ img_obj.image.url }}" alt="Memory preview">
                 <div class="text-center mt-3 font-['Dancing_Script'] text-gray-700 text-sm">Memory #{{ forloop.counter }}</div>
             </div>
             {% endfor %}
         </div>
+        <div class="orbit-dots" id="orbitDots"></div>
 
-        <footer class="absolute bottom-8 w-full flex justify-center opacity-60 z-[40]">
+        <footer class="absolute bottom-6 w-full flex justify-center opacity-70 z-[40]">
             <a href="{% url 'home' %}" class="flex flex-col items-center gap-1 group">
-                <span class="text-[8px] tracking-[0.4em] uppercase text-gray-500">Whispered by</span>
-                <span class="text-[12px] font-black tracking-[0.2em] blast-text">SURPRISE ME</span>
+                <span class="text-[8px] tracking-[0.4em] uppercase text-gray-400">Whispered by</span>
+                <span class="text-[12px] font-black tracking-[0.25em] blast-text">SURPRISE ME</span>
             </a>
         </footer>
     </main>
+
+    <div id="photoModal" onclick="closePhotoModal()">
+        <div class="modal-inner relative max-w-[90vw] max-h-[85vh] p-3 text-center" onclick="event.stopPropagation()">
+            <img id="modalImg" src="" class="max-w-full max-h-[75vh] object-contain rounded-xl">
+            <p id="modalCaption" class="mt-3 font-['Dancing_Script'] text-gray-800 text-xl font-bold"></p>
+            <button onclick="closePhotoModal()" class="absolute -top-4 -right-4 w-10 h-10 bg-amber-800 text-white rounded-full flex items-center justify-center text-lg shadow-lg">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+    </div>
 
     <script>
         const canvas = document.getElementById('leaf-canvas');
@@ -188,130 +358,255 @@
         let leaves = [];
         const leafEmojis = ['🍂', '🍁', '🍃', '🤎'];
 
-        // Initializing Canvas
-        function resize() { 
-            canvas.width = window.innerWidth; 
-            canvas.height = window.innerHeight; 
+        /* Web Audio API Sound Synthesizer */
+        let audioCtx = null;
+        function getAudioContext() {
+            if (!audioCtx) {
+                const AudioContext = window.AudioContext || window.webkitAudioContext;
+                if (AudioContext) audioCtx = new AudioContext();
+            }
+            if (audioCtx && audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+            return audioCtx;
         }
-        window.addEventListener('resize', resize); 
+
+        function playAutumnChime() {
+            try {
+                const ctx = getAudioContext();
+                if (!ctx) return;
+                const osc = ctx.createOscillator();
+                const gain = ctx.createGain();
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(523.25, ctx.currentTime); // C5
+                osc.frequency.exponentialRampToValueAtTime(659.25, ctx.currentTime + 0.3); // E5
+                gain.gain.setValueAtTime(0.2, ctx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.6);
+                osc.connect(gain);
+                gain.connect(ctx.destination);
+                osc.start();
+                osc.stop(ctx.currentTime + 0.6);
+            } catch (e) {}
+        }
+
+        function playClickSfx() {
+            try {
+                const ctx = getAudioContext();
+                if (!ctx) return;
+                const osc = ctx.createOscillator();
+                const gain = ctx.createGain();
+                osc.type = 'triangle';
+                osc.frequency.setValueAtTime(320, ctx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(120, ctx.currentTime + 0.15);
+                gain.gain.setValueAtTime(0.15, ctx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.15);
+                osc.connect(gain);
+                gain.connect(ctx.destination);
+                osc.start();
+                osc.stop(ctx.currentTime + 0.15);
+            } catch(e) {}
+        }
+
+        function resize() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resize);
         resize();
 
-        class Leaf {
-            constructor() { 
-                this.reset(); 
-                this.y = Math.random() * canvas.height; 
+        (function seedDust() {
+            const layer = document.getElementById('dust-layer');
+            const count = window.innerWidth < 640 ? 18 : 32;
+            for (let i = 0; i < count; i++) {
+                const d = document.createElement('div');
+                d.className = 'dust-mote';
+                const size = Math.random() * 3 + 1.5;
+                d.style.width = size + 'px';
+                d.style.height = size + 'px';
+                d.style.left = Math.random() * 100 + 'vw';
+                d.style.bottom = (Math.random() * 20 - 10) + 'vh';
+                d.style.animationDuration = (Math.random() * 12 + 10) + 's';
+                d.style.animationDelay = (Math.random() * 12) + 's';
+                layer.appendChild(d);
             }
-            reset() { 
-                this.x = Math.random() * canvas.width; 
-                this.y = -60; 
-                this.size = Math.random() * 20 + 15; 
-                this.speed = Math.random() * 1.2 + 0.6; 
-                this.angle = Math.random() * 360; 
-                this.spin = Math.random() * 2 - 1; 
-                this.emoji = leafEmojis[Math.floor(Math.random() * leafEmojis.length)]; 
-                this.wind = Math.random() * 2 - 1;
-            }
-            draw() { 
-                ctx.font = `${this.size}px serif`; 
-                ctx.save(); 
-                ctx.translate(this.x, this.y); 
-                ctx.rotate(this.angle * Math.PI / 180); 
-                ctx.fillText(this.emoji, 0, 0); 
-                ctx.restore(); 
-            }
-            update() { 
-                this.y += this.speed; 
-                this.x += Math.sin(this.y / 100) * 2 + this.wind; 
-                this.angle += this.spin; 
-                if (this.y > canvas.height + 60) this.reset(); 
+        })();
+
+        function toggleMusic() {
+            playClickSfx();
+            const music = document.getElementById('bg-music');
+            const icon = document.getElementById('musicIcon');
+            if (!music) return;
+            if (music.paused) {
+                music.play().catch(() => {});
+                icon.className = 'fas fa-volume-high';
+            } else {
+                music.pause();
+                icon.className = 'fas fa-volume-xmark';
             }
         }
 
-        // MAIN BUTTON CLICK
+        /* Enhanced Physics Leaf Particle Engine */
+        class Leaf {
+            constructor() {
+                this.reset();
+                this.y = Math.random() * canvas.height;
+            }
+            reset() {
+                this.x = Math.random() * canvas.width;
+                this.y = -60;
+                this.size = Math.random() * 22 + 16;
+                this.speed = Math.random() * 1.4 + 0.7;
+                this.angle = Math.random() * 360;
+                this.spin = Math.random() * 2 - 1;
+                this.emoji = leafEmojis[Math.floor(Math.random() * leafEmojis.length)];
+                this.wind = Math.random() * 1.5 - 0.75;
+                this.swayFreq = Math.random() * 0.02 + 0.01;
+            }
+            draw() {
+                ctx.font = `${this.size}px serif`;
+                ctx.save();
+                ctx.translate(this.x, this.y);
+                ctx.rotate(this.angle * Math.PI / 180);
+                ctx.fillText(this.emoji, 0, 0);
+                ctx.restore();
+            }
+            update() {
+                this.y += this.speed;
+                this.x += Math.sin(this.y * this.swayFreq) * 2.2 + this.wind;
+                this.angle += this.spin;
+                if (this.y > canvas.height + 60) this.reset();
+            }
+        }
+
+        /* Modal Zoom Controls */
+        function openPhotoModal(src, count) {
+            playClickSfx();
+            document.getElementById('modalImg').src = src;
+            document.getElementById('modalCaption').innerText = `Memory #${count}`;
+            document.getElementById('photoModal').classList.add('active');
+        }
+
+        function closePhotoModal() {
+            playClickSfx();
+            document.getElementById('photoModal').classList.remove('active');
+        }
+
         document.getElementById('openBtn').addEventListener('click', function() {
+            getAudioContext();
+            playAutumnChime();
+
             const btn = this;
             const music = document.getElementById('bg-music');
-            
-            // Audio Logic with User Interaction
+            const toggle = document.getElementById('musicToggle');
+
             if (music) {
                 music.volume = 0;
                 music.play().then(() => {
-                    gsap.to(music, { volume: 0.5, duration: 5 });
+                    gsap.to(music, { volume: 0.55, duration: 4 });
+                    if (toggle) toggle.classList.remove('hidden');
                 }).catch(err => console.log("Audio play deferred"));
             }
 
-            // Animation Timeline
             const tl = gsap.timeline();
 
-            tl.to("#leaf-icon", { rotation: 360, scale: 0, duration: 0.5 })
+            tl.to("#leaf-icon", { rotation: 360, scale: 0, duration: 0.6, ease: "back.in(1.7)" })
               .to(btn, { scale: 0, opacity: 0, duration: 0.4 }, "-=0.3")
               .to("#overlay", { opacity: 0, duration: 1, onComplete: () => {
                   document.getElementById('overlay').style.display = 'none';
                   document.getElementById('scene').classList.remove('hidden');
-                  
-                  // Set text
+
                   document.getElementById('message-text').innerText = "{{ wish.message|escapejs }}";
 
-                  // Reveal Elements
-                  gsap.from(".autumn-card", { 
-                      scale: 0.8, 
-                      opacity: 0, 
-                      y: 40, 
-                      duration: 1.5, 
-                      ease: "power4.out" 
+                  gsap.from(".autumn-card", {
+                      scale: 0.82,
+                      opacity: 0,
+                      y: 40,
+                      duration: 1.4,
+                      ease: "power4.out"
                   });
 
-                  // Polaroid Layout Logic
                   const polaroids = document.querySelectorAll('.polaroid');
+                  const dotsLayer = document.getElementById('orbitDots');
+                  let orbitIndex = 0;
+
                   polaroids.forEach((p, i) => {
-                      const spread = 50;
-                      const xOffset = (i - (polaroids.length - 1) / 2) * spread;
-                      const rotation = (i - (polaroids.length - 1) / 2) * 15;
-
-                      gsap.to(p, { 
-                          opacity: 1, 
-                          x: xOffset,
-                          y: Math.abs(xOffset / 2),
-                          rotation: rotation,
-                          duration: 1.5, 
-                          delay: 0.5 + (i * 0.15),
-                          ease: "back.out(1.5)"
+                      const dot = document.createElement('div');
+                      dot.className = 'orbit-dot' + (i === 0 ? ' is-active' : '');
+                      dot.addEventListener('click', () => {
+                          playClickSfx();
+                          orbitIndex = i;
+                          showOrbitFrame(orbitIndex);
                       });
-
-                      // Floating Idle Animation
-                      gsap.to(p, {
-                          y: "+=12",
-                          rotation: "+=2",
-                          duration: 2.5 + Math.random(),
-                          repeat: -1,
-                          yoyo: true,
-                          ease: "sine.inOut",
-                          delay: Math.random()
-                      });
+                      dotsLayer.appendChild(dot);
                   });
 
-                  // Start Canvas Animation
-                  for (let i = 0; i < 25; i++) leaves.push(new Leaf());
-                  function animate() { 
-                      ctx.clearRect(0, 0, canvas.width, canvas.height); 
-                      leaves.forEach(l => { l.update(); l.draw(); }); 
-                      requestAnimationFrame(animate); 
+                  function showOrbitFrame(index) {
+                      const dots = dotsLayer.querySelectorAll('.orbit-dot');
+                      polaroids.forEach((p, i) => {
+                          const isActive = i === index;
+                          gsap.to(p, {
+                              opacity: isActive ? 1 : 0,
+                              scale: isActive ? 1 : 0.85,
+                              rotation: isActive ? 0 : (i % 2 === 0 ? -6 : 6),
+                              zIndex: isActive ? 50 : 1,
+                              duration: 0.65,
+                              ease: "power2.out"
+                          });
+                          if (dots[i]) dots[i].classList.toggle('is-active', isActive);
+                      });
+                  }
+
+                  if (polaroids.length > 0) {
+                      showOrbitFrame(0);
+                      if (polaroids.length > 1) {
+                          let orbitInterval = setInterval(() => {
+                              orbitIndex = (orbitIndex + 1) % polaroids.length;
+                              showOrbitFrame(orbitIndex);
+                          }, 3200);
+
+                          /* Touch Swipe Gestures for Carousel */
+                          const orbitContainer = document.getElementById('orbit');
+                          let startX = 0;
+                          orbitContainer.addEventListener('touchstart', (e) => {
+                              startX = e.touches[0].clientX;
+                          }, { passive: true });
+
+                          orbitContainer.addEventListener('touchend', (e) => {
+                              const diffX = startX - e.changedTouches[0].clientX;
+                              if (Math.abs(diffX) > 40) {
+                                  clearInterval(orbitInterval);
+                                  if (diffX > 0) {
+                                      orbitIndex = (orbitIndex + 1) % polaroids.length;
+                                  } else {
+                                      orbitIndex = (orbitIndex - 1 + polaroids.length) % polaroids.length;
+                                  }
+                                  showOrbitFrame(orbitIndex);
+                              }
+                          }, { passive: true });
+                      }
+                  }
+
+                  for (let i = 0; i < 28; i++) leaves.push(new Leaf());
+                  function animate() {
+                      ctx.clearRect(0, 0, canvas.width, canvas.height);
+                      leaves.forEach(l => { l.update(); l.draw(); });
+                      requestAnimationFrame(animate);
                   }
                   animate();
               }});
         });
 
-        // Interactive Parallax for Card
+        /* Parallax Mouse Tilt Effect */
         document.addEventListener('mousemove', (e) => {
             if(document.getElementById('scene').classList.contains('hidden')) return;
-            const x = (window.innerWidth / 2 - e.pageX) / 30;
-            const y = (window.innerHeight / 2 - e.pageY) / 30;
-            gsap.to(".autumn-card", { 
-                rotationY: x/2, 
-                rotationX: -y/2, 
-                x: x, 
-                y: y, 
-                duration: 1 
+            const x = (window.innerWidth / 2 - e.pageX) / 35;
+            const y = (window.innerHeight / 2 - e.pageY) / 35;
+            gsap.to(".autumn-card", {
+                rotationY: x/2,
+                rotationX: -y/2,
+                x: x,
+                y: y,
+                duration: 1
             });
         });
     </script>
