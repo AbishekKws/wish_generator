@@ -3,14 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     
-    <title>A Special Surprise for {{ wish.receiver_name }}! ✨</title>
-    <meta name="description" content="{{ wish.sender_name }} has sent you a magical {{ wish.wish_type }} surprise. Click to unlock the magic!">
+    <title>A Special Surprise for {{ wish.receiver_name|default:"OPERATOR" }}! ✨</title>
+    <meta name="description" content="{{ wish.sender_name|default:'UNKNOWN_SOURCE' }} has sent you a magical {{ wish.wish_type|default:'classified' }} surprise. Click to unlock the magic!">
     
-    <meta property="og:title" content="A Special Surprise for {{ wish.receiver_name }}! ✨">
-    <meta property="og:description" content="Open the link to see a magical surprise from {{ wish.sender_name }}.">
+    <meta property="og:title" content="ENCRYPTED TRANSMISSION for {{ wish.receiver_name|default:'OPERATOR' }}! 🟢">
+    <meta property="og:description" content="Open the link to see a decrypted matrix surprise from {{ wish.sender_name|default:'ANONYMOUS' }}.">
     <meta property="og:url" content="{{ request.build_absolute_uri }}">
     
     {% if wish.images.exists %}
@@ -18,233 +16,576 @@
     {% endif %}
     
     <meta property="og:type" content="website">
-    <title>Neon Pulse | {{ wish.receiver_name }}</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Syncopate:wght@700&family=Rajdhani:wght@500;700&family=Fira+Code:wght@400&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Fira+Code:wght@400;600;700&family=JetBrains+Mono:ital,wght@0,400;0,800;1,400&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <style>
-        :root { 
-            --neon-pink: #ff00ff; 
-            --neon-blue: #00f3ff; 
-            --bg-dark: #08080c; 
+        :root {
+            --matrix-black: #020b05;
+            --matrix-dark: #051409;
+            --matrix-green: #00ff41;
+            --matrix-glow: #008f11;
+            --matrix-dim: #003b00;
+            --matrix-alert: #ff0055;
+            --matrix-cyan: #00f3ff;
         }
 
-        body, html { 
-            margin: 0; padding: 0; background: var(--bg-dark);
-            color: white; overflow: hidden; font-family: 'Rajdhani', sans-serif;
-            height: 100dvh; width: 100%; position: fixed;
+        * {
+            box-sizing: border-box;
+            user-select: none;
         }
 
-        /* Particle Background Area */
-        #particles { position: fixed; inset: 0; z-index: 0; pointer-events: none; }
-        .particle { position: absolute; background: var(--neon-blue); border-radius: 50%; opacity: 0.3; }
-
-        .grid-bg {
-            position: fixed; inset: 0;
-            background-image: 
-                linear-gradient(to right, rgba(0, 243, 255, 0.03) 1px, transparent 1px),
-                linear-gradient(to bottom, rgba(0, 243, 255, 0.03) 1px, transparent 1px);
-            background-size: 40px 40px;
-            z-index: -1;
-            mask-image: radial-gradient(circle at center, black, transparent 90%);
-        }
-
-        .neon-box {
-            background: rgba(10, 10, 15, 0.9);
-            border: 1px solid var(--neon-blue);
-            box-shadow: 0 0 15px rgba(0, 243, 255, 0.3);
-            position: relative;
-            clip-path: polygon(5% 0, 100% 0, 100% 95%, 95% 100%, 0 100%, 0 5%);
-        }
-
-        .neon-title {
-            font-family: 'Syncopate', sans-serif;
-            background: linear-gradient(90deg, var(--neon-blue), var(--neon-pink));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            filter: drop-shadow(0 0 8px var(--neon-blue));
-            animation: text-pulse 2s ease-in-out infinite alternate;
-        }
-
-        @keyframes text-pulse {
-            from { filter: drop-shadow(0 0 8px var(--neon-blue)); }
-            to { filter: drop-shadow(0 0 15px var(--neon-pink)); }
-        }
-
-        .cyber-card {
-            width: 85px; height: 110px;
-            position: relative; opacity: 0;
-            border: 1px solid var(--neon-pink);
+        body, html {
+            margin: 0; padding: 0;
+            background: var(--matrix-black);
+            color: var(--matrix-green);
+            font-family: 'Share Tech Mono', 'Fira Code', monospace;
+            height: 100dvh;
+            width: 100vw;
             overflow: hidden;
+            position: fixed;
         }
-        @media (min-width: 768px) { .cyber-card { width: 150px; height: 180px; } }
 
-        .btn-pulse {
-            background: transparent;
-            border: 1px solid var(--neon-pink);
-            color: var(--neon-pink);
-            font-family: 'Fira Code', monospace;
-            padding: 0.8rem 2rem;
-            text-transform: uppercase;
+        /* Matrix Canvas Layer */
+        #matrix-canvas {
+            position: fixed;
+            inset: 0;
+            z-index: 1;
+            opacity: 0.85;
+            pointer-events: none;
+        }
+
+        /* CRT Scanline and Flicker Overlay */
+        .crt-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 99;
+            pointer-events: none;
+            background: linear-gradient(
+                rgba(18, 16, 16, 0) 50%, 
+                rgba(0, 0, 0, 0.25) 50%
+            ), linear-gradient(
+                90deg,
+                rgba(255, 0, 0, 0.03),
+                rgba(0, 255, 0, 0.01),
+                rgba(0, 0, 255, 0.03)
+            );
+            background-size: 100% 3px, 6px 100%;
+        }
+
+        .scanline {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 8px;
+            background: rgba(0, 255, 65, 0.15);
+            opacity: 0.6;
+            z-index: 100;
+            pointer-events: none;
+            animation: scanline 8s linear infinite;
+        }
+
+        @keyframes scanline {
+            0% { top: -10px; }
+            100% { top: 100vh; }
+        }
+
+        /* Matrix Cyber Frame UI */
+        .matrix-box {
+            background: rgba(3, 15, 6, 0.88);
+            border: 1px solid var(--matrix-green);
+            box-shadow: 0 0 15px rgba(0, 255, 65, 0.25), inset 0 0 15px rgba(0, 255, 65, 0.1);
+            position: relative;
+            backdrop-filter: blur(4px);
+        }
+
+        .matrix-box::before {
+            content: 'SYS.VER.4.0.9';
+            position: absolute;
+            top: -9px; left: 12px;
+            font-size: 9px;
+            background: var(--matrix-black);
+            padding: 0 6px;
+            color: var(--matrix-green);
             letter-spacing: 2px;
+        }
+
+        .matrix-box::after {
+            content: 'SECURE_CHANNEL';
+            position: absolute;
+            bottom: -9px; right: 12px;
+            font-size: 9px;
+            background: var(--matrix-black);
+            padding: 0 6px;
+            color: var(--matrix-green);
+            letter-spacing: 2px;
+        }
+
+        .glow-text {
+            color: var(--matrix-green);
+            text-shadow: 0 0 8px var(--matrix-green), 0 0 20px var(--matrix-glow);
+        }
+
+        .glow-alert {
+            color: var(--matrix-alert);
+            text-shadow: 0 0 8px var(--matrix-alert);
+        }
+
+        /* Cyberpunk Button Style */
+        .cyber-btn {
+            background: rgba(0, 255, 65, 0.05);
+            border: 1px solid var(--matrix-green);
+            color: var(--matrix-green);
+            font-family: 'JetBrains Mono', monospace;
+            padding: 0.9rem 2.2rem;
+            text-transform: uppercase;
+            letter-spacing: 3px;
             position: relative;
             overflow: hidden;
+            transition: all 0.2s ease;
+            cursor: pointer;
+            outline: none;
+        }
+
+        .cyber-btn:hover {
+            background: var(--matrix-green);
+            color: var(--matrix-black);
+            box-shadow: 0 0 25px var(--matrix-green);
+            font-weight: 800;
+        }
+
+        .cyber-btn::before {
+            content: '';
+            position: absolute;
+            top: 0; left: -100%;
+            width: 100%; height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+            transition: 0.5s;
+        }
+
+        .cyber-btn:hover::before {
+            left: 100%;
+        }
+
+        /* Cyber Hologram Cards */
+        .holo-card {
+            width: 95px;
+            height: 125px;
+            position: relative;
+            opacity: 0;
+            border: 1px solid var(--matrix-green);
+            background: rgba(0, 20, 5, 0.6);
+            box-shadow: 0 0 10px rgba(0, 255, 65, 0.2);
+            transition: all 0.3s ease;
             cursor: pointer;
         }
 
-        .btn-pulse::after {
-            content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%;
-            background: linear-gradient(45deg, transparent, rgba(255,0,255,0.3), transparent);
-            transform: rotate(45deg); transition: 0.5s;
+        @media (min-width: 768px) {
+            .holo-card { width: 140px; height: 170px; }
         }
-        .btn-pulse:hover::after { left: 100%; }
 
-        #scene { height: 100dvh; display: flex; flex-direction: column; justify-content: space-between; padding: 1.5rem 0; z-index: 10; position: relative; }
+        .holo-card:hover {
+            transform: scale(1.08) translateY(-5px) !important;
+            box-shadow: 0 0 20px var(--matrix-green);
+            border-color: #ffffff;
+            z-index: 20;
+        }
+
+        .cursor-blink {
+            display: inline-block;
+            width: 10px;
+            height: 1.1em;
+            background: var(--matrix-green);
+            margin-left: 3px;
+            vertical-align: middle;
+            animation: blink 0.8s infinite;
+        }
+
+        @keyframes blink {
+            0%, 49% { opacity: 1; }
+            50%, 100% { opacity: 0; }
+        }
+
+        /* Scrollbar aesthetics */
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-track { background: var(--matrix-black); }
+        ::-webkit-scrollbar-thumb { background: var(--matrix-green); }
     </style>
 </head>
-<body>
+<body class="flex flex-col justify-between items-center min-h-screen">
 
-    <audio id="bg-music" loop>
+    <!-- AUDIO PLAYER -->
+    <audio id="bg-music" loop preload="auto">
         {% if wish.custom_music or wish.selected_music %}
             <source src="{% if wish.custom_music %}{{ wish.custom_music.url }}{% else %}{{ wish.selected_music.audio_file.url }}{% endif %}" type="audio/mpeg">
         {% endif %}
     </audio>
 
-    <div class="grid-bg"></div>
-    <div id="particles"></div>
+    <!-- CRT & SCANLINE EFFECTS -->
+    <div class="crt-overlay"></div>
+    <div class="scanline"></div>
 
-    <div id="overlay" class="fixed inset-0 z-[500] flex items-center justify-center bg-black">
-        <div class="text-center px-6">
-            <div class="mb-6 text-[10px] font-mono text-cyan-500 tracking-[0.4em] animate-pulse">SYSTEM READY...</div>
-            <button id="powerBtn" class="btn-pulse">ACTIVATE SIGNAL</button>
-            <p class="mt-8 text-[8px] text-gray-600 tracking-[0.5em] uppercase">Private Signal from {{ wish.sender_name }}</p>
+    <!-- MATRIX RAIN BACKGROUND CANVAS -->
+    <canvas id="matrix-canvas"></canvas>
+
+    <!-- PRE-ACTIVATION SECURITY OVERLAY -->
+    <div id="overlay" class="fixed inset-0 z-50 flex items-center justify-center bg-[#020b05] px-4">
+        <div class="max-w-md w-full matrix-box p-6 md:p-8 text-center relative z-10">
+            <div class="flex justify-between items-center mb-4 text-[10px] text-emerald-600 font-mono border-b border-emerald-900/60 pb-2">
+                <span>STATUS: LOCKED</span>
+                <span class="animate-pulse text-red-500">● ENCRYPTED</span>
+            </div>
+
+            <div class="my-6">
+                <i class="fa-solid fa-terminal text-4xl glow-text mb-4 inline-block animate-bounce"></i>
+                <h2 class="text-xs tracking-[0.3em] text-emerald-400 font-mono uppercase mb-2">INCOMING TRANSMISSION DETECTED</h2>
+                <div class="text-lg md:text-xl font-bold glow-text mb-4 tracking-wider">
+                    SOURCE: {{ wish.sender_name|default:"UNKNOWN OPERATOR"|upper }}
+                </div>
+                <p class="text-[11px] text-emerald-600 font-mono leading-relaxed mb-6">
+                    A classified matrix signal has been directed to this node. Authorization bypass is required to decrypt contents.
+                </p>
+            </div>
+
+            <button id="powerBtn" class="cyber-btn w-full text-xs md:text-sm font-bold tracking-widest">
+                [ BYPASS SECURITY ]
+            </button>
+
+            <div class="mt-6 text-[9px] text-emerald-800 font-mono tracking-widest uppercase">
+                LATENCY: 12ms // PORT: 8080 // NODE: ARCHITECT
+            </div>
         </div>
     </div>
 
-    <main id="scene" class="hidden opacity-0">
-        <div class="w-full px-6 text-center">
-            <p id="wish-label" class="text-[9px] text-cyan-400 font-mono mb-2 tracking-[0.5em] uppercase">
-                {% with w_type=wish.wish_type|lower %}
-                    {% if w_type == 'love' %}Yours, Now and Forever 💓
-                    {% elif w_type == 'good luck' %}Best wishes for you 
+    <!-- MAIN DECRYPTED TERMINAL SCENE -->
+    <main id="scene" class="relative z-10 w-full h-full max-w-4xl mx-auto flex flex-col justify-between p-4 md:p-8 opacity-0 pointer-events-none transition-opacity duration-700">
+        
+        <!-- TOP CONTROL BAR -->
+        <header class="w-full flex justify-between items-center border-b border-emerald-900/80 pb-3">
+            <div class="flex items-center gap-2">
+                <span class="inline-block w-2.5 h-2.5 rounded-full bg-emerald-500 animate-ping"></span>
+                <span class="text-xs font-mono text-emerald-400 font-bold tracking-widest">MATRIX // DECRYPTED</span>
+            </div>
+            
+            <div class="flex items-center gap-3">
+                <button id="muteBtn" class="text-emerald-500 hover:text-white text-xs font-mono border border-emerald-800 px-3 py-1 rounded bg-black/40 transition">
+                    <i class="fa-solid fa-volume-high mr-1" id="muteIcon"></i> <span id="muteText">AUDIO ON</span>
+                </button>
+            </div>
+        </header>
+
+        <!-- CENTER CONTENT: DYNAMIC HEADER & MESSAGE CONTAINER -->
+        <div class="my-auto py-6 w-full text-center">
+            
+            <!-- DYNAMIC WISH TYPE SYSTEM HEADER -->
+            <div id="wish-header" class="text-xs md:text-sm font-mono text-emerald-400 tracking-[0.25em] uppercase mb-4 font-semibold">
+                {% with w_type=wish.wish_type|default:'classified'|lower %}
+                    {% if w_type == 'birthday' %}
+                        SYSTEM DIAGNOSTIC: LEVEL UP DETECTED // CELEBRATING {{ wish.receiver_name|default:"OPERATOR"|upper }} 🎂
+                    {% elif w_type == 'anniversary' %}
+                        SECURE LINK ESTABLISHED // LOVE PROTOCOL ACTIVE 💞
+                    {% elif w_type == 'love' or w_type == 'proposal' %}
+                        ENCRYPTED FREQUENCY // HEARTBEAT SIGNAL MATCHED 💓
+                    {% elif w_type == 'graduation' %}
+                        MAINFRAME BYPASS COMPLETE // DEGREE VERIFIED 🎓
                     {% elif w_type == 'new year' %}
-                        <span class="block text-xl md:text-2xl mb-2 font-medium opacity-90 tracking-[0.2em] uppercase">
-                            Step into <span id="year-display"></span> 🚀
-                        </span>
-                        New Beginnings, Endless Possibilities! ✨
-                    {% elif w_type == 'friendship' %}To a great friend
-                    {% else %}A special gift for you{% endif %}
+                        CALENDAR OVERRIDE // WELCOMING NEW TIMELINE 🚀
+                    {% elif w_type == 'sorry' %}
+                        RECONCILIATION DECRYPTION // SYSTEM REPAIR IN PROGRESS 🩹
+                    {% elif w_type == 'thank you' %}
+                        ACKNOWLEDGEMENT RECEIPT // EXPRESSING GRATITUDE 🙏
+                    {% elif w_type == 'miss you' %}
+                        REMOTE SENSOR ACTIVE // ECHOES IN THE MATRIX 🛰️
+                    {% elif w_type == 'good luck' %}
+                        PROBABILITY ALGORITHM BOOSTED // GOOD LUCK 🍀
+                    {% elif w_type == 'festival' %}
+                        HOLIDAY OVERRIDE PROTOCOL // CELEBRATE IN THE MATRIX ✨
+                    {% else %}
+                        CLASSIFIED TRANSMISSION // DECRYPTING MESSAGE FOR {{ wish.receiver_name|default:"OPERATOR"|upper }}
+                    {% endif %}
                 {% endwith %}
-            </p>
-            <div class="neon-box p-6 md:p-10 mx-auto max-w-lg">
-                <h1 class="neon-title text-2xl md:text-5xl mb-4 uppercase font-black tracking-tighter">
-                    {{ wish.receiver_name }}
-                </h1>
-                <p id="msg-body" class="text-sm md:text-xl font-medium text-gray-200 italic leading-relaxed">
-                    "{{ wish.message }}"
-                </p>
+            </div>
+
+            <!-- MAIN MATRIX TERMINAL BOX -->
+            <div class="matrix-box p-6 md:p-10 mx-auto max-w-2xl text-left relative overflow-hidden">
+                
+                <!-- TERMINAL TITLE -->
+                <div class="border-b border-emerald-900/60 pb-3 mb-4 flex justify-between items-center">
+                    <h1 class="text-2xl md:text-4xl font-black glow-text tracking-wider uppercase">
+                        &gt; {{ wish.receiver_name|default:"AGENT_UNKNOWN" }}
+                    </h1>
+                    <span class="text-[10px] text-emerald-600 font-mono">ID: #00{{ wish.id|default:"771" }}</span>
+                </div>
+
+                <!-- TYPEWRITER MESSAGE BODY -->
+                <div class="min-h-[120px] md:min-h-[160px] flex items-start">
+                    <p id="msg-body" class="text-sm md:text-lg font-mono text-emerald-200 leading-relaxed tracking-wide">
+                        <!-- Message populated via typewriter js -->
+                    </p>
+                    <span id="type-cursor" class="cursor-blink"></span>
+                </div>
+
+                <!-- HIDDEN DATA BUFFER FOR JS TYPEWRITER -->
+                <div id="raw-message" class="hidden">
+                    {{ wish.message|default:"Welcome to the real world. Your path has been unlocked. Continue pushing parameters and reaching new heights within the code." }}
+                </div>
+
+                <div class="mt-4 pt-3 border-t border-emerald-900/60 flex justify-between items-center text-[10px] text-emerald-600 font-mono">
+                    <span>SECURITY_CHECK: PASSED</span>
+                    <span>ENCRYPTION: AES-256</span>
+                </div>
             </div>
         </div>
 
+        <!-- IMAGE GALLERY (IF ATTACHED) -->
         {% if wish.images.exists %}
-        <div class="flex justify-center gap-4 px-4">
+        <div class="flex justify-center items-center gap-3 md:gap-6 my-4">
             {% for img_obj in wish.images.all|slice:":3" %}
-            <div class="cyber-card group">
-                <img src="{{ img_obj.image.url }}" class="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-500">
-                <div class="absolute top-0 left-0 w-full h-full bg-cyan-500/10 pointer-events-none"></div>
+            <div class="holo-card group rounded overflow-hidden" onclick="openLightbox('{{ img_obj.image.url }}')">
+                <img src="{{ img_obj.image.url }}" alt="Matrix Upload" class="w-full h-full object-cover filter opacity-80 contrast-125 group-hover:opacity-100 group-hover:filter-none transition duration-300">
+                <div class="absolute inset-0 bg-emerald-900/30 group-hover:bg-transparent transition pointer-events-none"></div>
+                <div class="absolute bottom-1 right-1 text-[8px] bg-black/80 text-emerald-400 px-1 font-mono">IMG_0{{ forloop.counter }}</div>
             </div>
             {% endfor %}
         </div>
         {% endif %}
 
-        <div class="text-center">
-            <div class="text-[8px] text-pink-500 font-mono tracking-widest mb-4">ENCRYPTED BY: {{ wish.sender_name|upper }}</div>
-            <a href="{% url 'home' %}" class="inline-block text-[9px] border border-cyan-500/30 px-6 py-2 rounded-full text-cyan-500 uppercase tracking-widest hover:bg-cyan-500/20 hover:border-cyan-500 transition-all">
-                Create Your Own Wish
-            </a>
-        </div>
+        <!-- FOOTER & ACTION BUTTONS -->
+        <footer class="w-full text-center mt-auto pt-4 border-t border-emerald-900/60">
+            <div class="text-[10px] text-emerald-500 font-mono tracking-widest mb-3 uppercase">
+                TRANSMITTED BY OPERATOR: <span class="glow-text font-bold">{{ wish.sender_name|default:"SYSTEM"|upper }}</span>
+            </div>
+
+            <div class="flex justify-center items-center gap-4">
+                <a href="{% url 'home' %}" class="cyber-btn text-[10px] py-2 px-5 inline-block text-decoration-none">
+                    [ CREATE NEW TRANSMISSION ]
+                </a>
+            </div>
+        </footer>
     </main>
 
+    <!-- LIGHTBOX MODAL FOR IMAGES -->
+    <div id="lightbox" class="fixed inset-0 z-[200] bg-black/90 hidden items-center justify-center p-4" onclick="closeLightbox()">
+        <div class="matrix-box p-2 max-w-3xl max-h-[85vh] relative" onclick="event.stopPropagation()">
+            <button onclick="closeLightbox()" class="absolute -top-3 -right-3 bg-red-600 text-white font-mono text-xs px-2 py-1 border border-red-400 rounded hover:bg-red-700">X</button>
+            <img id="lightbox-img" src="" class="max-w-full max-h-[75vh] object-contain border border-emerald-800">
+            <div class="text-center font-mono text-xs text-emerald-400 mt-2">[ MATRIX IMAGE DATA STREAM ]</div>
+        </div>
+    </div>
+
     <script>
-        // Particle Engine
-        const pContainer = document.getElementById('particles');
-        function createParticles() {
-            for(let i=0; i<30; i++) {
-                const p = document.createElement('div');
-                p.className = 'particle';
-                let size = Math.random() * 3;
-                p.style.width = size + 'px';
-                p.style.height = size + 'px';
-                p.style.left = Math.random() * 100 + '%';
-                p.style.top = Math.random() * 100 + '%';
-                pContainer.appendChild(p);
-                
-                gsap.to(p, {
-                    y: (Math.random() - 0.5) * 200,
-                    x: (Math.random() - 0.5) * 200,
-                    opacity: 0,
-                    duration: Math.random() * 3 + 2,
-                    repeat: -1,
-                    yoyo: true,
-                    ease: "sine.inOut"
+        /* -------------------------------------------------------------
+           1. WEB AUDIO API SYNTHESIZER (Terminal Audio Feedback)
+           ------------------------------------------------------------- */
+        class CyberAudio {
+            constructor() {
+                this.ctx = null;
+            }
+
+            init() {
+                if (!this.ctx) {
+                    this.ctx = new (window.AudioContext || window.webkitAudioContext)();
+                }
+            }
+
+            playKeyBeep() {
+                if (!this.ctx) return;
+                const osc = this.ctx.createOscillator();
+                const gain = this.ctx.createGain();
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(600 + Math.random() * 400, this.ctx.currentTime);
+                gain.gain.setValueAtTime(0.015, this.ctx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 0.05);
+                osc.connect(gain);
+                gain.connect(this.ctx.destination);
+                osc.start();
+                osc.stop(this.ctx.currentTime + 0.05);
+            }
+
+            playUnlockSound() {
+                if (!this.ctx) return;
+                const now = this.ctx.currentTime;
+                const osc = this.ctx.createOscillator();
+                const gain = this.ctx.createGain();
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(150, now);
+                osc.frequency.exponentialRampToValueAtTime(880, now + 0.4);
+                gain.gain.setValueAtTime(0.1, now);
+                gain.gain.linearRampToValueAtTime(0.01, now + 0.5);
+                osc.connect(gain);
+                gain.connect(this.ctx.destination);
+                osc.start();
+                osc.stop(now + 0.5);
+            }
+        }
+
+        const synth = new CyberAudio();
+
+        /* -------------------------------------------------------------
+           2. MATRIX DIGITAL RAIN CANVAS ENGINE
+           ------------------------------------------------------------- */
+        const canvas = document.getElementById('matrix-canvas');
+        const ctx = canvas.getContext('2d');
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        resizeCanvas();
+        window.addEventListener('resize', resizeCanvas);
+
+        const katakana = 'アァカサタナハマヤャラワガザダバパイィキシチニヒミリヰギジヂビピウゥクスツヌフムユュルグズブヅプエェケセテネヘメレヱゲゼデベペオォコソトノホモヨョロヲゴゾドボポヴッン';
+        const latin = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%&*<>/\\';
+        const alphabet = katakana + latin;
+
+        const fontSize = 16;
+        let columns = Math.floor(canvas.width / fontSize);
+        let rainDrops = Array(columns).fill(1);
+
+        function drawMatrixRain() {
+            ctx.fillStyle = 'rgba(2, 11, 5, 0.08)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            ctx.fillStyle = '#00ff41';
+            ctx.font = fontSize + 'px monospace';
+
+            for (let i = 0; i < rainDrops.length; i++) {
+                const text = alphabet.charAt(Math.floor(Math.random() * alphabet.length));
+                const x = i * fontSize;
+                const y = rainDrops[i] * fontSize;
+
+                // Bright highlight on bottom character
+                if (Math.random() > 0.85) {
+                    ctx.fillStyle = '#ffffff';
+                } else {
+                    ctx.fillStyle = '#00ff41';
+                }
+
+                ctx.fillText(text, x, y);
+
+                if (y > canvas.height && Math.random() > 0.975) {
+                    rainDrops[i] = 0;
+                }
+                rainDrops[i]++;
+            }
+        }
+
+        setInterval(drawMatrixRain, 33);
+
+        /* -------------------------------------------------------------
+           3. TYPEWRITER EFFECT FOR MESSAGES
+           ------------------------------------------------------------- */
+        function startTypewriter() {
+            const rawText = document.getElementById('raw-message').textContent.trim();
+            const target = document.getElementById('msg-body');
+            target.textContent = '';
+            let index = 0;
+
+            function typeNextChar() {
+                if (index < rawText.length) {
+                    target.textContent += rawText.charAt(index);
+                    synth.playKeyBeep();
+                    index++;
+                    setTimeout(typeNextChar, 25 + Math.random() * 25);
+                } else {
+                    document.getElementById('type-cursor').classList.add('animate-pulse');
+                }
+            }
+
+            typeNextChar();
+        }
+
+        /* -------------------------------------------------------------
+           4. GREEN SPARKLE CONFETTI
+           ------------------------------------------------------------- */
+        function triggerMatrixSparkles() {
+            if (typeof confetti === 'function') {
+                confetti({
+                    particleCount: 80,
+                    spread: 100,
+                    origin: { y: 0.6 },
+                    colors: ['#00ff41', '#008f11', '#ffffff', '#00f3ff']
                 });
             }
         }
 
-        document.getElementById('powerBtn').addEventListener('click', function() {
-            // MUSIC INITIATION
-            const music = document.getElementById('bg-music');
-            if (music) {
-                music.volume = 0;
-                music.play().catch(e => console.log("Audio system blocked", e));
-                gsap.to(music, { volume: 0.5, duration: 4 });
+        /* -------------------------------------------------------------
+           5. ACTIVATION & MUSIC CONTROLS
+           ------------------------------------------------------------- */
+        const powerBtn = document.getElementById('powerBtn');
+        const bgMusic = document.getElementById('bg-music');
+        let isAudioPlaying = false;
+
+        powerBtn.addEventListener('click', () => {
+            synth.init();
+            synth.playUnlockSound();
+
+            // Attempt Music Playback
+            if (bgMusic && bgMusic.querySelector('source')) {
+                bgMusic.volume = 0;
+                bgMusic.play().then(() => {
+                    isAudioPlaying = true;
+                    gsap.to(bgMusic, { volume: 0.5, duration: 3 });
+                }).catch(err => console.log('Autoplay restriction:', err));
             }
 
-            createParticles();
+            // Animate Overlay Removal
             const tl = gsap.timeline();
-            
-            tl.to("#overlay", { backgroundColor: "#fff", duration: 0.05 })
-              .to("#overlay", { 
-                  opacity: 0, 
-                  scale: 3, 
-                  rotate: 5,
-                  duration: 0.6, 
-                  ease: "expo.in", 
-                  onComplete: () => {
+            tl.to("#overlay", { 
+                scale: 1.1,
+                opacity: 0,
+                duration: 0.5,
+                ease: "power2.inOut",
+                onComplete: () => {
                     document.getElementById('overlay').style.display = 'none';
-                    document.getElementById('scene').classList.remove('hidden');
-              }})
-              .to("#scene", { opacity: 1, duration: 1 })
-              .from("#wish-label", { y: -20, opacity: 0, duration: 0.5 })
-              .from(".neon-box", { 
-                  scale: 0.8,
-                  opacity: 0, 
-                  duration: 1, 
-                  ease: "elastic.out(1, 0.8)" 
-              }, "-=0.5")
-              .to(".cyber-card", { 
-                  opacity: 1, 
-                  y: 0, 
-                  rotation: (i) => i % 2 === 0 ? 5 : -5,
-                  duration: 0.8, 
-                  stagger: 0.2, 
-                  ease: "power2.out" 
-              }, "-=0.5");
+                    const scene = document.getElementById('scene');
+                    scene.classList.remove('opacity-0', 'pointer-events-none');
+                }
+            })
+            .from(".matrix-box", { y: 20, opacity: 0, duration: 0.8, ease: "back.out(1.2)" })
+            .to(".holo-card", { opacity: 1, y: 0, stagger: 0.15, duration: 0.5 }, "-=0.3")
+            .call(() => {
+                startTypewriter();
+                triggerMatrixSparkles();
+            });
         });
 
-        // Mouse Parallax
-        document.addEventListener('mousemove', (e) => {
-            if(document.getElementById('scene').classList.contains('hidden')) return;
-            const x = (e.clientX / window.innerWidth - 0.5) * 30;
-            const y = (e.clientY / window.innerHeight - 0.5) * 30;
-            gsap.to(".neon-box", { rotationY: x/2, rotationX: -y/2, duration: 1.5 });
-            gsap.to(".cyber-card", { x: x, y: y, duration: 2 });
+        // Audio Toggle Button
+        const muteBtn = document.getElementById('muteBtn');
+        const muteIcon = document.getElementById('muteIcon');
+        const muteText = document.getElementById('muteText');
+
+        muteBtn.addEventListener('click', () => {
+            if (!bgMusic) return;
+            if (bgMusic.paused) {
+                bgMusic.play();
+                muteIcon.className = 'fa-solid fa-volume-high mr-1';
+                muteText.textContent = 'AUDIO ON';
+            } else {
+                bgMusic.pause();
+                muteIcon.className = 'fa-solid fa-volume-xmark mr-1';
+                muteText.textContent = 'MUTED';
+            }
         });
-        const year = new Date().getFullYear();
-            if(document.getElementById('year-display')) {
-                document.getElementById('year-display').textContent = year;
+
+        /* -------------------------------------------------------------
+           6. LIGHTBOX FOR UPLOADED IMAGES
+           ------------------------------------------------------------- */
+        function openLightbox(url) {
+            document.getElementById('lightbox-img').src = url;
+            const lb = document.getElementById('lightbox');
+            lb.classList.remove('hidden');
+            lb.classList.add('flex');
+            synth.playKeyBeep();
+        }
+
+        function closeLightbox() {
+            const lb = document.getElementById('lightbox');
+            lb.classList.add('hidden');
+            lb.classList.remove('flex');
         }
     </script>
 </body>
