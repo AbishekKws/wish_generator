@@ -3,97 +3,124 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     
-    <title>A Special Surprise for {{ wish.receiver_name }}! ✨</title>
+    <title>Winter Serenade | {{ wish.receiver_name }}</title>
     <meta name="description" content="{{ wish.sender_name }} has sent you a magical {{ wish.wish_type }} surprise. Click to unlock the magic!">
     
+    <!-- Open Graph Tags -->
     <meta property="og:title" content="A Special Surprise for {{ wish.receiver_name }}! ✨">
     <meta property="og:description" content="Open the link to see a magical surprise from {{ wish.sender_name }}.">
     <meta property="og:url" content="{{ request.build_absolute_uri }}">
-    
     {% if wish.images.exists %}
     <meta property="og:image" content="{{ request.scheme }}://{{ request.get_host }}{{ wish.images.first.image.url }}">
     {% endif %}
-    
     <meta property="og:type" content="website">
-    <title>Winter Serenade | {{ wish.receiver_name }}</title>
     
+    <!-- External Libraries & Fonts -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=Quicksand:wght@300;500&family=Great+Vibes&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;800&family=Quicksand:wght@300;500;700&family=Great+Vibes&display=swap" rel="stylesheet">
     
     <style>
-        :root { --ice-blue: #e0f7fa; --deep-frost: #002b36; --snow-white: #ffffff; }
+        :root { 
+            --ice-blue: #e0f7fa; 
+            --deep-frost: #002b36; 
+            --snow-white: #ffffff; 
+            --glow-cyan: #80deea;
+        }
         
         body, html { 
-            margin: 0; padding: 0; background: #001219; 
-            color: var(--ice-blue); overflow: hidden; 
-            font-family: 'Quicksand', sans-serif; height: 100vh; width: 100vw;
+            margin: 0; padding: 0; 
+            background: #001219; 
+            color: var(--ice-blue); 
+            overflow: hidden; 
+            font-family: 'Quicksand', sans-serif; 
+            height: 100vh; width: 100vw;
+            user-select: none;
         }
 
-        .arctic-bg { position: fixed; inset: 0; background: linear-gradient(to bottom, #001219 0%, #003d4d 100%); z-index: -1; }
-        .frost-overlay { position: fixed; inset: 0; background: url('https://www.transparenttextures.com/patterns/pave.png'); opacity: 0.1; pointer-events: none; z-index: 1; }
+        .arctic-bg { 
+            position: fixed; inset: 0; 
+            background: radial-gradient(circle at center, #002b36 0%, #001219 100%); 
+            z-index: -1; 
+        }
+
+        .frost-overlay { 
+            position: fixed; inset: 0; 
+            background: url('https://www.transparenttextures.com/patterns/pave.png'); 
+            opacity: 0.15; 
+            pointer-events: none; 
+            z-index: 1; 
+        }
+
         #snow-canvas { position: fixed; inset: 0; z-index: 15; pointer-events: none; }
 
         .snow-floor {
-            position: fixed; bottom: 0; left: 0; width: 100%; height: 15vh;
-            background: linear-gradient(to top, rgba(255,255,255,0.7) 0%, rgba(255,255,255,0) 100%);
-            z-index: 20; pointer-events: none; filter: blur(12px);
+            position: fixed; bottom: 0; left: 0; width: 100%; height: 20vh;
+            background: linear-gradient(to top, rgba(224, 247, 250, 0.25) 0%, rgba(255,255,255,0) 100%);
+            z-index: 20; pointer-events: none; filter: blur(16px);
         }
 
-        /* GIANT SNOWBALL MESSAGE BOX */
+        /* ENHANCED FROZEN CARD */
         .frozen-card { 
-            background: rgba(255, 255, 255, 0.08); 
-            backdrop-filter: blur(18px); 
-            border: 2px solid rgba(255, 255, 255, 0.3); 
+            background: rgba(255, 255, 255, 0.05); 
+            backdrop-filter: blur(20px); 
+            -webkit-backdrop-filter: blur(20px);
+            border: 1.5px solid rgba(255, 255, 255, 0.25); 
             border-radius: 50%; 
             box-shadow: 
-                0 0 60px rgba(255, 255, 255, 0.15), 
-                inset 0 0 50px rgba(255, 255, 255, 0.3),
-                inset 20px -20px 60px rgba(0, 0, 0, 0.2); 
+                0 0 50px rgba(128, 222, 234, 0.2), 
+                inset 0 0 40px rgba(255, 255, 255, 0.25),
+                inset -10px -10px 40px rgba(0, 0, 0, 0.5); 
             
-            width: clamp(340px, 90vw, 520px);
-            height: clamp(340px, 90vw, 520px);
+            width: clamp(320px, 85vw, 480px);
+            height: clamp(320px, 85vw, 480px);
             
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            padding: 3.5rem;
+            padding: 2.5rem;
             text-align: center; 
             position: relative; 
-            z-index: 100; 
+            z-index: 100;
+            transition: border-color 0.5s ease;
+        }
+
+        .frozen-card:hover {
+            border-color: rgba(255, 255, 255, 0.5);
         }
 
         .winter-title { 
             font-family: 'Cinzel', serif; 
             color: var(--snow-white); 
-            text-shadow: 0 0 15px rgba(255, 255, 255, 0.4); 
-            letter-spacing: 1px;
-            font-size: clamp(1.2rem, 5vw, 1.8rem);
-            line-height: 1.2;
+            text-shadow: 0 0 20px rgba(255, 255, 255, 0.6); 
+            letter-spacing: 2px;
+            font-size: clamp(1.1rem, 4.5vw, 1.6rem);
+            line-height: 1.3;
         }
 
         #message-text { 
             font-family: 'Great Vibes', cursive; 
-            font-size: clamp(1.8rem, 7vw, 2.6rem); 
+            font-size: clamp(1.8rem, 6.5vw, 2.5rem); 
             color: var(--ice-blue); 
-            line-height: 1.1;
-            margin: 0.8rem 0;
-            text-shadow: 0 2px 10px rgba(0,0,0,0.3);
+            line-height: 1.2;
+            margin: 1rem 0;
+            text-shadow: 0 2px 12px rgba(0,0,0,0.5);
+            max-width: 90%;
+            word-wrap: break-word;
         }
 
         /* FALLING PHOTO SNOWBALLS */
         .ice-frame { 
             position: absolute;
-            width: 130px; height: 130px; 
-            background: white; 
+            width: clamp(90px, 20vw, 130px); 
+            height: clamp(90px, 20vw, 130px); 
+            background: rgba(255, 255, 255, 0.9); 
             border-radius: 50%; 
-            padding: 5px; 
-            box-shadow: 0 0 25px rgba(255,255,255,0.7); 
-            border: 4px solid white; 
+            padding: 4px; 
+            box-shadow: 0 0 25px rgba(255,255,255,0.6); 
+            border: 3px solid rgba(255, 255, 255, 0.9); 
             opacity: 0; 
             z-index: 50;
             pointer-events: none;
@@ -102,25 +129,36 @@
             align-items: center;
             justify-content: center;
         }
+
         .ice-frame img { 
             width: 100%; height: 100%; 
             object-fit: cover; 
             border-radius: 50%; 
         }
 
+        /* BUTTON ENHANCEMENT */
         .btn-freeze { 
-            background: white; color: var(--deep-frost); 
-            padding: 1.2rem 3rem; border-radius: 60px; 
-            font-weight: bold; letter-spacing: 4px; 
-            box-shadow: 0 0 30px rgba(255, 255, 255, 0.4);
-            transition: all 0.3s ease;
+            background: linear-gradient(135deg, #ffffff 0%, #e0f7fa 100%); 
+            color: var(--deep-frost); 
+            padding: 1rem 2.5rem; 
+            border-radius: 50px; 
+            font-weight: 700; 
+            letter-spacing: 3px; 
+            box-shadow: 0 0 25px rgba(255, 255, 255, 0.5), inset 0 0 10px rgba(255, 255, 255, 0.8);
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             cursor: pointer;
+            border: none;
+        }
+
+        .btn-freeze:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 35px rgba(255, 255, 255, 0.8);
         }
     </style>
 </head>
 <body>
 
-    <audio id="bg-music" loop>
+    <audio id="bg-music" loop preload="auto">
         {% if wish.custom_music or wish.selected_music %}
             <source src="{% if wish.custom_music %}{{ wish.custom_music.url }}{% else %}{{ wish.selected_music.audio_file.url }}{% endif %}" type="audio/mpeg">
         {% endif %}
@@ -131,50 +169,53 @@
     <div class="snow-floor"></div>
     <canvas id="snow-canvas"></canvas>
 
+    <!-- START OVERLAY -->
     <div id="overlay" class="fixed inset-0 z-[500] flex items-center justify-center bg-[#001219]">
         <div class="text-center px-4">
-            <div class="mb-8 text-8xl animate-bounce">❄️</div>
+            <div class="mb-8 text-7xl md:text-8xl animate-bounce filter drop-shadow-[0_0_15px_rgba(255,255,255,0.6)]">❄️</div>
             <button id="freezeBtn" class="btn-freeze uppercase">Open Surprise</button>
-            <p class="mt-6 text-[10px] tracking-[0.4em] text-cyan-200/50 uppercase">From {{ wish.sender_name }}</p>
+            <p class="mt-6 text-[11px] tracking-[0.4em] text-cyan-200/60 uppercase font-light">A Winter Gift From {{ wish.sender_name }}</p>
         </div>
     </div>
 
-    <div id="floating-images" class="fixed inset-0 pointer-events-none overflow-hidden">
+    <!-- FLOATING IMAGES CONTAINER -->
+    <div id="floating-images" class="fixed inset-0 pointer-events-none overflow-hidden z-[40]">
         {% for img_obj in wish.images.all %}
         <div class="ice-frame">
-            <img src="{{ img_obj.image.url }}">
+            <img src="{{ img_obj.image.url }}" alt="Memory">
         </div>
         {% endfor %}
     </div>
 
-    <main id="scene" class="hidden h-screen w-screen flex items-center justify-center p-6">
+    <!-- MAIN CARD SCENE -->
+    <main id="scene" class="hidden h-screen w-screen flex items-center justify-center p-4">
         <div class="frozen-card">
 
             <h1 class="winter-title">
                 {% if wish.wish_type|lower == 'sorry' %}
-                    Truly Sorry from Heart,<br>{{ wish.receiver_name|upper }}
+                    Truly Sorry from Heart,<br><span class="text-cyan-200">{{ wish.receiver_name|upper }}</span>
                 {% elif wish.wish_type|lower == 'love' %}
-                    MY WINTER LOVE 💓,<br>{{ wish.receiver_name|upper }}
+                    MY WINTER LOVE 💓,<br><span class="text-cyan-200">{{ wish.receiver_name|upper }}</span>
                 {% elif wish.wish_type|lower == 'miss you' %}
-                    MISSING YOU A LOT 🥲<br>{{ wish.receiver_name|upper }}
+                    MISSING YOU A LOT 🥲<br><span class="text-cyan-200">{{ wish.receiver_name|upper }}</span>
                 {% else %}
-                    DEAR<br>{{ wish.receiver_name|upper }}
+                    DEAR<br><span class="text-cyan-200">{{ wish.receiver_name|upper }}</span>
                 {% endif %}
             </h1>
 
             <p id="message-text"></p>
             
-            <div class="mt-4 flex justify-center items-center gap-4 opacity-40">
-                <div class="h-[1px] w-8 bg-white"></div>
-                <span class="text-[10px] tracking-[0.4em] text-white uppercase">{{ wish.sender_name }}</span>
-                <div class="h-[1px] w-8 bg-white"></div>
+            <div class="mt-2 flex justify-center items-center gap-3 opacity-60">
+                <div class="h-[1px] w-6 bg-cyan-200"></div>
+                <span class="text-[10px] tracking-[0.3em] text-cyan-100 uppercase">{{ wish.sender_name }}</span>
+                <div class="h-[1px] w-6 bg-cyan-200"></div>
             </div>
         </div>
 
-        <footer class="absolute bottom-6 w-full flex justify-center opacity-40 z-[110]">
-            <a href="{% url 'home' %}" class="flex flex-col items-center gap-1 group pointer-events-auto">
-                <span class="text-[7px] tracking-[0.3em] uppercase text-white">Crafted by</span>
-                <span class="text-[10px] font-black tracking-widest text-cyan-200">SURPRISE ME</span>
+        <footer class="absolute bottom-6 w-full flex justify-center opacity-50 z-[110]">
+            <a href="{% url 'home' %}" class="flex flex-col items-center gap-1 group pointer-events-auto hover:opacity-100 transition-opacity">
+                <span class="text-[8px] tracking-[0.3em] uppercase text-cyan-200/80">Crafted by</span>
+                <span class="text-[11px] font-bold tracking-widest text-white group-hover:text-cyan-200 transition-colors">SURPRISE ME</span>
             </a>
         </footer>
     </main>
@@ -183,72 +224,111 @@
         const canvas = document.getElementById('snow-canvas');
         const ctx = canvas.getContext('2d');
         let snowFlakes = [];
+        let mouseX = 0;
 
-        function resize() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
-        window.addEventListener('resize', resize); resize();
+        function resize() { 
+            canvas.width = window.innerWidth; 
+            canvas.height = window.innerHeight; 
+        }
+        window.addEventListener('resize', resize); 
+        resize();
 
+        // Snow animation with slight wind direction
         class Snowflake {
             constructor() { this.reset(); this.y = Math.random() * canvas.height; }
-            reset() { this.x = Math.random() * canvas.width; this.y = -20; this.size = Math.random() * 3 + 1; this.speed = Math.random() * 1.5 + 0.5; this.velX = Math.random() * 0.6 - 0.3; }
-            draw() { ctx.beginPath(); ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2); ctx.fillStyle = "rgba(255, 255, 255, 0.8)"; ctx.fill(); }
-            update() { this.y += this.speed; this.x += this.velX; if (this.y > canvas.height) this.reset(); }
+            reset() { 
+                this.x = Math.random() * canvas.width; 
+                this.y = -10; 
+                this.size = Math.random() * 3 + 1; 
+                this.speed = Math.random() * 1.2 + 0.5; 
+                this.velX = Math.random() * 0.4 - 0.2; 
+                this.opacity = Math.random() * 0.7 + 0.3;
+            }
+            draw() { 
+                ctx.beginPath(); 
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2); 
+                ctx.fillStyle = `rgba(255, 255, 255, ${this.opacity})`; 
+                ctx.fill(); 
+            }
+            update() { 
+                this.y += this.speed; 
+                this.x += this.velX + (mouseX * 0.005); 
+                if (this.y > canvas.height) this.reset(); 
+            }
         }
 
         document.getElementById('freezeBtn').addEventListener('click', () => {
-            // 1. Music Initiation
+            // 1. Audio Playback
             const music = document.getElementById('bg-music');
-            if (music) {
+            if (music && music.querySelector('source')) {
                 music.volume = 0;
-                music.play().catch(e => console.log("Audio blocked"));
-                gsap.to(music, { volume: 0.5, duration: 4 });
+                music.play().catch(e => console.log("Audio play deferred"));
+                gsap.to(music, { volume: 0.5, duration: 3 });
             }
 
-            // 2. Transition Logic
-            gsap.to("#overlay", { opacity: 0, duration: 1, onComplete: () => {
-                document.getElementById('overlay').style.display = 'none';
-                document.getElementById('scene').classList.remove('hidden');
-                document.getElementById('message-text').innerText = "{{ wish.message|escapejs }}";
+            // 2. Smooth Transition
+            gsap.to("#overlay", { 
+                opacity: 0, 
+                duration: 1.2, 
+                ease: "power2.inOut",
+                onComplete: () => {
+                    document.getElementById('overlay').style.display = 'none';
+                    document.getElementById('scene').classList.remove('hidden');
+                    document.getElementById('message-text').innerText = "{{ wish.message|escapejs }}";
 
-                // Entrance Animation
-                gsap.from(".frozen-card", { scale: 0.5, opacity: 0, duration: 2, ease: "elastic.out(1, 0.75)" });
+                    // Card Entrance Animation
+                    gsap.from(".frozen-card", { 
+                        scale: 0.6, 
+                        opacity: 0, 
+                        duration: 1.8, 
+                        ease: "back.out(1.4)" 
+                    });
 
-                // Falling Snowball Images
-                const frames = document.querySelectorAll('.ice-frame');
-                frames.forEach((f, i) => {
-                    function startFalling() {
-                        const startX = Math.random() * (window.innerWidth - 130);
-                        const duration = 12 + Math.random() * 10;
-                        gsap.set(f, { x: startX, y: -200, opacity: 0, scale: 0.7 });
-                        gsap.to(f, {
-                            y: window.innerHeight + 200,
-                            x: startX + (Math.random() * 200 - 100),
-                            rotation: Math.random() * 360,
-                            opacity: 0.8,
-                            duration: duration,
-                            ease: "none",
-                            onComplete: startFalling
-                        });
+                    // Falling Photo Snowballs Logic
+                    const frames = document.querySelectorAll('.ice-frame');
+                    frames.forEach((f, i) => {
+                        function startFalling() {
+                            const frameWidth = f.offsetWidth || 110;
+                            const startX = Math.random() * (window.innerWidth - frameWidth);
+                            const duration = 10 + Math.random() * 8;
+                            
+                            gsap.set(f, { x: startX, y: -150, opacity: 0, scale: 0.6 });
+                            
+                            // Timeline for continuous fall with soft fade-in/fade-out
+                            const tl = gsap.timeline({ onComplete: startFalling });
+                            tl.to(f, { opacity: 0.85, scale: 1, duration: 2, ease: "power1.out" }, 0)
+                              .to(f, { 
+                                  y: window.innerHeight + 150, 
+                                  x: startX + (Math.random() * 160 - 80), 
+                                  rotation: Math.random() * 360, 
+                                  duration: duration, 
+                                  ease: "none" 
+                              }, 0)
+                              .to(f, { opacity: 0, duration: 2, ease: "power1.in" }, duration - 2);
+                        }
+                        setTimeout(startFalling, i * 3500);
+                    });
+
+                    // Start Snowfall Canvas
+                    for (let i = 0; i < 90; i++) snowFlakes.push(new Snowflake());
+                    function animate() { 
+                        ctx.clearRect(0, 0, canvas.width, canvas.height); 
+                        snowFlakes.forEach(s => { s.update(); s.draw(); }); 
+                        requestAnimationFrame(animate); 
                     }
-                    setTimeout(startFalling, i * 4000);
-                });
-
-                // Snow Animation Start
-                for (let i = 0; i < 100; i++) snowFlakes.push(new Snowflake());
-                function animate() { 
-                    ctx.clearRect(0, 0, canvas.width, canvas.height); 
-                    snowFlakes.forEach(s => { s.update(); s.draw(); }); 
-                    requestAnimationFrame(animate); 
+                    animate();
                 }
-                animate();
-            }});
+            });
         });
 
-        // Parallax Interaction
+        // Interactive Mouse Parallax Effect
         document.addEventListener('mousemove', (e) => {
+            mouseX = e.clientX - window.innerWidth / 2;
             if(document.getElementById('scene').classList.contains('hidden')) return;
-            const x = (window.innerWidth / 2 - e.pageX) / 40;
-            const y = (window.innerHeight / 2 - e.pageY) / 40;
-            gsap.to(".frozen-card", { x: x, y: y, duration: 2 });
+            
+            const x = (window.innerWidth / 2 - e.pageX) / 35;
+            const y = (window.innerHeight / 2 - e.pageY) / 35;
+            gsap.to(".frozen-card", { x: x, y: y, duration: 1.5, ease: "power1.out" });
         });
     </script>
 </body>
