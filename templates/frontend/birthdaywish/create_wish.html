@@ -4,112 +4,279 @@
 {% block title %}Create a Magical Surprise ✨ | Surprise Me{% endblock %}
 
 {% block content %}
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+<style>
+    .lm-shell { position: relative; overflow: hidden; padding: 1rem 1rem 3rem; } @media (min-width: 1024px) { .lm-shell { padding-top: 1.5rem; } }
+    .lm-glow { position: absolute; width: 24rem; height: 24rem; border-radius: 999px; filter: blur(100px); pointer-events: none; }
+    .lm-glow-a { top: 20%; left: -6rem; background: rgba(255,107,74,0.08); }
+    .lm-glow-b { bottom: 18%; right: -6rem; background: rgba(255,200,87,0.06); }
 
-<div class="min-h-screen flex items-start justify-center p-0 sm:p-4 relative overflow-hidden bg-[#0a0a0c]">
-    
-    <div class="absolute top-1/4 -left-20 w-96 h-96 bg-pink-600/10 rounded-full blur-[120px] pointer-events-none"></div>
-    <div class="absolute bottom-1/4 -right-20 w-96 h-96 bg-violet-600/10 rounded-full blur-[120px] pointer-events-none"></div>
+    .lm-wrap { width: 100%; max-width: 56rem; margin: 0 auto; position: relative; z-index: 1; }
 
-    <div class="w-full max-w-4xl z-10">
-        
-        <div id="infoSection" class="transition-all duration-500 mx-auto text-center space-y-6 px-4 pt-24 md:pt-32">
-            <div class="inline-block px-4 py-1 mb-2 rounded-full bg-pink-500/10 border border-pink-500/20 backdrop-blur-md">
-                <span class="text-pink-400 text-xs font-bold uppercase tracking-[0.2em]">Welcome to Surprise Me ✨</span>
-            </div>
-            
-            <h1 class="text-4xl md:text-7xl font-black bg-gradient-to-r from-pink-500 via-purple-400 to-violet-500 bg-clip-text text-transparent leading-tight">
-                Ready to make <br class="md:hidden"> someone smile?
-            </h1>
-            
-            <p class="text-gray-400 text-sm md:text-xl max-w-3xl mx-auto leading-relaxed animate__animated animate__fadeIn">
-                Now make a 
-                <span class="text-pink-500 font-black border-b-2 border-pink-500/30">Magic Link</span> 
-                for the person you love! 
-                Whether it's a 
-                <span class="text-purple-500 font-black border-b-2 border-purple-500/30">Birthday Gift</span> 
-                for your partner or a 
-                <span class="text-blue-500 font-black border-b-2 border-blue-500/30">Love Message</span>, 
-                just add your photos, pick a song, and create a 3D surprise in seconds.
+    /* ---------- Info section ---------- */
+    #infoSection { text-align: center; padding: 1rem; transition: opacity 0.4s ease, transform 0.4s ease; }
+    @media (min-width: 768px) { #infoSection { padding: 2rem 3rem; } }
+
+    .lm-eyebrow { display: inline-block; padding: 0.3rem 0.9rem; margin-bottom: 1rem; border-radius: 999px; background: rgba(255,107,74,0.1); border: 1px solid rgba(255,107,74,0.25); }
+    .lm-eyebrow span { color: var(--coral); font-size: 0.68rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.16em; }
+
+    .lm-title { font-family: 'Fraunces', serif; font-weight: 600; font-size: clamp(2rem, 5vw, 3.5rem); line-height: 1.1; color: var(--text); }
+
+    .lm-sub { color: var(--text-muted); font-size: 0.95rem; max-width: 42rem; margin: 1.5rem auto 0; line-height: 1.7; }
+    @media (min-width: 768px) { .lm-sub { font-size: 1.1rem; } }
+    .lm-sub .lm-hl { color: var(--coral); font-weight: 700; border-bottom: 2px solid rgba(255,107,74,0.3); }
+    .lm-sub .lm-hl-alt { color: var(--gold); font-weight: 700; border-bottom: 2px solid rgba(255,200,87,0.3); }
+
+    .lm-tags { display: flex; flex-wrap: wrap; justify-content: center; gap: 0.6rem; margin-top: 1.5rem; }
+    .lm-tag { display: flex; align-items: center; gap: 0.5rem; padding: 0.5rem 1rem; border-radius: 999px; background: var(--panel); border: 1px solid var(--panel-line); font-size: 0.68rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-muted); }
+    .lm-tag i { color: var(--coral); }
+
+    /* ---------- Action Buttons ---------- */
+    .lm-action-btns { display: flex; align-items: center; justify-content: center; gap: 1rem; flex-wrap: wrap; padding-top: 2rem; }
+
+    .lm-btn-primary {
+        width: 100%; padding: 1rem 2.25rem; border-radius: 1.1rem;
+        background: var(--coral); color: #1A1210; font-weight: 800; font-size: 1rem;
+        box-shadow: 0 18px 38px -16px rgba(255,107,74,0.55);
+        display: inline-flex; align-items: center; justify-content: center; gap: 0.65rem;
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    @media (min-width: 480px) { .lm-btn-primary { width: auto; } }
+    .lm-btn-primary:hover { transform: translateY(-2px) scale(1.02); box-shadow: 0 22px 44px -16px rgba(255,107,74,0.65); }
+    .lm-btn-primary:active { transform: scale(0.97); }
+
+    .lm-btn-secondary {
+        width: 100%; padding: 1rem 1.75rem; border-radius: 1.1rem;
+        background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.12); color: #FFFFFF; font-weight: 700; font-size: 1rem;
+        display: inline-flex; align-items: center; justify-content: center; gap: 0.65rem;
+        transition: background 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
+        cursor: pointer;
+    }
+    @media (min-width: 480px) { .lm-btn-secondary { width: auto; } }
+    .lm-btn-secondary i { color: var(--coral); font-size: 1.1rem; }
+    .lm-btn-secondary:hover { background: rgba(255,255,255,0.07); border-color: rgba(255,107,74,0.4); transform: translateY(-2px); }
+    .lm-btn-secondary:active { transform: scale(0.97); }
+
+    /* ---------- Video Modal ---------- */
+    .lm-modal { position: fixed; inset: 0; z-index: 100; display: flex; align-items: center; justify-content: center; padding: 1rem; background: rgba(0,0,0,0.85); backdrop-filter: blur(12px); opacity: 0; pointer-events: none; transition: opacity 0.3s ease; }
+    .lm-modal.is-active { opacity: 1; pointer-events: auto; }
+    .lm-modal-content { position: relative; width: 100%; max-width: 50rem; background: #181520; border: 1px solid var(--panel-line); border-radius: 1.5rem; overflow: hidden; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.7); }
+    .lm-modal-close { position: absolute; top: 1rem; right: 1rem; z-index: 10; width: 32px; height: 32px; border-radius: 999px; background: rgba(0,0,0,0.6); color: #fff; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: background 0.2s ease; border: none; }
+    .lm-modal-close:hover { background: rgba(255,107,74,0.8); }
+    .lm-video-wrapper { position: relative; padding-bottom: 56.25%; height: 0; }
+    .lm-video-wrapper video, .lm-video-wrapper iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 0; }
+
+    /* ---------- Form section ---------- */
+    #formSection { opacity: 0; transform: translateY(2.5rem); transition: opacity 0.5s ease, transform 0.5s ease; }
+    #formSection.hidden { display: none; }
+
+    .lm-form-frame { background: transparent; padding: 1rem 0.25rem; }
+    @media (min-width: 768px) {
+        .lm-form-frame {
+            background: rgba(31,27,40,0.55); backdrop-filter: blur(24px);
+            border: 1px solid var(--panel-line); padding: 2rem; border-radius: 2rem;
+            box-shadow: 0 30px 60px -25px rgba(0,0,0,0.6);
+        }
+    }
+
+    .lm-error-box { margin-bottom: 1.5rem; background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.3); border-radius: 1rem; padding: 1rem; display: flex; align-items: flex-start; gap: 0.75rem; }
+    .lm-error-box i { color: #f87171; margin-top: 0.15rem; }
+    .lm-error-box p { color: #fca5a5; font-size: 0.82rem; }
+
+    .lm-cols { display: grid; grid-template-columns: 1fr; gap: 1.5rem; }
+    @media (min-width: 1024px) { .lm-cols { grid-template-columns: 1fr 1fr; } }
+    .lm-col { display: flex; flex-direction: column; gap: 1rem; }
+    .lm-row-2 { display: grid; grid-template-columns: 1fr; gap: 1rem; }
+    @media (min-width: 480px) { .lm-row-2 { grid-template-columns: 1fr 1fr; } }
+    .lm-field { display: flex; flex-direction: column; gap: 0.4rem; }
+    .lm-label { font-size: 0.68rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-muted); margin-left: 0.25rem; }
+
+    .lm-input, .lm-textarea {
+        width: 100%; background: rgba(0,0,0,0.28); border: 1px solid var(--panel-line);
+        border-radius: 0.85rem; padding: 0.85rem 1rem; color: var(--text); font-size: 0.85rem;
+        transition: border-color 0.25s ease, box-shadow 0.25s ease;
+    }
+    .lm-textarea { resize: none; }
+    .lm-input:focus, .lm-textarea:focus { outline: none; border-color: rgba(255,107,74,0.5); box-shadow: 0 0 0 3px rgba(255,107,74,0.14); }
+    .lm-input::placeholder, .lm-textarea::placeholder { color: var(--text-muted); }
+
+    .lm-upload { position: relative; }
+    .lm-upload-input { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; z-index: 20; }
+    .lm-upload-display {
+        background: rgba(0,0,0,0.2); border: 2px dashed var(--panel-line); border-radius: 0.85rem;
+        display: flex; flex-direction: column; align-items: center; justify-content: center;
+        text-align: center; padding: 1.4rem; transition: border-color 0.25s ease, background 0.25s ease;
+    }
+    .lm-upload-display i { margin-bottom: 0.5rem; font-size: 1.15rem; }
+    .lm-upload-display.lm-photo-icon i { color: var(--coral); }
+    .lm-upload-display.lm-music-icon i { color: var(--gold); }
+    .lm-upload-label { font-size: 0.62rem; color: var(--text-muted); font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; padding: 0 0.5rem; }
+    .lm-upload:hover .lm-upload-display { border-color: rgba(255,107,74,0.45); background: rgba(255,107,74,0.05); }
+    .lm-upload-display.is-filled { border-style: solid; border-color: rgba(255,107,74,0.4); }
+    .lm-upload-display.is-filled .lm-upload-label { color: var(--coral); }
+
+    .lm-photo-count { font-size: 0.6rem; font-weight: 700; color: var(--coral); text-transform: uppercase; letter-spacing: 0.02em; }
+    .lm-photo-count.is-invalid { color: #f87171; }
+    .lm-field-error { font-size: 0.68rem; color: #f87171; margin-left: 0.25rem; }
+
+    .lm-preview-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.5rem; margin-top: 0.6rem; }
+    @media (min-width: 480px) { .lm-preview-grid { grid-template-columns: repeat(5, 1fr); } }
+    .lm-preview-thumb { position: relative; aspect-ratio: 1; border-radius: 0.6rem; overflow: hidden; border: 1px solid var(--panel-line); }
+    .lm-preview-thumb img { width: 100%; height: 100%; object-fit: cover; }
+    .lm-preview-thumb button { position: absolute; top: 2px; right: 2px; width: 18px; height: 18px; border-radius: 999px; background: rgba(0,0,0,0.75); color: #fff; font-size: 10px; display: flex; align-items: center; justify-content: center; }
+
+    .lm-submit-wrap { padding-top: 1.5rem; display: flex; flex-direction: column; gap: 1rem; align-items: center; }
+    .lm-submit {
+        width: 100%; padding: 1.1rem; border-radius: 1.1rem;
+        background: var(--coral); color: #1A1210; font-weight: 800; font-size: 1.05rem;
+        box-shadow: 0 18px 38px -16px rgba(255,107,74,0.55);
+        display: flex; align-items: center; justify-content: center; gap: 0.75rem;
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    .lm-submit:hover { transform: translateY(-2px); box-shadow: 0 22px 46px -16px rgba(255,107,74,0.65); }
+    .lm-submit:active { transform: scale(0.98); }
+    .lm-submit:disabled { opacity: 0.7; }
+
+    .lm-back-btn {
+        padding: 0.75rem 1.75rem; border-radius: 0.85rem;
+        background: var(--panel); border: 1px solid var(--panel-line); color: var(--text-muted);
+        font-size: 0.65rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.16em;
+        display: flex; align-items: center; gap: 0.65rem;
+        transition: color 0.25s ease, border-color 0.25s ease;
+    }
+    .lm-back-btn:hover { color: var(--text); border-color: rgba(255,107,74,0.35); }
+
+    @media (prefers-reduced-motion: reduce) {
+        #infoSection, #formSection, .lm-btn-primary, .lm-btn-secondary, .lm-submit, .lm-upload-display { transition: none; }
+    }
+</style>
+
+<div class="lm-shell">
+    <div class="lm-glow lm-glow-a" aria-hidden="true"></div>
+    <div class="lm-glow lm-glow-b" aria-hidden="true"></div>
+
+    <div class="lm-wrap">
+
+        <div id="infoSection">
+            <div class="lm-eyebrow"><span>Welcome to Surprise Me</span></div>
+
+            <h1 class="lm-title">Ready to make<br class="md:hidden"> someone smile?</h1>
+
+            <p class="lm-sub">
+                Make a <span class="lm-hl">Magic Link</span> for the person you love — whether it's a
+                <span class="lm-hl-alt">Birthday Gift</span> for your partner or a
+                <span class="lm-hl">Love Message</span>. Add your photos, pick a song, and create a 3D surprise in seconds.
             </p>
 
-            <div class="flex flex-col sm:flex-row items-center justify-center gap-4 pt-8">
-                <button onclick="showForm()" class="w-full sm:w-auto px-12 py-5 rounded-2xl bg-gradient-to-r from-pink-600 to-purple-600 text-white font-extrabold shadow-2xl shadow-pink-500/20 hover:scale-105 active:scale-95 transition-all flex items-center justify-center gap-3">
-                    Start Creating <i class="fas fa-magic"></i>
+            <div class="lm-action-btns">
+                <button type="button" onclick="openDemoModal()" class="lm-btn-secondary">
+                    <i class="fas fa-play-circle"></i> Watch Demo
+                </button>
+                <button onclick="showForm()" class="lm-btn-primary">
+                    Start Creating <i class="fas fa-wand-magic-sparkles"></i>
                 </button>
             </div>
         </div>
 
-        <div id="formSection" class="hidden opacity-0 transform translate-y-10 transition-all duration-700 pt-2 sm:pt-4">
-            <div class="bg-transparent sm:bg-white/5 sm:backdrop-blur-2xl sm:border sm:border-white/10 p-6 md:p-10 rounded-none sm:rounded-[2.5rem] sm:shadow-2xl">
+        <div id="formSection" class="hidden">
+            <div class="lm-form-frame">
 
-                <form method="POST" enctype="multipart/form-data" class="space-y-4" id="wishForm">
+                <form method="POST" enctype="multipart/form-data" id="wishForm" novalidate>
                     {% csrf_token %}
-                    
-                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                        <div class="space-y-5">
-                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                <div class="space-y-2">
-                                    <label class="text-[10px] font-bold text-gray-400 uppercase tracking-widest ml-1">Your Name</label>
-                                    <input type="text" name="sender_name" required placeholder="Eg: Your Name/Nickname" class="w-full bg-white/5 sm:bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white focus:border-pink-500 transition-all outline-none">
+
+                    {% if form.non_field_errors %}
+                    <div class="lm-error-box">
+                        <i class="fas fa-triangle-exclamation"></i>
+                        <div>{% for error in form.non_field_errors %}<p>{{ error }}</p>{% endfor %}</div>
+                    </div>
+                    {% endif %}
+
+                    {% if form.errors %}
+                    <div class="lm-error-box">
+                        <i class="fas fa-triangle-exclamation"></i>
+                        <div>
+                            {% for field, errors in form.errors.items %}
+                                {% for error in errors %}<p><strong>{{ field }}:</strong> {{ error }}</p>{% endfor %}
+                            {% endfor %}
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    <div class="lm-cols">
+                        <div class="lm-col">
+                            <div class="lm-row-2">
+                                <div class="lm-field">
+                                    <label for="senderNameInput" class="lm-label">Your Name</label>
+                                    <input type="text" id="senderNameInput" name="sender_name" required placeholder="Eg: Your Name/Nickname" class="lm-input">
                                 </div>
-                                <div class="space-y-2">
-                                    <label class="text-[10px] font-bold text-gray-400 uppercase tracking-widest ml-1">Their Name</label>
-                                    <input type="text" name="receiver_name" required placeholder="Eg: His/Her Name/Nickname" class="w-full bg-white/5 sm:bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white focus:border-pink-500 transition-all outline-none">
+                                <div class="lm-field">
+                                    <label for="receiverNameInput" class="lm-label">Their Name</label>
+                                    <input type="text" id="receiverNameInput" name="receiver_name" required placeholder="Eg: His/Her Name/Nickname" class="lm-input">
                                 </div>
                             </div>
-                            <div class="space-y-2">
-                                <label class="text-[10px] font-bold text-gray-400 uppercase tracking-widest ml-1">Heartfelt Message</label>
-                                <textarea name="message" rows="5" required placeholder="Tell them how much they mean to you..." class="w-full bg-white/5 sm:bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white focus:border-pink-500 transition-all outline-none resize-none"></textarea>
+                            <div class="lm-field">
+                                <label for="messageInput" class="lm-label">Heartfelt Message</label>
+                                <textarea id="messageInput" name="message" rows="6" required placeholder="Tell them how much they mean to you..." class="lm-textarea"></textarea>
                             </div>
                         </div>
 
-                        <div class="space-y-5">
-                            <div class="space-y-2">
-                                <label class="text-[10px] font-bold text-gray-400 uppercase tracking-widest ml-1">Upload Memories (Min 5-10 Photos)</label>
-                                <div class="relative group h-32" id="imagesContainer">
-                                    <input type="file" name="images" id="imagesInput" multiple accept="image/*" required class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-20">
-                                    <div id="imagesDisplay" class="h-full bg-white/5 sm:bg-black/40 border-2 border-dashed border-white/10 rounded-xl flex flex-col items-center justify-center transition-all group-hover:border-pink-500/50">
-                                        <i id="imagesIcon" class="fas fa-images text-pink-400 mb-2 text-2xl"></i>
-                                        <p id="imagesLabel" class="text-[10px] text-gray-500 font-bold uppercase text-center px-2">Click to select photos</p>
+                        <div class="lm-col">
+                            <div class="lm-field">
+                                <div class="flex items-center justify-between ml-1">
+                                    <label for="imagesInput" class="lm-label" style="margin-left: 0;">Upload memories</label>
+                                    <span class="lm-photo-count" id="photoCount">0 / 5–10 photos</span>
+                                </div>
+                                <div class="lm-upload">
+                                    <input type="file" name="images" id="imagesInput" multiple accept="image/*" class="lm-upload-input">
+                                    <div id="imagesDisplay" class="lm-upload-display lm-photo-icon">
+                                        <i id="imagesIcon" class="fas fa-images"></i>
+                                        <p id="imagesLabel" class="lm-upload-label">Click or drop 5–10 photos</p>
                                     </div>
                                 </div>
+                                <div id="previewGrid" class="lm-preview-grid"></div>
+                                <p id="photoError" class="hidden lm-field-error"></p>
                             </div>
 
-                            <div class="space-y-2">
-                                <label class="text-[10px] font-bold text-gray-400 uppercase tracking-widest ml-1">Background Music (Optional)</label>
-                                <div class="relative group h-32" id="musicContainer">
-                                    <input type="file" name="music" id="musicInput" accept="audio/*" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-20">
-                                    <div id="musicDisplay" class="h-full bg-white/5 sm:bg-black/40 border-2 border-dashed border-white/10 rounded-xl flex flex-col items-center justify-center transition-all group-hover:border-violet-500/50">
-                                        <i id="musicIcon" class="fas fa-music text-violet-400 mb-2 text-2xl"></i>
-                                        <p id="musicLabel" class="text-[10px] text-gray-500 font-bold uppercase text-center px-2">Upload their favorite song</p>
+                            <div class="lm-field">
+                                <label for="musicInput" class="lm-label">Background music (optional)</label>
+                                <div class="lm-upload">
+                                    <input type="file" name="music" id="musicInput" accept="audio/*" class="lm-upload-input">
+                                    <div id="musicDisplay" class="lm-upload-display lm-music-icon">
+                                        <i id="musicIcon" class="fas fa-music"></i>
+                                        <p id="musicLabel" class="lm-upload-label">Upload their favorite song</p>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
 
-                    <div class="px-1 sm:px-0 pt-8 space-y-6">
-                        <button type="submit" id="submitBtn" class="w-full py-5 rounded-2xl bg-gradient-to-r from-pink-600 via-purple-600 to-violet-600 text-white font-black text-xl shadow-[0_10px_40px_rgba(219,39,119,0.4)] hover:-translate-y-1.5 hover:shadow-[0_15px_50px_rgba(219,39,119,0.5)] active:scale-95 transition-all duration-300 flex items-center justify-center gap-4 border border-white/10">
-                            <span id="btnText" class="tracking-tight">GENERATE THE MAGIC LINK</span>
-                            <i class="fas fa-wand-sparkles text-2xl" id="btnIcon"></i>
+                    <div class="lm-submit-wrap">
+                        <button type="submit" id="submitBtn" class="lm-submit">
+                            <span id="btnText">Generate the magic link</span>
+                            <i class="fas fa-wand-magic-sparkles" id="btnIcon"></i>
                         </button>
 
-                        <div class="flex justify-center pt-2">
-                            <button type="button" onclick="hideForm()" 
-                                class="group relative px-8 py-3 rounded-xl border border-white/5 bg-white/5 backdrop-blur-sm text-gray-400 hover:text-white hover:bg-white/10 hover:border-white/20 transition-all duration-500 overflow-hidden">
-                                
-                                <div class="absolute inset-0 bg-gradient-to-r from-pink-500/10 to-violet-500/10 opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                                
-                                <div class="relative flex items-center gap-3">
-                                    <i class="fas fa-chevron-left text-[10px] group-hover:-translate-x-1 transition-transform duration-300"></i>
-                                    <span class="text-[11px] font-bold uppercase tracking-[0.25em]">Change Mind? Go Back</span>
-                                </div>
-                            </button>
-                        </div>
+                        <button type="button" onclick="hideForm()" class="lm-back-btn">
+                            <i class="fas fa-chevron-left"></i> Change mind? Go back
+                        </button>
                     </div>
                 </form>
             </div>
+        </div>
+    </div>
+</div>
+
+<!-- ---------- Demo Video Modal ---------- -->
+<div id="demoModal" class="lm-modal" onclick="closeDemoModal(event)">
+    <div class="lm-modal-content">
+        <button type="button" class="lm-modal-close" onclick="closeDemoModal(event)" aria-label="Close demo video">
+            <i class="fas fa-xmark"></i>
+        </button>
+        <div class="lm-video-wrapper">
+            <!-- MP4 Video or YouTube embed path update garidinus -->
+            <video id="demoVideo" controls preload="metadata">
+                <source src="{% static 'videos/demo.mp4' %}" type="video/mp4">
+                Your browser does not support the video tag.
+            </video>
         </div>
     </div>
 </div>
@@ -117,84 +284,193 @@
 
 {% block scripts %}
 <script>
-    // LocalStorage Check to maintain state on refresh
-    window.onload = function() {
-        const sectionState = localStorage.getItem('activeSection');
-        if (sectionState === 'form') {
-            const info = document.getElementById('infoSection');
-            const form = document.getElementById('formSection');
-            info.classList.add('hidden');
-            form.classList.remove('hidden');
-            form.style.opacity = '1';
-            form.style.transform = 'translateY(0)';
-        }
-    };
+    const MIN_PHOTOS = 5;
+    const MAX_PHOTOS = 10;
+    const MAX_FILE_SIZE_MB = 10;
 
-    function showForm() {
-        const info = document.getElementById('infoSection');
-        const form = document.getElementById('formSection');
-        localStorage.setItem('activeSection', 'form');
-        info.style.opacity = '0';
-        info.style.transform = 'scale(0.95)';
-        setTimeout(() => {
-            info.classList.add('hidden');
-            form.classList.remove('hidden');
-            setTimeout(() => {
-                form.style.opacity = '1';
-                form.style.transform = 'translateY(0)';
-            }, 50);
-        }, 400);
+    const imagesInput = document.getElementById('imagesInput');
+    const imagesDisplay = document.getElementById('imagesDisplay');
+    const imagesLabel = document.getElementById('imagesLabel');
+    const previewGrid = document.getElementById('previewGrid');
+    const photoCount = document.getElementById('photoCount');
+    const photoError = document.getElementById('photoError');
+
+    let currentPhotos = [];
+
+    function syncImagesInput() {
+        const dt = new DataTransfer();
+        currentPhotos.forEach((f) => dt.items.add(f));
+        imagesInput.files = dt.files;
     }
 
-    function hideForm() {
-        const info = document.getElementById('infoSection');
-        const form = document.getElementById('formSection');
-        localStorage.removeItem('activeSection');
-        form.style.opacity = '0';
-        form.style.transform = 'translateY(20px)';
-        setTimeout(() => {
-            form.classList.add('hidden');
-            info.classList.remove('hidden');
-            setTimeout(() => {
-                info.style.opacity = '1';
-                info.style.transform = 'scale(1)';
-            }, 50);
-        }, 400);
-    }
-
-    // File feedback helper
-    function setupFileFeedback(inputId, displayId, labelId, iconId, colorHex) {
-        document.getElementById(inputId).addEventListener('change', function() {
-            if (this.files && this.files.length > 0) {
-                const count = this.files.length;
-                document.getElementById(labelId).innerText = count > 1 ? `${count} Photos Selected` : this.files[0].name;
-                const display = document.getElementById(displayId);
-                display.style.borderColor = colorHex;
-                display.style.background = `${colorHex}1a`; 
-                const icon = document.getElementById(iconId);
-                icon.className = "fas fa-check-circle text-2xl mb-2";
-                icon.style.color = colorHex;
-            }
+    function renderPhotoPreviews() {
+        previewGrid.innerHTML = '';
+        currentPhotos.forEach((file, index) => {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const wrapper = document.createElement('div');
+                wrapper.className = 'lm-preview-thumb';
+                wrapper.innerHTML = `<img src="${e.target.result}" alt="Photo ${index + 1}">
+                    <button type="button" aria-label="Remove photo">&times;</button>`;
+                wrapper.querySelector('button').addEventListener('click', () => {
+                    currentPhotos.splice(index, 1);
+                    syncImagesInput();
+                    renderPhotoPreviews();
+                    updatePhotoStatus();
+                });
+                previewGrid.appendChild(wrapper);
+            };
+            reader.readAsDataURL(file);
         });
     }
 
-    setupFileFeedback('imagesInput', 'imagesDisplay', 'imagesLabel', 'imagesIcon', '#ec4899');
-    setupFileFeedback('musicInput', 'musicDisplay', 'musicLabel', 'musicIcon', '#8b5cf6');
+    function updatePhotoStatus() {
+        const count = currentPhotos.length;
+        const inRange = count >= MIN_PHOTOS && count <= MAX_PHOTOS;
 
-    // Handle Submit Animation
-    document.getElementById('wishForm').addEventListener('submit', function(e) {
-        const imgInput = document.getElementById('imagesInput');
-        if(imgInput.files.length < 1) {
-            alert("Please select at least one photo!");
-            e.preventDefault();
+        photoCount.textContent = `${count} / ${MIN_PHOTOS}\u2013${MAX_PHOTOS} photos`;
+        photoCount.classList.toggle('is-invalid', count > 0 && !inRange);
+
+        if (count === 0) {
+            imagesLabel.textContent = 'Click or drop 5–10 photos';
+            imagesDisplay.classList.remove('is-filled');
+            photoError.classList.add('hidden');
             return;
         }
 
-        localStorage.removeItem('activeSection');
+        imagesLabel.textContent = `${count} photo${count > 1 ? 's' : ''} selected`;
+        imagesDisplay.classList.toggle('is-filled', inRange);
+
+        if (count < MIN_PHOTOS) {
+            photoError.textContent = `Add at least ${MIN_PHOTOS} photos.`;
+            photoError.classList.remove('hidden');
+        } else if (count > MAX_PHOTOS) {
+            photoError.textContent = `Please keep it to ${MAX_PHOTOS} photos or fewer.`;
+            photoError.classList.remove('hidden');
+        } else {
+            photoError.classList.add('hidden');
+        }
+    }
+
+    imagesInput.addEventListener('change', function () {
+        const incoming = Array.from(this.files).filter((f) => {
+            if (!f.type.startsWith('image/')) return false;
+            if (f.size > MAX_FILE_SIZE_MB * 1024 * 1024) {
+                photoError.textContent = `"${f.name}" is over ${MAX_FILE_SIZE_MB}MB and was skipped.`;
+                photoError.classList.remove('hidden');
+                return false;
+            }
+            return true;
+        });
+        currentPhotos = [...currentPhotos, ...incoming].slice(0, MAX_PHOTOS);
+        syncImagesInput();
+        renderPhotoPreviews();
+        updatePhotoStatus();
+    });
+
+    // ---------- Music file UI feedback ----------
+    const musicInput = document.getElementById('musicInput');
+    const musicDisplay = document.getElementById('musicDisplay');
+    const musicLabel = document.getElementById('musicLabel');
+    const musicIcon = document.getElementById('musicIcon');
+
+    musicInput.addEventListener('change', function () {
+        if (this.files && this.files.length > 0) {
+            musicLabel.textContent = this.files[0].name;
+            musicDisplay.classList.add('is-filled');
+            musicIcon.className = 'fas fa-check-circle';
+        } else {
+            musicLabel.textContent = 'Upload their favorite song';
+            musicDisplay.classList.remove('is-filled');
+            musicIcon.className = 'fas fa-music';
+        }
+    });
+
+    // ---------- Info / form toggle ----------
+    const infoSection = document.getElementById('infoSection');
+    const formSection = document.getElementById('formSection');
+
+    function showForm(skipAnim) {
+        if (window.location.hash !== '#create') window.location.hash = 'create';
+        if (skipAnim) {
+            infoSection.classList.add('hidden');
+            formSection.classList.remove('hidden');
+            formSection.style.opacity = '1';
+            formSection.style.transform = 'translateY(0)';
+            return;
+        }
+        infoSection.style.opacity = '0';
+        infoSection.style.transform = 'scale(0.96)';
+        setTimeout(() => {
+            infoSection.classList.add('hidden');
+            formSection.classList.remove('hidden');
+            requestAnimationFrame(() => {
+                formSection.style.opacity = '1';
+                formSection.style.transform = 'translateY(0)';
+            });
+        }, 300);
+    }
+
+    function hideForm(skipHash) {
+        if (!skipHash) history.replaceState(null, '', window.location.pathname + window.location.search);
+        formSection.style.opacity = '0';
+        formSection.style.transform = 'translateY(0.6rem)';
+        setTimeout(() => {
+            formSection.classList.add('hidden');
+            infoSection.classList.remove('hidden');
+            requestAnimationFrame(() => {
+                infoSection.style.opacity = '1';
+                infoSection.style.transform = 'scale(1)';
+            });
+        }, 300);
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+        if (window.location.hash === '#create') showForm(true);
+    });
+
+    window.addEventListener('hashchange', () => {
+        const wantsForm = window.location.hash === '#create';
+        const formIsShown = !formSection.classList.contains('hidden');
+        if (wantsForm && !formIsShown) showForm(true);
+        if (!wantsForm && formIsShown) hideForm(true);
+    });
+
+    if (document.querySelector('.lm-error-box')) {
+        showForm(true);
+    }
+
+    // ---------- Demo Modal Functions ----------
+    const demoModal = document.getElementById('demoModal');
+    const demoVideo = document.getElementById('demoVideo');
+
+    function openDemoModal() {
+        demoModal.classList.add('is-active');
+        if (demoVideo) demoVideo.play();
+    }
+
+    function closeDemoModal(e) {
+        if (e.target === demoModal || e.currentTarget.classList.contains('lm-modal-close') || e.currentTarget === demoModal) {
+            demoModal.classList.remove('is-active');
+            if (demoVideo) {
+                demoVideo.pause();
+                demoVideo.currentTime = 0;
+            }
+        }
+    }
+
+    // ---------- Submit: validate photo count, then show loading state ----------
+    document.getElementById('wishForm').addEventListener('submit', function (e) {
+        if (currentPhotos.length < MIN_PHOTOS || currentPhotos.length > MAX_PHOTOS) {
+            e.preventDefault();
+            updatePhotoStatus();
+            imagesDisplay.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            return;
+        }
         const btn = document.getElementById('submitBtn');
         btn.disabled = true;
-        document.getElementById('btnText').innerText = "GENERATING MAGIC...";
-        document.getElementById('btnIcon').className = "fas fa-circle-notch fa-spin";
+        document.getElementById('btnText').textContent = 'Generating magic...';
+        document.getElementById('btnIcon').className = 'fas fa-circle-notch fa-spin';
     });
 </script>
 {% endblock %}
