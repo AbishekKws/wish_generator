@@ -3,224 +3,563 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Golden Magic | {{ wish.receiver_name }} ✨</title>
-    
+    <title>Golden Magic | {{ wish.receiver_name|default:"Dearest Friend" }} ✨</title>
+
+    <!-- External Libraries: Tailwind CSS, GSAP, Canvas Confetti & FontAwesome -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&family=Playfair+Display:ital,wght@1,500&display=swap" rel="stylesheet">
+    
+    <!-- Luxury Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700;900&family=Cinzel:wght@400;600;800;900&family=Playfair+Display:ital,wght@0,400;0,600;1,400;1,600&family=Montserrat:wght@300;400;600&display=swap" rel="stylesheet">
 
     <style>
-        body, html { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background: #050505; color: white; }
-        
-        .main-title { font-family: 'Cinzel', serif; }
-        .intro-text { font-family: 'Playfair Display', serif; }
+        :root {
+            --gold-primary: #fbbf24;
+            --gold-light: #fef08a;
+            --gold-dark: #b45309;
+            --gold-accent: #d97706;
+            --bg-deep: #030303;
+        }
 
-        /* Floating Circular Image Frames */
+        * {
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body, html {
+            margin: 0; padding: 0;
+            width: 100%; height: 100%;
+            overflow: hidden;
+            background: var(--bg-deep);
+            color: #ffffff;
+            font-family: 'Montserrat', sans-serif;
+            user-select: none;
+        }
+
+        .font-cinzel { font-family: 'Cinzel', serif; }
+        .font-cinzel-dec { font-family: 'Cinzel Decorative', serif; }
+        .font-playfair { font-family: 'Playfair Display', serif; }
+
+        /* Dynamic Golden Shimmer Animation */
+        .gold-shimmer-text {
+            background: linear-gradient(135deg, #fff7ed 0%, #fde047 25%, #ca8a04 50%, #fef08a 75%, #a16207 100%);
+            background-size: 200% auto;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: shimmer 5s linear infinite;
+        }
+
+        @keyframes shimmer {
+            0% { background-position: 0% center; }
+            100% { background-position: 200% center; }
+        }
+
+        /* Glassmorphism Luxury Panels */
+        .glass-luxury {
+            background: rgba(12, 10, 5, 0.85);
+            backdrop-filter: blur(30px) saturate(200%);
+            -webkit-backdrop-filter: blur(30px) saturate(200%);
+            border: 1px solid rgba(251, 191, 36, 0.35);
+            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.9), 0 0 40px rgba(217, 119, 6, 0.25), inset 0 0 20px rgba(251, 191, 36, 0.1);
+            border-radius: 2rem;
+        }
+
+        /* Custom Golden Scrollbar Fix for Overflow Message */
+        .custom-scroll::-webkit-scrollbar {
+            width: 5px;
+        }
+        .custom-scroll::-webkit-scrollbar-track {
+            background: rgba(251, 191, 36, 0.05);
+            border-radius: 10px;
+        }
+        .custom-scroll::-webkit-scrollbar-thumb {
+            background: rgba(251, 191, 36, 0.4);
+            border-radius: 10px;
+        }
+        .custom-scroll::-webkit-scrollbar-thumb:hover {
+            background: rgba(251, 191, 36, 0.8);
+        }
+
+        /* Portal Unlock Magic Button */
+        .portal-btn {
+            position: relative;
+            width: 130px; height: 130px;
+            background: radial-gradient(circle, #fef08a 0%, #fbbf24 40%, #b45309 80%, #78350f 100%);
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            box-shadow: 0 0 70px rgba(245, 158, 11, 0.9), inset 0 0 25px rgba(255, 255, 255, 0.9);
+            cursor: pointer; border: none;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .portal-btn::before {
+            content: ''; position: absolute; inset: -14px;
+            border: 2px dashed rgba(251, 191, 36, 0.7);
+            border-radius: 50%;
+            animation: spin 10s linear infinite;
+        }
+
+        .portal-btn::after {
+            content: ''; position: absolute; inset: -28px;
+            border: 1px solid rgba(251, 191, 36, 0.3);
+            border-radius: 50%;
+            animation: spin-reverse 18s linear infinite;
+        }
+
+        @keyframes spin { 100% { transform: rotate(360deg); } }
+        @keyframes spin-reverse { 100% { transform: rotate(-360deg); } }
+
+        .portal-btn:hover {
+            transform: scale(1.15);
+            box-shadow: 0 0 90px rgba(251, 191, 36, 1), 0 0 40px rgba(255, 255, 255, 1);
+        }
+
+        /* Interactive Floating Orbs */
         .golden-orb {
             position: absolute;
             border-radius: 50%;
-            border: 2px solid rgba(234, 179, 8, 0.6);
-            box-shadow: 0 0 25px rgba(234, 179, 8, 0.5);
+            border: 2px solid rgba(254, 240, 138, 0.9);
+            box-shadow: 0 0 35px rgba(245, 158, 11, 0.7), inset 0 0 20px rgba(251, 191, 36, 0.6);
             overflow: hidden;
             opacity: 0;
-            z-index: 5;
-            pointer-events: none;
-        }
-        .golden-orb img { width: 100%; height: 100%; object-fit: cover; }
-
-        /* Surprise Button Style */
-        .portal-btn {
-            position: relative; width: 110px; height: 110px;
-            background: linear-gradient(45deg, #fbbf24, #d97706);
-            border-radius: 50%; display: flex; align-items: center; justify-content: center;
-            box-shadow: 0 0 45px rgba(217, 119, 6, 0.8);
-            animation: heartbeat 1.5s infinite ease-in-out;
-            cursor: pointer; border: none;
-        }
-        @keyframes heartbeat { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.1); box-shadow: 0 0 65px rgba(251, 191, 36, 1); } }
-
-        .glass-panel { 
-            background: rgba(0, 0, 0, 0.65); backdrop-filter: blur(20px); 
-            border: 1px solid rgba(234, 179, 8, 0.25);
-            border-radius: 1.5rem; padding: 2rem;
+            z-index: 20;
+            cursor: pointer;
+            pointer-events: auto;
+            transition: border-color 0.3s, box-shadow 0.3s, transform 0.3s ease;
         }
 
-        canvas { filter: blur(1px); }
+        .golden-orb:hover {
+            border-color: #ffffff;
+            box-shadow: 0 0 60px rgba(255, 255, 255, 1), 0 0 30px rgba(245, 158, 11, 1);
+            transform: scale(1.1) !important;
+        }
+
+        .golden-orb img {
+            width: 100%; height: 100%;
+            object-fit: cover;
+            transition: transform 0.6s ease;
+        }
+
+        .golden-orb:hover img {
+            transform: scale(1.2);
+        }
+
+        /* Sparkler Button Style */
+        .sparkler-btn {
+            background: linear-gradient(135deg, rgba(251, 191, 36, 0.25) 0%, rgba(180, 83, 9, 0.5) 100%);
+            border: 1px solid rgba(251, 191, 36, 0.7);
+            color: #fef08a;
+            box-shadow: 0 0 25px rgba(245, 158, 11, 0.4);
+            transition: all 0.3s ease;
+        }
+
+        .sparkler-btn:hover {
+            background: linear-gradient(135deg, rgba(251, 191, 36, 0.6) 0%, rgba(217, 119, 6, 0.9) 100%);
+            color: #ffffff;
+            box-shadow: 0 0 50px rgba(251, 191, 36, 1);
+            transform: translateY(-3px);
+        }
     </style>
 </head>
 <body>
 
+    <!-- Optional Audio Stream -->
     {% if wish.custom_music or wish.selected_music %}
         <audio id="bgMusic" src="{% if wish.custom_music %}{{ wish.custom_music.url }}{% else %}{{ wish.selected_music.audio_file.url }}{% endif %}" loop></audio>
     {% endif %}
 
-    <div id="overlay" class="fixed inset-0 z-[100] flex items-center justify-center bg-[#050505]">
-        <button onclick="unlockMagic()" class="flex flex-col items-center gap-6">
-            <div class="portal-btn">
-                <i class="fa-solid fa-wand-magic-sparkles text-4xl text-black"></i>
-            </div>
-            <div class="text-center">
-                <span class="block text-[10px] font-black tracking-[0.6em] text-yellow-500 uppercase">A Surprise For You</span>
-                <span class="block text-sm text-gray-300 mt-2">Tap to see the magic</span>
-            </div>
+    <!-- HTML5 Particle Canvas -->
+    <canvas id="particleCanvas" class="fixed inset-0 z-0 pointer-events-none"></canvas>
+
+    <!-- Luxury Ambient Lighting -->
+    <div class="fixed inset-0 bg-gradient-to-t from-black via-transparent to-black z-[1] pointer-events-none opacity-90"></div>
+    <div class="fixed inset-0 bg-[radial-gradient(circle_at_center,rgba(217,119,6,0.22)_0%,transparent_70%)] z-[1] pointer-events-none"></div>
+
+    <!-- Floating Sound Control Toggle -->
+    <div id="audio-control" class="fixed top-6 right-6 z-[300] hidden">
+        <button onclick="toggleAudio()" class="w-12 h-12 flex items-center justify-center border border-amber-500/50 bg-black/70 rounded-full text-amber-300 hover:text-white hover:border-amber-400 hover:shadow-[0_0_25px_rgba(251,191,36,0.8)] transition-all backdrop-blur-md">
+            <i id="audio-icon" class="fas fa-volume-up text-base"></i>
         </button>
     </div>
 
-    <div id="magic-content" class="hidden opacity-0 fixed inset-0">
-        <canvas id="particleCanvas" class="absolute inset-0 z-0"></canvas>
-        <div class="absolute inset-0 bg-gradient-to-t from-black via-transparent to-black z-[1]"></div>
-        <div class="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(234,179,8,0.15)_0%,transparent_70%)] z-[1]"></div>
+    <!-- STEP 1: Portal Magic Unlock Screen -->
+    <div id="overlay" class="fixed inset-0 z-[200] flex flex-col items-center justify-center bg-[#030303] px-4">
+        <div class="text-center flex flex-col items-center gap-8">
+            
+            <div class="space-y-2">
+                <span class="block text-xs font-semibold tracking-[0.6em] text-amber-400 uppercase">A LUXURIOUS SURPRISE</span>
+                <p class="text-xs text-amber-200/60 font-cinzel tracking-widest">// PREPARED FOR {{ wish.receiver_name|default:"YOU"|upper }}</p>
+            </div>
 
-        <div id="image-space" class="absolute inset-0 pointer-events-none">
+            <button onclick="unlockMagic()" class="flex flex-col items-center gap-6 group focus:outline-none">
+                <div class="portal-btn">
+                    <i class="fa-solid fa-wand-magic-sparkles text-4xl text-black drop-shadow-md group-hover:rotate-12 transition-transform duration-300"></i>
+                </div>
+                <div class="text-center mt-2">
+                    <span class="block text-base font-cinzel font-bold tracking-[0.35em] text-amber-200 group-hover:text-white transition-colors">UNLOCK THE MAGIC</span>
+                    <span class="block text-xs text-amber-500/90 font-light mt-1 tracking-wider">Tap to enter the golden realm</span>
+                </div>
+            </button>
+            
+        </div>
+    </div>
+
+    <!-- Floating Orbs Gallery Container -->
+    <div id="image-space" class="fixed inset-0 pointer-events-auto z-[20]">
+        {% if wish.images.exists %}
             {% for img_obj in wish.images.all|slice:":6" %}
-                <div class="golden-orb" style="width: 130px; height: 130px;">
-                    <img src="{{ img_obj.image.url }}" alt="Memory">
+                <div class="golden-orb" onclick="openLightbox('{{ img_obj.image.url }}', 'GOLDEN MEMORY #0{{ forloop.counter }}')">
+                    <img src="{{ img_obj.image.url }}" alt="Memory {{ forloop.counter }}">
                 </div>
             {% endfor %}
+        {% else %}
+            <!-- Fallback High Quality Decorative Gallery Orbs -->
+            <div class="golden-orb" onclick="openLightbox('https://images.unsplash.com/photo-1513151233558-d860c5398176?q=80&w=800', 'GOLDEN MOMENT #01')">
+                <img src="https://images.unsplash.com/photo-1513151233558-d860c5398176?q=80&w=800" alt="Sample Memory 1">
+            </div>
+            <div class="golden-orb" onclick="openLightbox('https://images.unsplash.com/photo-1530103862676-de8c9debad1d?q=80&w=800', 'GOLDEN MOMENT #02')">
+                <img src="https://images.unsplash.com/photo-1530103862676-de8c9debad1d?q=80&w=800" alt="Sample Memory 2">
+            </div>
+            <div class="golden-orb" onclick="openLightbox('https://images.unsplash.com/photo-1464366400600-7168b8af9bc3?q=80&w=800', 'GOLDEN MOMENT #03')">
+                <img src="https://images.unsplash.com/photo-1464366400600-7168b8af9bc3?q=80&w=800" alt="Sample Memory 3">
+            </div>
+            <div class="golden-orb" onclick="openLightbox('https://images.unsplash.com/photo-1519741497674-611481863552?q=80&w=800', 'GOLDEN MOMENT #04')">
+                <img src="https://images.unsplash.com/photo-1519741497674-611481863552?q=80&w=800" alt="Sample Memory 4">
+            </div>
+        {% endif %}
+    </div>
+
+    <!-- STEP 2 & 3: Main Dynamic Magic Content -->
+    <div id="magic-content" class="hidden opacity-0 fixed inset-0 z-[10] overflow-y-auto">
+        <div class="min-h-full flex flex-col items-center justify-between py-10 px-4 sm:px-6 text-center relative">
+            
+            <!-- Header Greeting -->
+            <header class="w-full max-w-4xl mx-auto pt-2">
+                <div id="intro-wrap" class="overflow-hidden mb-1">
+                    <h2 class="intro-text font-playfair italic text-lg sm:text-2xl md:text-3xl text-amber-200/90 tracking-widest">
+                        Wishing You A Magical & Golden
+                    </h2>
+                </div>
+
+                <div id="title-wrap" class="relative inline-block my-2">
+                    <h1 class="main-title font-cinzel-dec text-4xl sm:text-7xl md:text-8xl font-black uppercase leading-tight tracking-tight gold-shimmer-text filter drop-shadow-[0_0_40px_rgba(245,158,11,0.6)]">
+                        {% if wish.wish_type %}{{ wish.wish_type }}{% else %}Happy<br>Birthday{% endif %}
+                    </h1>
+                    <div class="absolute -top-4 -right-4 sm:-top-6 sm:-right-6 text-xl sm:text-4xl animate-bounce">✨</div>
+                    <div class="absolute -bottom-4 -left-4 sm:-bottom-6 sm:-left-6 text-xl sm:text-4xl animate-pulse">✨</div>
+                </div>
+
+                <div id="name-wrap" class="mt-2">
+                    <div class="flex items-center justify-center gap-3 sm:gap-4">
+                        <div class="h-[1px] w-8 sm:w-20 bg-gradient-to-r from-transparent to-amber-400"></div>
+                        <span class="font-cinzel text-xl sm:text-4xl md:text-5xl font-bold text-white tracking-[0.2em] sm:tracking-[0.25em] filter drop-shadow-[0_0_20px_rgba(255,255,255,0.9)]">
+                            {{ wish.receiver_name|default:"Alexander" }}
+                        </span>
+                        <div class="h-[1px] w-8 sm:w-20 bg-gradient-to-l from-transparent to-amber-400"></div>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Personal Message Container with Typewriter (FIXED OVERFLOW) -->
+            <main id="message-wrap" class="w-full max-w-2xl mx-auto my-6 glass-luxury p-6 sm:p-8 relative flex flex-col justify-between">
+                <div class="absolute -top-3.5 left-1/2 -translate-x-1/2 bg-amber-500 text-black font-cinzel text-[10px] font-bold tracking-[0.4em] px-5 py-1 rounded-full uppercase shadow-[0_0_20px_rgba(251,191,36,0.9)] z-20">
+                    SPECIAL DEDICATION
+                </div>
+
+                <!-- Text Box Container Fixed for Text Overflow -->
+                <div class="w-full max-h-[260px] sm:max-h-[320px] overflow-y-auto custom-scroll px-2 py-3 my-2 text-center flex items-center justify-center">
+                    <p id="typed-message" class="font-playfair text-base sm:text-xl md:text-2xl text-amber-100/95 italic font-light leading-relaxed whitespace-pre-line break-words w-full">
+                        <!-- Text typed via JS -->
+                    </p>
+                </div>
+
+                <div class="mt-4 pt-4 border-t border-amber-500/30 flex flex-col sm:flex-row items-center justify-between gap-4">
+                    <p class="text-xs font-cinzel font-semibold text-amber-400/90 tracking-[0.3em] uppercase">
+                        WITH LOVE, <span class="text-white">{{ wish.sender_name|default:"Victoria" }}</span>
+                    </p>
+
+                    <!-- STEP 3: Interactive Sparkler Celebration Trigger -->
+                    <button onclick="triggerSparklerCelebration()" class="sparkler-btn font-cinzel text-xs font-bold px-5 py-2.5 rounded-full flex items-center gap-2 cursor-pointer shrink-0">
+                        <i class="fas fa-fire text-amber-300"></i>
+                        <span>SEND BLESSINGS ✨</span>
+                    </button>
+                </div>
+            </main>
+
+            <!-- Footer Badge -->
+            <footer class="w-full text-center pb-2">
+                <a href="{% url 'home' %}" class="font-cinzel text-[10px] tracking-[0.5em] text-amber-500/70 hover:text-amber-300 transition-colors uppercase">
+                    • CREATED WITH SURPRISEME GOLDEN MAGIC •
+                </a>
+            </footer>
+
         </div>
+    </div>
 
-        <div class="relative z-10 flex flex-col items-center justify-center h-full px-6 text-center">
-            <div id="intro-wrap">
-                <h2 class="intro-text text-2xl md:text-4xl text-yellow-200/60 tracking-widest mb-2">
-                    Wishing You
-                </h2>
-            </div>
-
-            <div id="title-wrap" class="relative inline-block mt-2">
-                <h1 class="main-title text-6xl md:text-9xl font-black uppercase leading-none tracking-tighter text-transparent bg-clip-text bg-gradient-to-b from-yellow-100 via-yellow-500 to-yellow-800 filter drop-shadow-[0_0_20px_rgba(234,179,8,0.4)]">
-                    Happy <br> Birthday
-                </h1>
-                <div class="absolute -top-4 -right-4 text-2xl animate-pulse">✨</div>
-                <div class="absolute -bottom-4 -left-4 text-2xl animate-pulse [animation-delay:1s]">✨</div>
-            </div>
-
-            <div id="name-wrap" class="mt-8">
-                <div class="flex items-center justify-center gap-4 mb-2">
-                    <div class="h-[1px] w-12 bg-gradient-to-r from-transparent to-yellow-500"></div>
-                    <span class="text-3xl md:text-6xl font-bold text-white tracking-[0.2em] drop-shadow-lg">
-                        {{ wish.receiver_name }}
-                    </span>
-                    <div class="h-[1px] w-12 bg-gradient-to-l from-transparent to-yellow-500"></div>
-                </div>
-            </div>
-
-            <div id="message-wrap" class="mt-8 glass-panel max-w-2xl mx-auto">
-                <p class="text-lg md:text-xl text-yellow-100/90 italic font-light leading-relaxed">
-                    "{{ wish.message }}"
-                </p>
-                <div class="mt-6 pt-4 border-t border-yellow-500/20">
-                    <p class="text-[10px] font-bold text-yellow-600 uppercase tracking-[0.4em]">From: {{ wish.sender_name }}</p>
-                </div>
+    <!-- Lightbox Modal -->
+    <div id="lightbox" class="fixed inset-0 z-[500] hidden bg-black/95 flex items-center justify-center p-4 backdrop-blur-2xl" onclick="closeLightbox()">
+        <div class="relative max-w-4xl max-h-[85vh] border border-amber-500/50 p-3 bg-neutral-950/95 rounded-2xl shadow-[0_0_70px_rgba(245,158,11,0.5)]" onclick="event.stopPropagation()">
+            <img id="lightbox-img" src="" alt="Expanded Memory" class="max-w-full max-h-[72vh] object-contain rounded-xl">
+            <div class="flex justify-between items-center mt-4 px-3 font-cinzel text-xs text-amber-300">
+                <span id="lightbox-tag" class="tracking-widest font-bold">GOLDEN MEMORY</span>
+                <button onclick="closeLightbox()" class="text-amber-200 hover:text-white font-bold tracking-widest px-4 py-1.5 border border-amber-500/40 rounded-lg hover:bg-amber-500/30 transition-all uppercase">
+                    [ CLOSE ]
+                </button>
             </div>
         </div>
     </div>
 
     <script>
+        const rawMessage = "{{ wish.message|escapejs }}";
+        const wishMessage = rawMessage.trim() !== "" ? rawMessage : "May your day be filled with radiant joy, endless laughter, and memories that shine as brightly as gold forever!";
+        
+        let audioPlaying = false;
+        const bgAudio = document.getElementById('bgMusic');
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+        function playGoldenChime(freq = 587.33, duration = 0.8) {
+            try {
+                if (audioCtx.state === 'suspended') audioCtx.resume();
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(freq * 1.5, audioCtx.currentTime + duration);
+
+                gain.gain.setValueAtTime(0.08, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.00001, audioCtx.currentTime + duration);
+
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.start();
+                osc.stop(audioCtx.currentTime + duration);
+            } catch(e) {}
+        }
+
+        function playSparkleBurst() {
+            [523.25, 659.25, 783.99, 1046.50, 1318.51].forEach((freq, idx) => {
+                setTimeout(() => playGoldenChime(freq, 0.6), idx * 80);
+            });
+        }
+
+        // HTML5 Particle Canvas
         const canvas = document.getElementById('particleCanvas');
         const ctx = canvas.getContext('2d');
         let particles = [];
+        let mouse = { x: -1000, y: -1000, radius: 150 };
 
-        function resize() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
-        window.addEventListener('resize', resize); resize();
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        window.addEventListener('mousemove', (e) => {
+            mouse.x = e.clientX;
+            mouse.y = e.clientY;
+        });
 
         class Particle {
             constructor() { this.reset(); }
             reset() {
                 this.x = Math.random() * canvas.width;
                 this.y = Math.random() * canvas.height + canvas.height;
-                this.size = Math.random() * 2.5 + 0.5;
-                this.speedY = Math.random() * 1.2 + 0.5;
-                this.speedX = Math.random() * 0.8 - 0.4;
-                this.opacity = Math.random() * 0.6 + 0.2;
+                this.size = Math.random() * 2.8 + 0.6;
+                this.speedY = Math.random() * 0.9 + 0.3;
+                this.speedX = Math.random() * 0.6 - 0.3;
+                this.opacity = Math.random() * 0.7 + 0.2;
+                this.baseOpacity = this.opacity;
+                this.color = Math.random() > 0.3 ? '#fbbf24' : '#fef08a';
             }
             update() {
-                this.y -= this.speedY; this.x += this.speedX;
-                if (this.y < -10) this.reset();
+                this.y -= this.speedY;
+                this.x += this.speedX;
+
+                const dx = mouse.x - this.x;
+                const dy = mouse.y - this.y;
+                const dist = Math.sqrt(dx * dx + dy * dy);
+
+                if (dist < mouse.radius) {
+                    const force = (mouse.radius - dist) / mouse.radius;
+                    this.x -= (dx / dist) * force * 3;
+                    this.y -= (dy / dist) * force * 3;
+                    this.opacity = Math.min(1, this.baseOpacity + force * 0.5);
+                } else {
+                    this.opacity = this.baseOpacity;
+                }
+
+                if (this.y < -20 || this.x < -20 || this.x > canvas.width + 20) {
+                    this.reset();
+                    this.y = canvas.height + 10;
+                }
             }
             draw() {
-                ctx.fillStyle = `rgba(234, 179, 8, ${this.opacity})`;
-                ctx.beginPath(); ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2); ctx.fill();
+                ctx.fillStyle = this.color;
+                ctx.globalAlpha = this.opacity;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fill();
             }
         }
 
-        for (let i = 0; i < 150; i++) particles.push(new Particle());
+        for (let i = 0; i < 120; i++) particles.push(new Particle());
 
-        function animate() {
+        function animateParticles() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             particles.forEach(p => { p.update(); p.draw(); });
-            requestAnimationFrame(animate);
+            requestAnimationFrame(animateParticles);
         }
+        animateParticles();
 
         function unlockMagic() {
-            const music = document.getElementById('bgMusic');
-            if(music) music.play().catch(e => console.log("Audio play blocked"));
+            playSparkleBurst();
 
-            gsap.to("#overlay", { 
-                scale: 1.2, opacity: 0, duration: 0.8, ease: "power2.in",
+            if (bgAudio) {
+                bgAudio.play().then(() => {
+                    audioPlaying = true;
+                    document.getElementById('audio-control').classList.remove('hidden');
+                }).catch(() => {});
+            }
+
+            gsap.to("#overlay", {
+                scale: 1.15, opacity: 0, duration: 0.9, ease: "power2.inOut",
                 onComplete: () => {
                     document.getElementById('overlay').style.display = 'none';
                     const content = document.getElementById('magic-content');
                     content.classList.remove('hidden');
-                    gsap.to(content, { opacity: 1, duration: 0.5 });
-                    
-                    runSequence();
-                    startImageFloating();
-                    animate();
+
+                    gsap.to(content, { opacity: 1, duration: 0.8 });
+
+                    confetti({
+                        particleCount: 140,
+                        spread: 85,
+                        origin: { y: 0.5 },
+                        colors: ['#fbbf24', '#fef08a', '#b45309', '#ffffff']
+                    });
+
+                    runEntranceSequence();
+                    startOrbFloatingPhysics();
                 }
             });
         }
 
-        function runSequence() {
+        function runEntranceSequence() {
             const tl = gsap.timeline();
 
-            // Set initial hidden states
-            gsap.set(".intro-text", { opacity: 0, y: 20 });
-            gsap.set(".main-title", { opacity: 0, scale: 0.8, filter: "blur(12px)" });
+            gsap.set(".intro-text", { opacity: 0, y: 30 });
+            gsap.set(".main-title", { opacity: 0, scale: 0.85, filter: "blur(12px)" });
             gsap.set("#name-wrap", { opacity: 0, y: 30 });
-            gsap.set("#message-wrap", { opacity: 0, scale: 0.9 });
+            gsap.set("#message-wrap", { opacity: 0, scale: 0.9, y: 20 });
 
-            // Execution sequence
-            tl.to(".intro-text", { opacity: 1, y: 0, duration: 1.2, ease: "power2.out" })
-              .to(".main-title", { 
-                  opacity: 1, scale: 1, filter: "blur(0px)", 
-                  duration: 1.8, ease: "expo.out" 
-              }, "-=0.4")
-              .to("#name-wrap", { 
-                  opacity: 1, y: 0, duration: 1, ease: "back.out(1.7)" 
-              }, "-=0.6")
-              .to("#message-wrap", { 
-                  opacity: 1, scale: 1, duration: 1.2, ease: "power3.out" 
-              }, "-=0.5");
+            tl.to(".intro-text", { opacity: 1, y: 0, duration: 1.2, ease: "power3.out" })
+              .to(".main-title", { opacity: 1, scale: 1, filter: "blur(0px)", duration: 1.6, ease: "expo.out" }, "-=0.6")
+              .to("#name-wrap", { opacity: 1, y: 0, duration: 1, ease: "back.out(1.5)" }, "-=0.8")
+              .to("#message-wrap", { opacity: 1, scale: 1, y: 0, duration: 1.2, ease: "power3.out" }, "-=0.5")
+              .call(typeMessage);
 
-            // Continuous floating title
             gsap.to(".main-title", {
-                y: 15, duration: 3, repeat: -1, yoyo: true, ease: "sine.inOut"
+                y: 12, duration: 3.5, repeat: -1, yoyo: true, ease: "sine.inOut"
             });
         }
 
-        function startImageFloating() {
+        function typeMessage() {
+            const container = document.getElementById('typed-message');
+            let idx = 0;
+            container.innerText = "";
+
+            const interval = setInterval(() => {
+                if (idx < wishMessage.length) {
+                    container.innerText += wishMessage.charAt(idx);
+                    if (idx % 4 === 0) playGoldenChime(700 + (idx * 2), 0.05);
+                    idx++;
+                } else {
+                    clearInterval(interval);
+                }
+            }, 35);
+        }
+
+        function startOrbFloatingPhysics() {
             const orbs = document.querySelectorAll('.golden-orb');
+            const padding = 100;
+
             orbs.forEach((orb, index) => {
-                const startX = Math.random() * (window.innerWidth - 150);
-                const startY = Math.random() * (window.innerHeight - 150);
-                
+                const orbSize = Math.min(window.innerWidth * 0.22, 140);
+                orb.style.width = orbSize + 'px';
+                orb.style.height = orbSize + 'px';
+
+                const startX = Math.random() * (window.innerWidth - orbSize - padding) + padding / 2;
+                const startY = Math.random() * (window.innerHeight - orbSize - padding) + padding / 2;
+
                 gsap.set(orb, { x: startX, y: startY, opacity: 0, scale: 0 });
 
                 gsap.to(orb, {
-                    opacity: 1, scale: 1, duration: 1.5, delay: 1 + (index * 0.4), ease: "back.out(1.2)"
+                    opacity: 1, scale: 1, duration: 1.5, delay: 0.5 + (index * 0.25), ease: "back.out(1.4)"
                 });
 
-                // Random bouncing / floating path
-                gsap.to(orb, {
-                    x: `+=${Math.random() * 120 - 60}`,
-                    y: `+=${Math.random() * 120 - 60}`,
-                    duration: 4 + Math.random() * 3,
-                    repeat: -1,
-                    yoyo: true,
-                    ease: "sine.inOut"
-                });
+                function moveOrb() {
+                    const newX = Math.random() * (window.innerWidth - orbSize - padding) + padding / 2;
+                    const newY = Math.random() * (window.innerHeight - orbSize - padding) + padding / 2;
+                    
+                    gsap.to(orb, {
+                        x: newX,
+                        y: newY,
+                        duration: 6 + Math.random() * 5,
+                        ease: "sine.inOut",
+                        onComplete: moveOrb
+                    });
+                }
+
+                setTimeout(moveOrb, 2000 + index * 500);
             });
+        }
+
+        function triggerSparklerCelebration() {
+            playSparkleBurst();
+            confetti({
+                particleCount: 150,
+                angle: 60,
+                spread: 70,
+                origin: { x: 0 },
+                colors: ['#fbbf24', '#fef08a', '#ffffff']
+            });
+            confetti({
+                particleCount: 150,
+                angle: 120,
+                spread: 70,
+                origin: { x: 1 },
+                colors: ['#fbbf24', '#fef08a', '#ffffff']
+            });
+        }
+
+        function openLightbox(url, title) {
+            playGoldenChime(880, 0.2);
+            document.getElementById('lightbox-img').src = url;
+            document.getElementById('lightbox-tag').innerText = title;
+            document.getElementById('lightbox').classList.remove('hidden');
+        }
+
+        function closeLightbox() {
+            document.getElementById('lightbox').classList.add('hidden');
+        }
+
+        function toggleAudio() {
+            const icon = document.getElementById('audio-icon');
+            if (bgAudio) {
+                if (audioPlaying) {
+                    bgAudio.pause();
+                    icon.className = "fas fa-volume-mute text-base text-red-400";
+                } else {
+                    bgAudio.play();
+                    icon.className = "fas fa-volume-up text-base text-amber-300";
+                }
+                audioPlaying = !audioPlaying;
+            }
         }
     </script>
 </body>
