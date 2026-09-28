@@ -6,26 +6,22 @@
 {% block content %}
 {% with type=wish_type.lower temp=template_id.lower %}
 
-<div class="min-h-[calc(100vh-80px)] w-full flex items-center justify-center p-3 md:p-6 relative overflow-x-hidden transition-all duration-700 
-    {% if temp == 'matrix_rain' %} bg-black font-mono
-    {% elif type == 'sorry' %} bg-gradient-to-b from-slate-950 to-black
-    {% else %} bg-slate-950 {% endif %}">
-    
-    <div class="absolute top-1/4 -left-20 w-64 h-64 bg-pink-600/10 rounded-full blur-[100px] pointer-events-none"></div>
-    <div class="absolute bottom-1/4 -right-20 w-64 h-64 bg-violet-600/10 rounded-full blur-[100px] pointer-events-none"></div>
+<div class="cw-shell
+    {% if temp == 'matrix_rain' %} cw-shell-matrix
+    {% elif type == 'sorry' %} cw-shell-sorry
+    {% endif %}">
 
-    <div class="w-full max-w-5xl z-10">
-        <div class="transition-all duration-500 mx-auto
-            md:bg-white/5 md:backdrop-blur-3xl md:border md:border-white/10 md:p-10 md:rounded-[3rem] md:shadow-2xl 
-            p-4 rounded-none bg-transparent border-none shadow-none">
-            
-            <div class="text-center mb-6 md:mb-8">
-                <div class="inline-block px-3 py-1 mb-3 rounded-full bg-pink-500/10 border border-pink-500/20">
-                    <span class="text-pink-400 text-[9px] md:text-[10px] font-bold uppercase tracking-[0.2em]">
-                        CUSTOMIZE YOUR {{ display_name }} SURPRISE
-                    </span>
+    <div class="cw-glow cw-glow-a" aria-hidden="true"></div>
+    <div class="cw-glow cw-glow-b" aria-hidden="true"></div>
+
+    <div class="cw-frame-outer">
+        <div class="cw-frame">
+
+            <div class="cw-head">
+                <div class="cw-eyebrow-pill">
+                    <span>Customize your {{ display_name }} surprise</span>
                 </div>
-                <h1 class="text-2xl md:text-4xl font-black bg-gradient-to-r from-pink-500 via-purple-400 to-violet-500 bg-clip-text text-transparent leading-tight">
+                <h1 class="cw-title">
                     {% if temp == 'matrix_rain' %} Enter the Matrix
                     {% elif temp == 'heart_shape' %} Crafting Your Heart
                     {% elif type == 'sorry' %} A Sincere Apology
@@ -33,114 +29,125 @@
                 </h1>
             </div>
 
-            <form method="POST" enctype="multipart/form-data" class="space-y-5 md:space-y-6" id="wishForm">
+            {% if form.non_field_errors %}
+            <div class="cw-error-box">
+                <i class="fas fa-triangle-exclamation"></i>
+                <div>{% for error in form.non_field_errors %}<p>{{ error }}</p>{% endfor %}</div>
+            </div>
+            {% endif %}
+
+            {% if form.errors %}
+            <div class="cw-error-box" id="formErrorSummary">
+                <i class="fas fa-triangle-exclamation"></i>
+                <p>Please fix the highlighted fields below before continuing.</p>
+            </div>
+            {% endif %}
+
+            <form method="POST" enctype="multipart/form-data" class="cw-form" id="wishForm" novalidate>
                 {% csrf_token %}
 
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                    
-                    <div class="space-y-5">
-                        <div class="grid grid-cols-2 gap-4">
-                            <div class="space-y-1.5">
-                                <label class="flex items-center gap-2 text-[10px] font-bold text-gray-400 ml-1 uppercase tracking-wider">
-                                    <i class="fas fa-paper-plane text-pink-500 text-[8px]"></i> From
+                <div class="cw-cols">
+
+                    <div class="cw-col">
+                        <div class="cw-row-2">
+                            <div class="cw-field">
+                                <label for="{{ form.sender_name.id_for_label }}" class="cw-label">
+                                    <i class="fas fa-paper-plane"></i> From
                                 </label>
-                                <div class="magic-input-wrapper">
-                                    {{ form.sender_name }}
-                                </div>
+                                <div class="magic-input-wrapper">{{ form.sender_name }}</div>
+                                {% if form.sender_name.errors %}<p class="cw-field-error">{{ form.sender_name.errors.0 }}</p>{% endif %}
                             </div>
-                            <div class="space-y-1.5">
-                                <label class="flex items-center gap-2 text-[10px] font-bold text-gray-400 ml-1 uppercase tracking-wider">
-                                    <i class="fas fa-heart text-pink-500 text-[8px]"></i> To
+                            <div class="cw-field">
+                                <label for="{{ form.receiver_name.id_for_label }}" class="cw-label">
+                                    <i class="fas fa-heart"></i> To
                                 </label>
-                                <div class="magic-input-wrapper">
-                                    {{ form.receiver_name }}
-                                </div>
+                                <div class="magic-input-wrapper">{{ form.receiver_name }}</div>
+                                {% if form.receiver_name.errors %}<p class="cw-field-error">{{ form.receiver_name.errors.0 }}</p>{% endif %}
                             </div>
                         </div>
 
-                        <div class="space-y-1.5">
-                            <label class="flex items-center gap-2 text-[10px] font-bold text-gray-400 ml-1 uppercase tracking-wider">
-                                <i class="fas fa-pen-nib text-pink-500 text-[8px]"></i> Heartfelt Message
+                        <div class="cw-field">
+                            <label for="{{ form.message.id_for_label }}" class="cw-label cw-label-row">
+                                <span><i class="fas fa-pen-nib"></i> Heartfelt message</span>
+                                <span id="msgCounter" class="cw-counter"></span>
                             </label>
-                            <div class="magic-input-wrapper message-area">
-                                {{ form.message }}
-                            </div>
+                            <div class="magic-input-wrapper message-area">{{ form.message }}</div>
+                            {% if form.message.errors %}<p class="cw-field-error">{{ form.message.errors.0 }}</p>{% endif %}
                         </div>
                     </div>
 
-                    <div class="space-y-5">
-                        <div class="space-y-1.5">
-                            <label class="flex items-center gap-2 text-[10px] font-bold text-gray-400 ml-1 uppercase tracking-wider">
-                                <i class="fas fa-music text-[8px] 
-                                    {% if type == 'birthday' %} text-amber-500 
-                                    {% elif type == 'sorry' %} text-blue-500 
-                                    {% else %} text-violet-500 {% endif %}"></i> Audio Vibe
+                    <div class="cw-col">
+                        <div class="cw-field">
+                            <label for="{{ form.selected_music.id_for_label }}" class="cw-label">
+                                <i class="fas fa-music cw-music-icon
+                                    {% if type == 'birthday' %} cw-music-gold
+                                    {% elif type == 'sorry' %} cw-music-blue
+                                    {% else %} cw-music-coral {% endif %}"></i> Audio vibe
                             </label>
-                            
-                            <div class="bg-black/40 border border-white/10 rounded-[1.2rem] p-3 md:p-4 transition-all duration-500 hover:border-white/20">
-                                <div class="magic-input-wrapper music-select-container relative group">
-                                    <div class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 group-focus-within:text-pink-500 transition-colors pointer-events-none">
-                                        <i class="fas fa-compact-disc animate-spin-slow text-xs"></i>
-                                    </div>
-                                    {{ form.selected_music }}
-                                </div>
 
-                                <div class="flex items-center gap-4 my-3">
-                                    <div class="h-[1px] flex-1 bg-gradient-to-r from-transparent via-white/10 to-transparent"></div>
-                                    <span class="text-[7px] text-gray-500 font-black uppercase tracking-[0.2em] italic">Or Upload Your Own</span>
-                                    <div class="h-[1px] flex-1 bg-gradient-to-r from-transparent via-white/10 to-transparent"></div>
+                            <div class="cw-audio-panel">
+                                <div class="magic-input-wrapper music-select-container">
+                                    <i class="fas fa-compact-disc cw-spin-slow" aria-hidden="true"></i>
+                                    {{ form.selected_music }}
+                                    <button type="button" id="musicPreviewBtn" title="Preview track" class="cw-preview-btn">
+                                        <i class="fas fa-play" id="musicPreviewIcon"></i>
+                                    </button>
+                                </div>
+                                <audio id="musicPreviewPlayer" class="hidden"></audio>
+
+                                <div class="cw-divider">
+                                    <span class="cw-divider-line"></span>
+                                    <span class="cw-divider-text">Or upload your own</span>
+                                    <span class="cw-divider-line"></span>
                                 </div>
 
                                 <div class="custom-music-container">
-                                    <div class="relative group">
-                                        {{ form.custom_music }}
-                                    </div>
+                                    {{ form.custom_music }}
                                 </div>
                             </div>
+                            {% if form.selected_music.errors %}<p class="cw-field-error">{{ form.selected_music.errors.0 }}</p>{% endif %}
                         </div>
 
                         {% if temp != 'firework_show' %}
-                        <div class="space-y-1.5">
-                            <div class="flex items-center justify-between ml-1">
-                                <label class="flex items-center gap-2 text-[10px] font-bold text-gray-400 uppercase tracking-wider">
-                                    <i class="fas fa-images text-pink-500 text-[8px]"></i> Photos
+                        <div class="cw-field">
+                            <div class="cw-label-row">
+                                <label for="imageInput" class="cw-label">
+                                    <i class="fas fa-images"></i> Photos
                                 </label>
-                                <span class="text-[8px] font-black text-pink-500/80 uppercase tracking-tighter italic">
-                                    {% if temp == 'heart_shape' %} 12-20 Photos Required
-                                    {% elif temp == 'matrix_rain' %} 1 Portrait Only
-                                    {% elif temp == 'space_odyssey' %} Best with 3 Photos
-                                    {% else %} Multiple Photos Allowed {% endif %}
+                                <span class="cw-photo-req" id="photoRequirement">
+                                    {% if temp == 'heart_shape' %} 12–20 photos required
+                                    {% elif temp == 'matrix_rain' %} 1 portrait only
+                                    {% elif temp == 'space_odyssey' %} Best with 3 photos
+                                    {% else %} Multiple photos allowed {% endif %}
                                 </span>
                             </div>
-                            
-                            <div class="relative group h-[85px] md:h-[100px]">
-                                <input type="file" name="images" id="imageInput" {% if temp == 'matrix_rain' %}accept="image/*"{% else %}multiple{% endif %} 
-                                    class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-20" onchange="updateFileName(this)">
-                                <div id="imagesDisplay" class="h-full bg-black/40 border border-dashed border-white/20 rounded-xl flex flex-col items-center justify-center p-3 transition-all duration-300 group-hover:border-pink-500/50 group-hover:bg-pink-500/5">
-                                    <i class="fas fa-camera text-pink-400 mb-1.5 text-lg"></i>
-                                    <p id="fileLabel" class="text-[9px] text-gray-500 font-bold uppercase tracking-widest text-center">Tap to select photos</p>
+
+                            <div class="cw-dropzone" id="dropZone">
+                                <input type="file" name="images" id="imageInput" {% if temp == 'matrix_rain' %}accept="image/*"{% else %}multiple accept="image/*"{% endif %}
+                                    class="cw-dropzone-input" onchange="handleFiles(this.files)">
+                                <div id="imagesDisplay" class="cw-dropzone-display">
+                                    <i class="fas fa-camera"></i>
+                                    <p id="fileLabel" class="cw-dropzone-label">Tap or drag photos here</p>
                                 </div>
                             </div>
+                            <p id="photoError" class="hidden cw-field-error"></p>
+
+                            <div id="previewGrid" class="cw-preview-grid"></div>
+                            {% if form.images.errors %}<p class="cw-field-error">{{ form.images.errors.0 }}</p>{% endif %}
                         </div>
                         {% endif %}
                     </div>
                 </div>
 
-                <div class="pt-4">
-                    <button type="submit" id="submitBtn"
-                        class="group relative w-full overflow-hidden py-4 rounded-2xl font-black text-xs tracking-[0.2em] text-white transition-all transform active:scale-[0.98] shadow-2xl
-                        {% if temp == 'matrix_rain' %} bg-green-600 text-black
-                        {% elif type == 'sorry' %} bg-gradient-to-r from-blue-700 to-indigo-800
-                        {% else %} bg-gradient-to-r from-pink-600 via-purple-600 to-violet-600 {% endif %}">
-                        
-                        <div class="absolute inset-0 bg-white/20 translate-y-[100%] group-hover:translate-y-0 transition-transform duration-300"></div>
-                        
-                        <span class="relative z-10 flex items-center justify-center gap-3">
-                            <span id="btnText">GENERATE MAGIC LINK</span>
+                <div class="cw-submit-wrap">
+                    <button type="submit" id="submitBtn" class="cw-submit">
+                        <span class="cw-submit-sheen"></span>
+                        <span class="cw-submit-content">
+                            <span id="btnText">Generate magic link</span>
                             <i class="fas fa-wand-magic-sparkles" id="btnIcon"></i>
                         </span>
                     </button>
-                    <p class="text-center text-[9px] text-gray-500 mt-4 uppercase tracking-[0.1em] opacity-60">Crafted with love for your special someone</p>
+                    <p class="cw-submit-note">Crafted with love for your special someone</p>
                 </div>
             </form>
         </div>
@@ -148,82 +155,374 @@
 </div>
 
 <style>
+    .cw-shell {
+        min-height: calc(100dvh - 4rem);
+        width: 100%;
+        display: flex; align-items: center; justify-content: center;
+        padding: clamp(0.5rem, 2vh, 1.5rem);
+        position: relative; overflow-x: hidden;
+        background: var(--ink);
+        box-sizing: border-box;
+    }
+    .cw-shell-matrix { background: #06090A; font-family: 'Courier New', monospace; }
+    .cw-shell-sorry { background: linear-gradient(to bottom, #14161F, #0C0D12); }
+
+    .cw-glow { position: absolute; width: 16rem; height: 16rem; border-radius: 999px; filter: blur(90px); pointer-events: none; }
+    .cw-glow-a { top: 25%; left: -5rem; background: rgba(255,107,74,0.10); }
+    .cw-glow-b { bottom: 25%; right: -5rem; background: rgba(255,200,87,0.08); }
+    .cw-shell-matrix .cw-glow { background: rgba(22,163,74,0.10) !important; }
+
+    .cw-frame-outer { width: 100%; max-width: 64rem; z-index: 1; }
+    .cw-frame {
+        margin: 0 auto;
+        padding: clamp(0.85rem, 3vh, 2.5rem);
+        border-radius: clamp(1rem, 3vh, 2.25rem);
+        background: transparent; border: none; box-shadow: none;
+        box-sizing: border-box;
+    }
+    @media (min-width: 768px) {
+        .cw-frame {
+            background: rgba(31,27,40,0.55); backdrop-filter: blur(28px);
+            border: 1px solid var(--panel-line);
+            box-shadow: 0 30px 60px -25px rgba(0,0,0,0.6);
+        }
+    }
+
+    .cw-head { text-align: center; margin-bottom: clamp(0.9rem, 2.5vh, 1.75rem); }
+    .cw-eyebrow-pill { display: inline-block; padding: 0.3rem 0.85rem; margin-bottom: 0.6rem; border-radius: 999px; background: rgba(255,107,74,0.1); border: 1px solid rgba(255,107,74,0.25); }
+    .cw-eyebrow-pill span { color: var(--coral); font-size: 0.62rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.16em; }
+    .cw-title { font-family: 'Fraunces', serif; font-weight: 600; font-size: clamp(1.25rem, 2.5vh + 1vw, 2.4rem); color: var(--text); line-height: 1.2; }
+    .cw-shell-matrix .cw-title { color: #16a34a; }
+
+    .cw-error-box { margin-bottom: 1.25rem; background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.3); border-radius: 1rem; padding: 0.85rem 1rem; display: flex; align-items: flex-start; gap: 0.75rem; }
+    .cw-error-box i { color: #f87171; margin-top: 0.15rem; }
+    .cw-error-box p { color: #fca5a5; font-size: 0.85rem; }
+
+    .cw-form { display: flex; flex-direction: column; gap: clamp(0.75rem, 2vh, 1.5rem); }
+    .cw-cols { display: grid; grid-template-columns: 1fr; gap: clamp(1rem, 3vh, 2rem); }
+    @media (min-width: 768px) { .cw-cols { grid-template-columns: 1fr 1fr; } }
+    .cw-col { display: flex; flex-direction: column; gap: clamp(0.75rem, 2vh, 1.25rem); }
+    .cw-row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+    @media (max-width: 360px) { .cw-row-2 { grid-template-columns: 1fr; } }
+    .cw-field { display: flex; flex-direction: column; gap: 0.4rem; min-width: 0; }
+
+    .cw-label { display: flex; align-items: center; gap: 0.5rem; font-size: 0.68rem; font-weight: 700; color: var(--text-muted); margin-left: 0.25rem; text-transform: uppercase; letter-spacing: 0.1em; }
+    .cw-label i { color: var(--coral); font-size: 0.6rem; }
+    .cw-label-row { display: flex; align-items: center; justify-content: space-between; margin-left: 0.25rem; }
+    .cw-label-row .cw-label { margin-left: 0; }
+    .cw-counter { font-size: 0.6rem; color: var(--text-muted); font-weight: 600; }
+    .cw-field-error { font-size: 0.68rem; color: #f87171; margin-left: 0.25rem; }
+    .cw-photo-req { font-size: 0.6rem; font-weight: 700; color: var(--coral); text-transform: uppercase; letter-spacing: 0.02em; opacity: 0.85; }
+
     /* Custom Input Styling */
-    .magic-input-wrapper input[type="text"], 
+    .magic-input-wrapper input[type="text"],
     .magic-input-wrapper select,
     .music-select-container select {
         width: 100% !important;
-        background: rgba(15, 23, 42, 0.6) !important;
-        border: 1px solid rgba(255, 255, 255, 0.08) !important;
+        max-width: 100%;
+        box-sizing: border-box !important;
+        background: rgba(22, 20, 28, 0.6) !important;
+        border: 1px solid var(--panel-line) !important;
         border-radius: 0.8rem !important;
-        padding: 0.75rem 1rem 0.75rem 2.5rem !important;
-        color: #e2e8f0 !important;
+        padding: clamp(0.55rem, 1.6vh, 0.75rem) 1rem clamp(0.55rem, 1.6vh, 0.75rem) 2.5rem !important;
+        color: var(--text) !important;
         font-size: 0.8rem !important;
         font-weight: 600 !important;
         letter-spacing: 0.025em !important;
         outline: none !important;
-        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1) !important;
+        transition: border-color 0.3s ease, box-shadow 0.3s ease !important;
     }
 
     .magic-input-wrapper textarea {
         width: 100% !important;
-        background: rgba(0, 0, 0, 0.5) !important;
-        border: 1px solid rgba(255, 255, 255, 0.1) !important;
+        max-width: 100%;
+        box-sizing: border-box !important;
+        background: rgba(0, 0, 0, 0.35) !important;
+        border: 1px solid var(--panel-line) !important;
         border-radius: 0.8rem !important;
         padding: 0.75rem 1rem !important;
-        color: white !important;
+        color: var(--text) !important;
         font-size: 0.85rem !important;
-        height: 150px !important;
+        height: clamp(70px, 14vh, 150px) !important;
         resize: none !important;
         outline: none !important;
     }
 
-    /* Select Icon Fix */
+    .music-select-container { position: relative; display: flex; align-items: center; gap: 0.5rem; }
+    .music-select-container .fa-compact-disc { position: absolute; left: 0.9rem; top: 50%; transform: translateY(-50%); color: var(--text-muted); font-size: 0.75rem; pointer-events: none; }
     .music-select-container select {
         appearance: none !important;
-        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%2394a3b8' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e") !important;
+        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%23A79FB0' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e") !important;
         background-position: right 0.75rem center !important;
         background-repeat: no-repeat !important;
         background-size: 1.2em 1.2em !important;
     }
 
-    .magic-input-wrapper input:focus, .magic-input-wrapper textarea:focus {
-        border-color: rgba(236, 72, 153, 0.5) !important;
-        background: rgba(15, 23, 42, 0.8) !important;
-        box-shadow: 0 0 20px rgba(236, 72, 153, 0.1) !important;
+    .magic-input-wrapper input:focus, .magic-input-wrapper textarea:focus, .magic-input-wrapper select:focus {
+        border-color: rgba(255,107,74,0.55) !important;
+        background: rgba(22,20,28,0.85) !important;
+        box-shadow: 0 0 0 3px rgba(255,107,74,0.14) !important;
     }
 
-    .animate-spin-slow { animation: spin 4s linear infinite; }
-    @keyframes spin { from { transform: translateY(-50%) rotate(0deg); } to { transform: translateY(-50%) rotate(360deg); } }
-    
-    {% if temp == 'matrix_rain' %}
-    .magic-input-wrapper input, .magic-input-wrapper textarea, select { border-color: #16a34a !important; font-family: 'Courier New', monospace !important; color: #16a34a !important; }
-    {% endif %}
+    .cw-spin-slow { animation: cw-spin 4s linear infinite; }
+    @keyframes cw-spin { from { transform: translateY(-50%) rotate(0deg); } to { transform: translateY(-50%) rotate(360deg); } }
+
+    .cw-audio-panel { background: rgba(0,0,0,0.3); border: 1px solid var(--panel-line); border-radius: 1.2rem; padding: clamp(0.6rem, 1.8vh, 0.85rem); transition: border-color 0.3s ease; box-sizing: border-box; }
+    .cw-audio-panel:hover { border-color: rgba(245,241,234,0.15); }
+    .cw-preview-btn { flex-shrink: 0; width: 2.25rem; height: 2.25rem; border-radius: 999px; background: rgba(255,107,74,0.12); border: 1px solid rgba(255,107,74,0.28); color: var(--coral); display: flex; align-items: center; justify-content: center; transition: background 0.2s ease; }
+    .cw-preview-btn:hover { background: rgba(255,107,74,0.22); }
+    .cw-preview-btn i { font-size: 0.65rem; }
+
+    .cw-divider { display: flex; align-items: center; gap: 1rem; margin: clamp(0.5rem, 1.5vh, 0.75rem) 0; }
+    .cw-divider-line { height: 1px; flex: 1; background: linear-gradient(to right, transparent, var(--panel-line), transparent); }
+    .cw-divider-text { font-size: 0.6rem; color: var(--text-muted); font-weight: 700; text-transform: uppercase; letter-spacing: 0.16em; white-space: nowrap; }
+
+    .cw-music-icon.cw-music-gold { color: var(--gold) !important; }
+    .cw-music-icon.cw-music-blue { color: #6EA8FE !important; }
+    .cw-music-icon.cw-music-coral { color: var(--coral) !important; }
+
+    .cw-dropzone { position: relative; height: clamp(64px, 11vh, 100px); }
+    .cw-dropzone-input { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; z-index: 20; }
+    .cw-dropzone-display { height: 100%; background: rgba(0,0,0,0.3); border: 1px dashed var(--panel-line); border-radius: 1rem; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 0.6rem; transition: border-color 0.3s ease, background 0.3s ease; box-sizing: border-box; }
+    .cw-dropzone-display i { color: var(--coral); margin-bottom: 0.3rem; font-size: 1.1rem; }
+    .cw-dropzone:hover .cw-dropzone-display { border-color: rgba(255,107,74,0.5); background: rgba(255,107,74,0.05); }
+    .cw-dropzone.drag-active .cw-dropzone-display { border-color: rgba(255,107,74,0.6); background: rgba(255,107,74,0.08); }
+    .cw-dropzone-label { font-size: 0.6rem; color: var(--text-muted); font-weight: 700; text-transform: uppercase; letter-spacing: 0.12em; text-align: center; }
+    .cw-dropzone-label.has-photos { color: var(--coral); }
+
+    .cw-preview-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.4rem; margin-top: 0.4rem; }
+    @media (min-width: 480px) { .cw-preview-grid { grid-template-columns: repeat(6, 1fr); } }
+    .preview-thumb { position: relative; aspect-ratio: 1; border-radius: 0.6rem; overflow: hidden; border: 1px solid var(--panel-line); }
+    .preview-thumb img { width: 100%; height: 100%; object-fit: cover; }
+    .preview-thumb button { position: absolute; top: 2px; right: 2px; width: 18px; height: 18px; border-radius: 999px; background: rgba(0,0,0,0.75); color: white; font-size: 10px; line-height: 1; display: flex; align-items: center; justify-content: center; }
+
+    .cw-submit-wrap { padding-top: clamp(0.25rem, 1vh, 0.5rem); }
+    .cw-submit {
+        position: relative; width: 100%; overflow: hidden;
+        padding: clamp(0.7rem, 2vh, 1rem); border-radius: 1rem;
+        font-weight: 700; font-size: 0.72rem; letter-spacing: 0.16em; text-transform: uppercase;
+        color: #1A1210;
+        background: var(--coral);
+        transition: transform 0.15s ease, box-shadow 0.2s ease;
+        box-shadow: 0 14px 34px -14px rgba(255,107,74,0.55);
+        box-sizing: border-box;
+    }
+    .cw-submit:hover { box-shadow: 0 18px 40px -14px rgba(255,107,74,0.65); }
+    .cw-submit:active { transform: scale(0.98); }
+    .cw-shell-matrix .cw-submit { background: #16a34a; color: #05130A; box-shadow: none; }
+    .cw-shell-sorry .cw-submit { background: linear-gradient(to right, #3B5BDB, #364FC7); color: white; box-shadow: 0 14px 34px -14px rgba(59,91,219,0.55); }
+
+    .cw-submit-sheen { position: absolute; inset: 0; background: rgba(255,255,255,0.18); transform: translateY(100%); transition: transform 0.3s ease; }
+    .cw-submit:hover .cw-submit-sheen { transform: translateY(0); }
+    .cw-submit-content { position: relative; z-index: 1; display: flex; align-items: center; justify-content: center; gap: 0.75rem; }
+    .cw-submit-note { text-align: center; font-size: 0.6rem; color: var(--text-muted); margin-top: clamp(0.5rem, 1.5vh, 1rem); text-transform: uppercase; letter-spacing: 0.1em; opacity: 0.7; }
+
+    /* Matrix template: scoped to this form only */
+    .cw-shell-matrix .magic-input-wrapper input,
+    .cw-shell-matrix .magic-input-wrapper textarea,
+    .cw-shell-matrix .magic-input-wrapper select {
+        border-color: #16a34a !important;
+        font-family: 'Courier New', monospace !important;
+        color: #16a34a !important;
+    }
+
+    /* ---------- Compact mode for short viewports (landscape phones, small laptops) ---------- */
+    @media (max-height: 700px) {
+        .cw-shell { align-items: flex-start; }
+        .cw-eyebrow-pill { display: none; }
+        .cw-head { margin-bottom: 0.75rem; }
+    }
+    @media (max-height: 560px) {
+        .cw-title { font-size: 1.1rem; }
+        .magic-input-wrapper textarea { height: 56px !important; }
+        .cw-dropzone { height: 56px; }
+        .cw-audio-panel { padding: 0.5rem; }
+        .cw-divider { margin: 0.4rem 0; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        .cw-spin-slow { animation: none; }
+        .cw-submit, .cw-submit-sheen, .cw-dropzone-display { transition: none; }
+    }
 </style>
 
 <script>
-    // File upload visual feedback
-    function updateFileName(input) {
-        const label = document.getElementById('fileLabel');
-        const count = input.files.length;
-        const tempId = "{{ temp }}";
-        
-        if (count > 0) {
-            let message = count + " " + (count > 1 ? "Photos" : "Photo") + " Added ✓";
-            if(tempId === 'heart_shape' && count < 12) { 
-                message = "Add " + (12 - count) + " more for Heart ❤️"; 
-            }
-            label.innerText = message;
-            label.className = "text-[9px] text-pink-400 font-black uppercase tracking-widest text-center animate-pulse";
+    const tempId = "{{ temp }}";
+    const MIN_PHOTOS = tempId === 'heart_shape' ? 12 : (tempId === 'matrix_rain' ? 1 : 1);
+    const MAX_PHOTOS = tempId === 'heart_shape' ? 20 : (tempId === 'matrix_rain' ? 1 : 20);
+    const MAX_FILE_SIZE_MB = 10;
+
+    const imageInput = document.getElementById('imageInput');
+    const dropZone = document.getElementById('dropZone');
+    const fileLabel = document.getElementById('fileLabel');
+    const previewGrid = document.getElementById('previewGrid');
+    const photoError = document.getElementById('photoError');
+
+    let currentFiles = [];
+
+    function showPhotoError(msg) {
+        if (!photoError) return;
+        photoError.textContent = msg;
+        photoError.classList.remove('hidden');
+    }
+    function clearPhotoError() {
+        if (!photoError) return;
+        photoError.classList.add('hidden');
+    }
+
+    function syncInputFiles() {
+        if (!imageInput) return;
+        const dt = new DataTransfer();
+        currentFiles.forEach((f) => dt.items.add(f));
+        imageInput.files = dt.files;
+    }
+
+    function renderPreviews() {
+        if (!previewGrid) return;
+        previewGrid.innerHTML = '';
+        currentFiles.forEach((file, index) => {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const wrapper = document.createElement('div');
+                wrapper.className = 'preview-thumb';
+                wrapper.innerHTML = `<img src="${e.target.result}" alt="Photo ${index + 1}">
+                    <button type="button" aria-label="Remove photo">&times;</button>`;
+                wrapper.querySelector('button').addEventListener('click', () => {
+                    currentFiles.splice(index, 1);
+                    syncInputFiles();
+                    renderPreviews();
+                    updateLabel();
+                });
+                previewGrid.appendChild(wrapper);
+            };
+            reader.readAsDataURL(file);
+        });
+    }
+
+    function updateLabel() {
+        const count = currentFiles.length;
+        if (count === 0) {
+            fileLabel.innerText = "Tap or drag photos here";
+            fileLabel.classList.remove('has-photos');
+            clearPhotoError();
+            return;
+        }
+
+        let message = count + " " + (count > 1 ? "Photos" : "Photo") + " Added ✓";
+        if (tempId === 'heart_shape' && count < 12) {
+            message = "Add " + (12 - count) + " more for Heart ❤️";
+        }
+        fileLabel.innerText = message;
+        fileLabel.classList.add('has-photos');
+
+        if (count < MIN_PHOTOS) {
+            showPhotoError(`This template needs at least ${MIN_PHOTOS} photo${MIN_PHOTOS > 1 ? 's' : ''}.`);
+        } else if (count > MAX_PHOTOS) {
+            showPhotoError(`This template accepts up to ${MAX_PHOTOS} photos.`);
+        } else {
+            clearPhotoError();
         }
     }
 
-    // Submit animation
-    document.getElementById('wishForm').addEventListener('submit', function() {
+    function handleFiles(fileList) {
+        const incoming = Array.from(fileList).filter((f) => {
+            if (!f.type.startsWith('image/')) return false;
+            if (f.size > MAX_FILE_SIZE_MB * 1024 * 1024) {
+                showPhotoError(`"${f.name}" is over ${MAX_FILE_SIZE_MB}MB and was skipped.`);
+                return false;
+            }
+            return true;
+        });
+
+        currentFiles = tempId === 'matrix_rain' ? incoming.slice(0, 1) : [...currentFiles, ...incoming].slice(0, MAX_PHOTOS);
+        syncInputFiles();
+        renderPreviews();
+        updateLabel();
+    }
+
+    if (dropZone) {
+        ['dragenter', 'dragover'].forEach((evt) => {
+            dropZone.addEventListener(evt, (e) => {
+                e.preventDefault();
+                dropZone.classList.add('drag-active');
+            });
+        });
+        ['dragleave', 'drop'].forEach((evt) => {
+            dropZone.addEventListener(evt, (e) => {
+                e.preventDefault();
+                dropZone.classList.remove('drag-active');
+            });
+        });
+        dropZone.addEventListener('drop', (e) => {
+            if (e.dataTransfer.files.length) handleFiles(e.dataTransfer.files);
+        });
+    }
+
+    // ---------- Message character counter ----------
+    const messageField = document.getElementById('{{ form.message.id_for_label }}');
+    const msgCounter = document.getElementById('msgCounter');
+    if (messageField && msgCounter) {
+        const updateCounter = () => {
+            const len = messageField.value.length;
+            const max = messageField.maxLength && messageField.maxLength > 0 ? messageField.maxLength : null;
+            msgCounter.textContent = max ? `${len} / ${max}` : `${len} characters`;
+        };
+        messageField.addEventListener('input', updateCounter);
+        updateCounter();
+    }
+
+    // ---------- Audio preview ----------
+    const musicSelect = document.getElementById('{{ form.selected_music.id_for_label }}');
+    const previewBtn = document.getElementById('musicPreviewBtn');
+    const previewIcon = document.getElementById('musicPreviewIcon');
+    const previewPlayer = document.getElementById('musicPreviewPlayer');
+
+    if (musicSelect && previewBtn && previewPlayer) {
+        previewBtn.addEventListener('click', () => {
+            // musicSelect.value is just the MusicLibrary row's ID (a ModelChoiceField) —
+            // the actual playable URL is stamped on the option via data-audio-url
+            // (see MusicSelectWidget in forms.py).
+            const selectedOption = musicSelect.options[musicSelect.selectedIndex];
+            const src = selectedOption ? selectedOption.dataset.audioUrl : null;
+            if (!src) return;
+
+            if (previewPlayer.src !== src) {
+                previewPlayer.src = src;
+            }
+
+            if (previewPlayer.paused) {
+                previewPlayer.play().catch(() => {});
+                previewIcon.className = 'fas fa-pause';
+            } else {
+                previewPlayer.pause();
+                previewIcon.className = 'fas fa-play';
+            }
+        });
+
+        previewPlayer.addEventListener('ended', () => {
+            previewIcon.className = 'fas fa-play';
+        });
+
+        musicSelect.addEventListener('change', () => {
+            previewPlayer.pause();
+            previewPlayer.currentTime = 0;
+            previewIcon.className = 'fas fa-play';
+        });
+    }
+
+    // ---------- Submit: validate photo count, then show loading state ----------
+    document.getElementById('wishForm').addEventListener('submit', function(e) {
+        if (dropZone && (currentFiles.length < MIN_PHOTOS || currentFiles.length > MAX_PHOTOS)) {
+            e.preventDefault();
+            updateLabel();
+            dropZone.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            return;
+        }
+
         const btn = document.getElementById('submitBtn');
         btn.disabled = true;
         btn.style.opacity = "0.7";
-        document.getElementById('btnText').innerText = "WEAVING MAGIC...";
+        document.getElementById('btnText').innerText = "Weaving magic...";
         document.getElementById('btnIcon').className = "fas fa-spinner fa-spin";
     });
 </script>
