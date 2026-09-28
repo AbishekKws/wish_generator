@@ -3,309 +3,628 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    
-    <title>A Special Surprise for {{ wish.receiver_name }}! ✨</title>
+
+    <title>Comedy Pop! | {{ wish.receiver_name }}</title>
     <meta name="description" content="{{ wish.sender_name }} has sent you a magical {{ wish.wish_type }} surprise. Click to unlock the magic!">
-    
+
+    <!-- Open Graph Metadata -->
     <meta property="og:title" content="A Special Surprise for {{ wish.receiver_name }}! ✨">
     <meta property="og:description" content="Open the link to see a magical surprise from {{ wish.sender_name }}.">
     <meta property="og:url" content="{{ request.build_absolute_uri }}">
-    
+
     {% if wish.images.exists %}
     <meta property="og:image" content="{{ request.scheme }}://{{ request.get_host }}{{ wish.images.first.image.url }}">
     {% endif %}
-    
+
     <meta property="og:type" content="website">
-    <title>Comedy Pop! | {{ wish.receiver_name }}</title>
-    
+
+    <!-- Tailwind CSS & FontAwesome Icons -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Bangers&family=Permanent+Marker&display=swap" rel="stylesheet">
-    
+    <link href="https://fonts.googleapis.com/css2?family=Bangers&family=Permanent+Marker&family=Outfit:wght@400;700;900&display=swap" rel="stylesheet">
+
     <style>
         :root {
-            --bg-dark: #0f172a;
-            --neon-pink: #f43f5e;
-            --neon-blue: #0ea5e9;
-            --comic-white: #f8fafc;
+            --bg-dark: #0a0f1d;
+            --neon-pink: #ff2a85;
+            --neon-blue: #00d2ff;
+            --neon-yellow: #ffea00;
+            --neon-green: #00ff66;
+            --comic-white: #ffffff;
+            --comic-black: #000000;
         }
 
-        body, html { 
-            margin: 0; padding: 0; width: 100%; height: 100vh; 
+        * {
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body, html {
+            margin: 0; padding: 0; width: 100%; height: 100vh;
             background: var(--bg-dark); overflow: hidden;
             font-family: 'Bangers', cursive; color: white;
             user-select: none;
         }
 
-        /* Lightning & Sunburst Background */
+        /* Halftone comic texture overlay */
+        .halftone-layer {
+            position: fixed; inset: 0; z-index: 1; pointer-events: none;
+            background-image: radial-gradient(rgba(255, 255, 255, 0.18) 1.5px, transparent 1.5px);
+            background-size: 12px 12px;
+            mix-blend-mode: overlay;
+            opacity: 0.6;
+        }
+
         .lightning-flash {
             position: fixed; inset: 0; background: white;
             opacity: 0; z-index: 2000; pointer-events: none;
         }
+
         .sunburst {
             position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
-            width: 250vw; height: 250vw;
+            width: 280vw; height: 280vw;
             background: repeating-conic-gradient(from 0deg, #1e293b 0deg 15deg, #0f172a 15deg 30deg);
-            z-index: -2; animation: rotate 100s linear infinite;
+            z-index: 0; animation: rotateSunburst 80s linear infinite;
         }
-        @keyframes rotate { from { transform: translate(-50%, -50%) rotate(0deg); } to { transform: translate(-50%, -50%) rotate(360deg); } }
+        @keyframes rotateSunburst { 
+            from { transform: translate(-50%, -50%) rotate(0deg); } 
+            to { transform: translate(-50%, -50%) rotate(360deg); } 
+        }
 
-        /* Floating Emojis */
+        /* Dynamic Particle Canvas */
+        #fxCanvas {
+            position: fixed;
+            inset: 0;
+            z-index: 1000;
+            pointer-events: none;
+        }
+
+        /* Floating stickers / Emojis */
         .emoji {
-            position: fixed; pointer-events: none; z-index: 1;
-            font-size: 2rem; animation: floatUp var(--d) linear infinite;
-            opacity: 0; bottom: -50px;
+            position: fixed; pointer-events: none; z-index: 2;
+            font-size: clamp(2rem, 4vw, 3.5rem); animation: floatUp var(--d) linear infinite;
+            opacity: 0; bottom: -80px;
+            filter: drop-shadow(4px 4px 0px rgba(0,0,0,0.8));
         }
         @keyframes floatUp {
             0% { transform: translateY(0) rotate(0deg); opacity: 0; }
             10% { opacity: 1; }
-            100% { transform: translateY(-110vh) rotate(360deg); opacity: 0; }
+            90% { opacity: 1; }
+            100% { transform: translateY(-115vh) rotate(360deg); opacity: 0; }
         }
 
-        /* Layout Container - Fixed Viewport */
         #scene {
             display: none;
-            height: 100vh;
-            width: 100vw;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
-            box-sizing: border-box;
+            height: 100vh; width: 100vw;
+            flex-direction: column; justify-content: space-evenly; align-items: center;
+            padding: 16px; box-sizing: border-box; position: relative; z-index: 10;
         }
 
-        /* Laptop View: Side-by-Side */
         @media (min-width: 1024px) {
-            #scene {
-                flex-direction: row;
-                justify-content: space-evenly;
-                gap: 40px;
-                padding: 40px;
+            #scene { 
+                flex-direction: row; 
+                justify-content: center; 
+                gap: 50px; 
+                padding: 40px; 
             }
         }
 
         .message-section {
-            flex-shrink: 0;
-            text-align: center;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            z-index: 10;
-            max-width: 90%;
+            flex-shrink: 0; text-align: center;
+            display: flex; flex-direction: column; align-items: center;
+            z-index: 10; max-width: 100%;
         }
+        @media (min-width: 1024px) { .message-section { max-width: 50%; } }
 
-        @media (min-width: 1024px) {
-            .message-section { max-width: 45%; }
-        }
-
-        /* Dynamic Wish Tag */
         .wish-tag {
-            background: #fde047;
-            color: black;
-            padding: 5px 20px;
-            font-size: clamp(1rem, 2vw, 1.5rem);
-            border: 3px solid black;
-            transform: skew(-10deg) rotate(-2deg);
-            box-shadow: 5px 5px 0px var(--neon-pink);
-            margin-bottom: 10px;
+            background: var(--neon-yellow); color: black;
+            padding: 8px 24px; font-size: clamp(1.1rem, 2.2vw, 1.8rem);
+            border: 4px solid black; transform: skew(-8deg) rotate(-2deg);
+            box-shadow: 6px 6px 0px var(--neon-pink); margin-bottom: 16px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
         }
 
+        /* Enhanced Speech Bubble with Animated Tail */
         .message-bubble {
-            background: white;
-            color: black;
-            padding: 20px;
-            border: 4px solid black;
-            box-shadow: 10px 10px 0px white;
-            width: 100%;
-            overflow-y: auto; /* Scroll message if too long inside bubble */
-            max-height: 30vh;
+            background: var(--comic-white); color: black;
+            padding: 24px; border: 5px solid black;
+            box-shadow: 12px 12px 0px var(--neon-blue);
+            width: 100%; max-width: 600px;
+            overflow-y: auto; max-height: 35vh;
+            position: relative;
+            border-radius: 18px;
+            background-image: radial-gradient(rgba(0,0,0,0.06) 1.5px, transparent 1.5px);
+            background-size: 9px 9px;
+            transform: rotate(-1deg);
+            transition: transform 0.3s ease;
+        }
+        
+        .message-bubble::after {
+            content: '';
+            position: absolute;
+            bottom: -24px;
+            left: 40px;
+            border-width: 24px 24px 0 0;
+            border-style: solid;
+            border-color: var(--comic-white) transparent transparent transparent;
+            display: block;
+            width: 0;
+            z-index: 2;
+            filter: drop-shadow(4px 4px 0px black);
+        }
+        .message-bubble::before {
+            content: '';
+            position: absolute;
+            bottom: -32px;
+            left: 36px;
+            border-width: 30px 28px 0 0;
+            border-style: solid;
+            border-color: black transparent transparent transparent;
+            display: block;
+            width: 0;
+            z-index: 1;
         }
 
-        @media (min-width: 1024px) {
-            .message-bubble { max-height: 50vh; }
+        @media (min-width: 1024px) { .message-bubble { max-height: 52vh; padding: 32px; } }
+
+        #rainbow-message { 
+            font-family: 'Permanent Marker', cursive; 
+            line-height: 1.4; 
+            font-size: clamp(1.2rem, 2.5vw, 2.2rem); 
+            letter-spacing: 0.5px;
         }
 
-        #rainbow-message {
-            font-family: 'Permanent Marker', cursive;
-            line-height: 1.3;
-            font-size: clamp(1.1rem, 2.5vw, 2.2rem);
-        }
-
-        /* Photo Container - Grid/Row Control */
+        /* Dynamic Photo Grid & Tilt Cards */
         #photo-container {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 15px;
-            width: fit-content;
-            margin-top: 20px;
+            display: grid; grid-template-columns: repeat(2, 1fr);
+            gap: 16px; width: fit-content; margin-top: 15px;
+            perspective: 1000px;
         }
-
-        @media (min-width: 1024px) {
-            #photo-container { margin-top: 0; }
-        }
+        @media (min-width: 1024px) { #photo-container { margin-top: 0; gap: 24px; } }
 
         .comic-card {
-            background: var(--comic-white); border: 3px solid black;
-            padding: 5px; position: relative;
-            box-shadow: 6px 6px 0px var(--neon-blue);
-            width: clamp(110px, 15vw, 180px);
-            transition: 0.2s;
+            background: var(--comic-white); border: 4px solid black;
+            padding: 6px; position: relative;
+            box-shadow: 8px 8px 0px var(--neon-yellow);
+            width: clamp(120px, 18vw, 210px);
+            transition: transform 0.15s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.2s ease; 
+            cursor: pointer;
+            border-radius: 8px;
+            transform-style: preserve-3d;
         }
-        .comic-card:hover { transform: scale(1.1) rotate(0deg) !important; z-index: 100; box-shadow: 8px 8px 0px var(--neon-pink); }
-        .comic-card img { width: 100%; aspect-ratio: 1/1; object-fit: cover; border: 2px solid black; }
+        .comic-card:hover { 
+            box-shadow: 12px 12px 0px var(--neon-pink); 
+        }
+        .comic-card img { 
+            width: 100%; aspect-ratio: 1/1; 
+            object-fit: cover; border: 3px solid black; 
+            border-radius: 4px;
+            pointer-events: none;
+        }
 
-        .bubble {
-            position: absolute; padding: 2px 8px;
+        /* Action Badge Stickers */
+        .bubble-badge {
+            position: absolute; padding: 3px 10px;
             background: var(--neon-pink); color: white;
-            border: 2px solid black; font-size: 0.7rem;
-            top: -10px; right: -5px; transform: rotate(10deg);
-            font-family: 'Permanent Marker', cursive;
-            z-index: 10;
+            border: 3px solid black; font-size: 0.85rem;
+            top: -12px; right: -8px; transform: rotate(12deg);
+            font-family: 'Bangers', cursive; z-index: 10;
+            box-shadow: 3px 3px 0px black;
+            letter-spacing: 1px;
+            pointer-events: none;
         }
 
-        #overlay { background: #000; z-index: 3000; }
+        #overlay { background: #030611; z-index: 3000; }
+
+        /* Comic Starburst behind the BOOM button */
+        .burst-star {
+            position: absolute; inset: -80px;
+            background: var(--neon-yellow);
+            clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
+            animation: spinStar 12s linear infinite;
+            opacity: 0.95; z-index: -1;
+            filter: drop-shadow(0 0 10px var(--neon-yellow));
+        }
+        .burst-star.star-2 { 
+            inset: -110px; 
+            background: var(--neon-pink); 
+            opacity: 0.65; 
+            animation: spinStar 16s linear infinite reverse; 
+        }
+        @keyframes spinStar { to { transform: rotate(360deg); } }
+
         .btn-boom {
-            background: var(--neon-pink);
-            box-shadow: 8px 8px 0px white;
-            animation: shake 0.5s infinite;
+            position: relative;
+            background: linear-gradient(135deg, var(--neon-pink), #d90429);
+            box-shadow: 10px 10px 0px white, 10px 10px 0px 4px black;
+            animation: pulseShake 0.6s infinite ease-in-out alternate;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: transform 0.1s ease;
         }
-        @keyframes shake {
-            0%, 100% { transform: translate(0, 0); }
-            25% { transform: translate(-3px, 3px); }
-            75% { transform: translate(3px, -3px); }
+        .btn-boom:hover {
+            transform: scale(1.08) rotate(-2deg);
+        }
+        @keyframes pulseShake {
+            0% { transform: scale(1) rotate(0deg); }
+            50% { transform: scale(1.04) rotate(2deg); }
+            100% { transform: scale(0.98) rotate(-2deg); }
         }
 
-        .boom-flash { animation: flashScreen 0.3s ease-out forwards; }
+        .boom-flash { animation: flashScreen 0.35s ease-out forwards; }
         @keyframes flashScreen { 0% { opacity: 0; } 50% { opacity: 1; } 100% { opacity: 0; } }
 
-        footer { position: fixed; bottom: 10px; width: 100%; opacity: 0.5; pointer-events: none; text-align: center; }
+        @keyframes screenShake {
+            0%, 100% { transform: translate(0,0); }
+            20% { transform: translate(-10px, 8px) rotate(-1deg); }
+            40% { transform: translate(10px, -8px) rotate(1deg); }
+            60% { transform: translate(-8px, -10px); }
+            80% { transform: translate(8px, 10px); }
+        }
+        body.impact { animation: screenShake 0.45s cubic-bezier(.36,.07,.19,.97); }
+
+        footer { 
+            position: fixed; bottom: 12px; width: 100%; 
+            opacity: 0.85; text-align: center; z-index: 20; 
+        }
+
+        .music-toggle {
+            position: fixed; top: 20px; right: 20px; z-index: 60;
+            width: 50px; height: 50px; border-radius: 50%;
+            background: rgba(255, 255, 255, 0.15); backdrop-filter: blur(10px);
+            border: 3px solid black; box-shadow: 4px 4px 0px var(--neon-pink);
+            display: flex; align-items: center; justify-content: center;
+            color: #fff; font-size: 1.2rem; cursor: pointer;
+            transition: transform .2s ease;
+        }
+        .music-toggle:hover { transform: scale(1.15) rotate(10deg); }
+
+        /* Custom Scrollbar */
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: rgba(0,0,0,0.1); border-radius: 10px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: var(--neon-pink); border-radius: 10px; }
     </style>
 </head>
 <body>
 
+    <canvas id="fxCanvas"></canvas>
     <div id="flashLayer" class="lightning-flash"></div>
-    <audio id="bgMusic" src="{% if wish.custom_music %}{{ wish.custom_music.url }}{% else %}{{ wish.selected_music.audio_file.url }}{% endif %}" loop></audio>
+
+    {% if wish.custom_music or wish.selected_music %}
+        <audio id="bgMusic" src="{% if wish.custom_music %}{{ wish.custom_music.url }}{% else %}{{ wish.selected_music.audio_file.url }}{% endif %}" loop></audio>
+        <div class="music-toggle hidden" id="musicToggle" onclick="toggleMusic()">
+            <i class="fas fa-volume-high" id="musicIcon"></i>
+        </div>
+    {% endif %}
 
     <div class="sunburst"></div>
+    <div class="halftone-layer"></div>
     <div id="emoji-layer"></div>
 
-    <div id="overlay" class="fixed inset-0 flex flex-col items-center justify-center">
-        <button id="boomBtn" class="btn-boom px-12 py-6 text-white text-3xl md:text-5xl font-bold uppercase border-4 border-black">
-            HIT THE BOOM! 💥
-        </button>
-        <p class="mt-4 text-yellow-400 animate-pulse tracking-widest text-sm uppercase">STAY TUNED FOR {{ wish.wish_type }}</p>
+    <!-- Entrance Portal Overlay -->
+    <div id="overlay" class="fixed inset-0 flex flex-col items-center justify-center p-4">
+        <div class="relative flex items-center justify-center">
+            <div class="burst-star"></div>
+            <div class="burst-star star-2"></div>
+            <button id="boomBtn" class="btn-boom px-10 py-5 md:px-14 md:py-7 text-white text-3xl md:text-6xl font-black uppercase border-4 border-black tracking-wider">
+                HIT THE BOOM! 💥
+            </button>
+        </div>
+        <p class="mt-8 text-yellow-300 animate-pulse tracking-[0.25em] text-base md:text-xl uppercase drop-shadow-[2px_2px_0_#000]">
+            READY FOR {{ wish.wish_type|default:"COMEDY" }} SURPRISE?
+        </p>
     </div>
 
+    <!-- Main Comic Scene -->
     <main id="scene">
+        <!-- Message Card Box -->
         <div class="message-section">
             <div class="wish-tag">Cake is the Only Reason FOR WISHING You HAPPY {{ wish.wish_type|upper }}!</div>
-            <h1 class="text-5xl md:text-7xl mb-4 leading-none" style="filter: drop-shadow(4px 4px 0px var(--neon-pink))">
+            
+            <h1 class="text-5xl sm:text-7xl md:text-8xl mb-4 leading-none tracking-wide" style="filter: drop-shadow(5px 5px 0px var(--neon-pink))">
                 {{ wish.receiver_name|upper }}
             </h1>
-            <div class="message-bubble -rotate-1">
+
+            <div class="message-bubble custom-scrollbar">
                 <p id="rainbow-message"></p>
             </div>
         </div>
 
+        <!-- Dynamic Tilt Photo Gallery -->
         <div id="photo-container">
             {% for img_obj in wish.images.all|slice:":4" %}
-            <div class="comic-card" onclick="createBurst(event)" style="transform: rotate({% cycle '-4deg' '4deg' %});">
-                <div class="bubble">{% cycle 'POW!' 'BOOM!' 'ZAP!' 'WOW!' %}</div>
-                <img src="{{ img_obj.image.url }}" alt="memory">
-                <div class="mt-1 text-center text-black text-[10px] font-bold uppercase tracking-tighter">#SCENE_{{ forloop.counter }}</div>
+            <div class="comic-card tilt-card" onclick="triggerCardExplosion(event)" style="transform: rotate({% cycle '-4deg' '4deg' %});">
+                <div class="bubble-badge">{% cycle 'POW!' 'BOOM!' 'ZAP!' 'KABOOM!' %}</div>
+                <img src="{{ img_obj.image.url }}" alt="memory preview">
+                <div class="mt-1 text-center text-black text-[11px] font-black uppercase tracking-tighter">#SCENE_{{ forloop.counter }}</div>
             </div>
             {% endfor %}
         </div>
 
         <footer>
-            <p class="text-[9px] tracking-widest text-gray-400 uppercase">With Love From {{ wish.sender_name }}</p>
+            <p class="text-sm md:text-base tracking-widest text-yellow-300 font-bold uppercase drop-shadow-[2px_2px_0_#000]">
+                ⚡ CREATED WITH LOVE FROM {{ wish.sender_name }} ⚡
+            </p>
         </footer>
     </main>
 
     <script>
         const messageText = "{{ wish.message|escapejs }}";
-        const emojis = ['😂', '🤣', '😆', '😏', '😉', '😁', '🔥', '💥', '😎'];
+        const emojis = ['😂', '🤣', '😆', '😏', '😉', '😁', '🔥', '💥', '😎', '⚡', '🎉', '🤡'];
 
-        function triggerLightning() {
-            if (Math.random() > 0.92) {
-                const flash = document.getElementById('flashLayer');
-                flash.classList.add('boom-flash');
-                setTimeout(() => flash.classList.remove('boom-flash'), 300);
+        /* Web Audio API Sound Synthesizer */
+        let audioCtx = null;
+
+        function getAudioContext() {
+            if (!audioCtx) {
+                const AudioContext = window.AudioContext || window.webkitAudioContext;
+                if (AudioContext) audioCtx = new AudioContext();
+            }
+            if (audioCtx && audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+            return audioCtx;
+        }
+
+        // Synthesizes dynamic retro jump and comic explosion sound FX
+        function playComicSound(type = 'boom') {
+            try {
+                const ctx = getAudioContext();
+                if (!ctx) return;
+
+                if (type === 'boom') {
+                    // Deep explosion sound
+                    const osc = ctx.createOscillator();
+                    const gain = ctx.createGain();
+                    osc.type = 'sawtooth';
+                    osc.frequency.setValueAtTime(150, ctx.currentTime);
+                    osc.frequency.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.5);
+                    
+                    gain.gain.setValueAtTime(1, ctx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.5);
+
+                    osc.connect(gain);
+                    gain.connect(ctx.destination);
+                    osc.start();
+                    osc.stop(ctx.currentTime + 0.5);
+                } else {
+                    // Retro Zap Sound
+                    const osc = ctx.createOscillator();
+                    const gain = ctx.createGain();
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(800, ctx.currentTime);
+                    osc.frequency.exponentialRampToValueAtTime(150, ctx.currentTime + 0.2);
+
+                    gain.gain.setValueAtTime(0.6, ctx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.2);
+
+                    osc.connect(gain);
+                    gain.connect(ctx.destination);
+                    osc.start();
+                    osc.stop(ctx.currentTime + 0.2);
+                }
+            } catch (e) { console.log('Audio FX error:', e); }
+        }
+
+        /* Comic Particle Burst Canvas Engine */
+        const canvas = document.getElementById('fxCanvas');
+        const ctx = canvas.getContext('2d');
+        let particles = [];
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        const BURST_WORDS = ['POW!', 'BOOM!', 'ZAP!', 'KABOOM!', 'LOL!', 'HA-HA!', 'BAM!'];
+        const BURST_COLORS = ['#ff2a85', '#00d2ff', '#ffea00', '#00ff66', '#ffffff'];
+
+        class Particle {
+            constructor(x, y) {
+                this.x = x;
+                this.y = y;
+                this.isText = Math.random() < 0.25;
+                this.text = BURST_WORDS[Math.floor(Math.random() * BURST_WORDS.length)];
+                this.color = BURST_COLORS[Math.floor(Math.random() * BURST_COLORS.length)];
+                this.size = this.isText ? Math.random() * 14 + 18 : Math.random() * 8 + 6;
+                this.speedX = (Math.random() - 0.5) * 20;
+                this.speedY = (Math.random() - 0.5) * 20 - 2;
+                this.rotation = (Math.random() - 0.5) * 0.8;
+                this.angle = 0;
+                this.life = 1.0;
+                this.decay = Math.random() * 0.02 + 0.015;
+            }
+
+            update() {
+                this.x += this.speedX;
+                this.y += this.speedY;
+                this.speedY += 0.25; // gravity
+                this.angle += this.rotation;
+                this.life -= this.decay;
+            }
+
+            draw() {
+                ctx.save();
+                ctx.translate(this.x, this.y);
+                ctx.rotate(this.angle);
+                ctx.globalAlpha = Math.max(0, this.life);
+
+                if (this.isText) {
+                    ctx.font = `900 ${this.size}px 'Bangers', cursive`;
+                    ctx.fillStyle = this.color;
+                    ctx.strokeStyle = '#000000';
+                    ctx.lineWidth = 4;
+                    ctx.strokeText(this.text, 0, 0);
+                    ctx.fillText(this.text, 0, 0);
+                } else {
+                    ctx.beginPath();
+                    ctx.arc(0, 0, this.size, 0, Math.PI * 2);
+                    ctx.fillStyle = this.color;
+                    ctx.strokeStyle = '#000000';
+                    ctx.lineWidth = 2;
+                    ctx.fill();
+                    ctx.stroke();
+                }
+
+                ctx.restore();
             }
         }
-        setInterval(triggerLightning, 2500);
 
+        function createExplosion(x, y, count = 30) {
+            for (let i = 0; i < count; i++) {
+                particles.push(new Particle(x, y));
+            }
+            if (particles.length === count) {
+                requestAnimationFrame(renderParticles);
+            }
+        }
+
+        function renderParticles() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            particles.forEach((p, idx) => {
+                p.update();
+                p.draw();
+            });
+            particles = particles.filter(p => p.life > 0);
+            if (particles.length > 0) {
+                requestAnimationFrame(renderParticles);
+            }
+        }
+
+        function triggerCardExplosion(e) {
+            playComicSound('zap');
+            const rect = e.currentTarget.getBoundingClientRect();
+            const x = rect.left + rect.width / 2;
+            const y = rect.top + rect.height / 2;
+            createExplosion(x, y, 25);
+        }
+
+        /* --- Audio Music Toggle --- */
+        function toggleMusic() {
+            const music = document.getElementById('bgMusic');
+            const icon = document.getElementById('musicIcon');
+            if (!music) return;
+            if (music.paused) {
+                music.play().catch(() => {});
+                icon.className = 'fas fa-volume-high';
+            } else {
+                music.pause();
+                icon.className = 'fas fa-volume-xmark';
+            }
+        }
+
+        /* --- Lightning Flash FX --- */
+        function triggerLightning() {
+            if (Math.random() > 0.88) {
+                const flash = document.getElementById('flashLayer');
+                flash.classList.add('boom-flash');
+                setTimeout(() => flash.classList.remove('boom-flash'), 350);
+            }
+        }
+        setInterval(triggerLightning, 2800);
+
+        /* Floating background Emojis */
         function createFloatingEmojis() {
             const layer = document.getElementById('emoji-layer');
-            for(let i = 0; i < 20; i++) {
+            for (let i = 0; i < 22; i++) {
                 const span = document.createElement('span');
                 span.className = 'emoji';
                 span.innerText = emojis[Math.floor(Math.random() * emojis.length)];
-                span.style.left = Math.random() * 100 + 'vw';
+                span.style.left = Math.random() * 95 + 'vw';
                 span.style.setProperty('--d', (Math.random() * 4 + 4) + 's');
-                span.style.animationDelay = (Math.random() * 5) + 's';
+                span.style.animationDelay = (Math.random() * 6) + 's';
                 layer.appendChild(span);
             }
         }
 
-        function createBurst(e) {
-            const rect = e.currentTarget.getBoundingClientRect();
-            const centerX = rect.left + rect.width / 2;
-            const centerY = rect.top + rect.height / 2;
-            for (let i = 0; i < 6; i++) {
-                const emo = document.createElement('div');
-                emo.style.position = 'fixed';
-                emo.style.zIndex = '1000';
-                emo.style.pointerEvents = 'none';
-                emo.innerText = emojis[Math.floor(Math.random() * 5)];
-                emo.style.fontSize = '1.5rem';
-                
-                const angle = (i / 6) * Math.PI * 2;
-                const dist = 50 + Math.random() * 40;
-                const tx = Math.cos(angle) * dist;
-                const ty = Math.sin(angle) * dist;
-                
-                emo.style.left = centerX + 'px';
-                emo.style.top = centerY + 'px';
-                
-                document.body.appendChild(emo);
-                
-                emo.animate([
-                    { transform: 'translate(-50%, -50%) scale(0)', opacity: 1 },
-                    { transform: `translate(calc(-50% + ${tx}px), calc(-50% + ${ty}px)) scale(1.2)`, opacity: 0 }
-                ], { duration: 600, easing: 'ease-out', fill: 'forwards' });
-
-                setTimeout(() => emo.remove(), 600);
-            }
-        }
-
+        /* --- STREAMING_CHUNK:Typewriter Effect & Interactive Cards Setup... --- */
         function typeMessage() {
             const container = document.getElementById('rainbow-message');
             let i = 0; container.innerHTML = '';
-            function nextChar() {
-                if (i < messageText.length) {
-                    container.innerHTML += messageText.charAt(i);
-                    i++; setTimeout(nextChar, 40);
+
+            // Split into words to add highlighted styling
+            const words = messageText.split(" ");
+            let wordIdx = 0;
+
+            function nextWord() {
+                if (wordIdx < words.length) {
+                    const word = words[wordIdx];
+                    const isHighlight = wordIdx % 4 === 0; // Highlight every 4th word
+                    const colorClass = isHighlight ? 'text-pink-600 font-extrabold' : 'text-slate-900';
+                    
+                    const wordSpan = document.createElement('span');
+                    wordSpan.className = colorClass;
+                    wordSpan.textContent = word + ' ';
+                    container.appendChild(wordSpan);
+
+                    wordIdx++;
+                    setTimeout(nextWord, 70);
                 }
             }
-            nextChar();
+            nextWord();
         }
 
-        document.getElementById('boomBtn').addEventListener('click', () => {
-            const music = document.getElementById('bgMusic');
-            if(music) music.play().catch(e => {});
+        /* Springy 3D Card Tilt Effect */
+        function initTiltCards() {
+            const cards = document.querySelectorAll('.tilt-card');
+            cards.forEach(card => {
+                card.addEventListener('mousemove', (e) => {
+                    const rect = card.getBoundingClientRect();
+                    const x = e.clientX - rect.left;
+                    const y = e.clientY - rect.top;
+                    const centerX = rect.width / 2;
+                    const centerY = rect.height / 2;
+                    
+                    const rotateX = ((y - centerY) / centerY) * -16;
+                    const rotateY = ((x - centerX) / centerX) * 16;
 
+                    card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale(1.08)`;
+                });
+
+                card.addEventListener('mouseleave', () => {
+                    card.style.transform = `perspective(1000px) rotateX(0deg) rotateY(0deg) scale(1)`;
+                });
+            });
+        }
+
+        /* Launch Sequence on Boom Click */
+        document.getElementById('boomBtn').addEventListener('click', (e) => {
+            getAudioContext();
+            playComicSound('boom');
+
+            const music = document.getElementById('bgMusic');
+            const toggle = document.getElementById('musicToggle');
+            if (music) {
+                music.play().then(() => { if (toggle) toggle.classList.remove('hidden'); }).catch(e => {});
+            }
+
+            // Screen Impact Shake & Lightning
+            document.body.classList.add('impact');
+            const flash = document.getElementById('flashLayer');
+            flash.classList.add('boom-flash');
+            
+            // Trigger Particle Boom on Center
+            createExplosion(window.innerWidth / 2, window.innerHeight / 2, 60);
+
+            setTimeout(() => { 
+                flash.classList.remove('boom-flash'); 
+                document.body.classList.remove('impact'); 
+            }, 500);
+
+            // Hide Overlay and Transition to Main Scene
             document.getElementById('overlay').style.opacity = "0";
             document.getElementById('overlay').style.pointerEvents = "none";
-            
+
             setTimeout(() => {
                 document.getElementById('overlay').style.display = 'none';
                 const scene = document.getElementById('scene');
                 scene.style.display = 'flex';
                 createFloatingEmojis();
                 typeMessage();
+                initTiltCards();
             }, 400);
         });
     </script>
