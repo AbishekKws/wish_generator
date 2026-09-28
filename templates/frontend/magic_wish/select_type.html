@@ -4,27 +4,194 @@
 {% block title %}Select Wish Type | Surprise Me{% endblock %}
 
 {% block content %}
-<div class="max-w-7xl mx-auto px-6 py-10 md:py-16 overflow-hidden min-h-screen">
-    <div class="text-center mb-16 md:mb-24 header-animate">
-        <h1 class="text-5xl md:text-8xl font-black mb-6 tracking-tighter leading-none text-white">
-            Choose a <span class="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-indigo-500 to-purple-600 drop-shadow-sm">Wish</span> 
-            <span class="text-transparent bg-clip-text bg-gradient-to-r from-pink-400 to-rose-600 drop-shadow-sm">Category</span>
-        </h1>
-        <p class="text-gray-400 text-base md:text-xl max-w-2xl mx-auto leading-relaxed opacity-80">
-            What is the occasion? Pick one to start the magic and create a memory that lasts forever. ✨
-        </p>
+<style>
+    .st-page {
+        max-width: 80rem;
+        margin: 0 auto;
+        padding: 3rem 1.5rem 5rem;
+        min-height: 100vh;
+    }
+    .st-head { text-align: center; margin-bottom: 3rem; }
+    .st-eyebrow { color: var(--text-muted); font-size: 0.95rem; margin-bottom: 0.75rem; }
+    .st-title {
+        font-family: 'Fraunces', serif;
+        font-weight: 600;
+        font-size: clamp(2.25rem, 5vw, 3.75rem);
+        line-height: 1.1;
+        letter-spacing: -0.01em;
+        color: var(--text);
+        margin-bottom: 1rem;
+    }
+    .st-sub { color: var(--text-muted); font-size: 1.05rem; max-width: 34rem; margin: 0 auto; line-height: 1.6; }
+
+    .st-search-wrap { display: flex; justify-content: center; margin-bottom: 3rem; }
+    .st-search {
+        position: relative;
+        width: 100%;
+        max-width: 22rem;
+    }
+    .st-search input {
+        width: 100%;
+        background: var(--panel);
+        border: 1px solid var(--panel-line);
+        border-radius: 999px;
+        padding: 0.8rem 1.1rem 0.8rem 2.6rem;
+        font-size: 0.9rem;
+        color: var(--text);
+        transition: border-color 0.25s ease, box-shadow 0.25s ease;
+    }
+    .st-search input::placeholder { color: var(--text-muted); }
+    .st-search input:focus { outline: none; border-color: var(--coral); box-shadow: 0 0 0 3px rgba(255,107,74,0.18); }
+    .st-search i { position: absolute; left: 1rem; top: 50%; transform: translateY(-50%); color: var(--text-muted); font-size: 0.85rem; }
+
+    .st-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1.25rem;
+    }
+    @media (min-width: 768px) { .st-grid { grid-template-columns: repeat(3, 1fr); gap: 1.75rem; } }
+    @media (min-width: 1024px) { .st-grid { grid-template-columns: repeat(4, 1fr); } }
+
+    .wish-card {
+        position: relative;
+        background: var(--panel);
+        border: 1px solid var(--panel-line);
+        border-radius: 1.75rem;
+        padding: 2rem 1.5rem;
+        text-align: center;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+        transition: border-color 0.25s ease, transform 0.25s ease, box-shadow 0.25s ease, opacity 0.3s ease;
+        -webkit-tap-highlight-color: transparent;
+        touch-action: manipulation;
+
+        /* entrance animation, staggered by --i (set inline per card) */
+        opacity: 0;
+        animation: st-card-in 0.55s cubic-bezier(0.22, 1, 0.36, 1) both;
+        animation-delay: calc(var(--i, 0) * 45ms);
+    }
+    @keyframes st-card-in {
+        from { opacity: 0; transform: translateY(18px) scale(0.96); }
+        to   { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    /* cursor-following spotlight glow */
+    .wish-card::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        border-radius: inherit;
+        background: radial-gradient(220px circle at var(--mx, 50%) var(--my, 50%), rgba(255,107,74,0.16), transparent 70%);
+        opacity: 0;
+        transition: opacity 0.35s ease;
+        pointer-events: none;
+    }
+    .wish-card:hover::before { opacity: 1; }
+
+    .wish-card:hover {
+        border-color: rgba(255,107,74,0.4);
+        transform: translateY(-4px);
+        box-shadow: 0 18px 38px -18px rgba(255,107,74,0.45);
+    }
+    .wish-card:active { transform: translateY(-1px) scale(0.97); }
+    .wish-card:focus-visible { outline: 2px solid var(--gold); outline-offset: 3px; }
+
+    /* smooth leave transition before removal on filter, instead of an abrupt cut */
+    .wish-card.is-leaving {
+        opacity: 0;
+        transform: translateY(6px) scale(0.94);
+        pointer-events: none;
+    }
+    .wish-card.is-hidden { display: none; }
+
+    .continue-badge {
+        position: absolute;
+        top: 0.9rem;
+        right: 0.9rem;
+        background: var(--coral);
+        color: #1A1210;
+        font-size: 0.6rem;
+        font-weight: 700;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        padding: 0.25rem 0.6rem;
+        border-radius: 999px;
+        animation: st-badge-pulse 2.4s ease-in-out infinite;
+    }
+    @keyframes st-badge-pulse {
+        0%, 100% { box-shadow: 0 0 0 0 rgba(255,107,74,0.5); }
+        50% { box-shadow: 0 0 0 5px rgba(255,107,74,0); }
+    }
+
+    .wish-emoji {
+        font-size: 2.75rem;
+        margin-bottom: 1rem;
+        transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+    .wish-card:hover .wish-emoji { transform: scale(1.18) translateY(-3px) rotate(-4deg); }
+
+    .wish-name {
+        font-weight: 700;
+        font-size: 1.05rem;
+        color: var(--text);
+        margin-bottom: 0.35rem;
+    }
+    .wish-hint {
+        font-size: 0.68rem;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+        color: var(--text-muted);
+        font-weight: 700;
+        transition: color 0.25s ease, letter-spacing 0.25s ease;
+    }
+    .wish-card:hover .wish-hint { color: var(--coral); letter-spacing: 0.24em; }
+
+    #noResults {
+        display: none;
+        padding: 5rem 0;
+        text-align: center;
+        animation: st-rise 0.4s ease both;
+    }
+    #noResults p { color: var(--text-muted); font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; font-size: 0.85rem; }
+
+    /* Page-level entrance for header + search (one orchestrated moment, separate from card stagger) */
+    @keyframes st-rise { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+    .st-head, .st-search-wrap { animation: st-rise 0.6s ease both; }
+
+    @media (prefers-reduced-motion: reduce) {
+        .st-head, .st-search-wrap, .wish-card, #noResults { animation: none !important; opacity: 1; }
+        .wish-card, .wish-emoji, .wish-hint { transition: none; }
+        .wish-card::before { display: none; }
+    }
+</style>
+
+<div class="st-page">
+    <div class="st-head">
+        <h1 class="st-title">What's the occasion?</h1>
+        <p class="st-sub">Pick a category to start building — you can add your own photos, music, and message next.</p>
     </div>
 
-    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 md:gap-10">
-        {% for type in types %}
-        <a href="{% url 'select_template' type|lower %}" 
-           class="wish-card group relative bg-slate-900/30 border border-white/5 p-8 md:p-12 rounded-[3rem] text-center transition-all duration-700 flex flex-col items-center justify-center overflow-hidden backdrop-blur-sm">
-            
-            <div class="absolute inset-0 bg-gradient-to-br from-indigo-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-            
-            <div class="absolute -inset-[1px] bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 rounded-[3rem] opacity-0 group-hover:opacity-30 blur-sm transition-all duration-500 group-hover:blur-md"></div>
+    <div class="st-search-wrap">
+        <div class="st-search">
+            <i class="fas fa-magnifying-glass"></i>
+            <input type="text" id="categorySearch" placeholder="Search categories...">
+        </div>
+    </div>
 
-            <div class="text-5xl md:text-7xl mb-6 transform group-hover:scale-125 group-hover:-translate-y-4 transition-all duration-700 cubic-bezier(0.34, 1.56, 0.64, 1) z-10 filter drop-shadow-2xl">
+    <div id="categoryGrid" class="st-grid">
+        {% for type in types %}
+        <a href="{% url 'select_template' type|lower %}"
+           data-type="{{ type }}"
+           onclick="rememberCategory('{{ type|escapejs }}')"
+           class="wish-card"
+           style="--i:{{ forloop.counter0 }};">
+
+            <span class="continue-badge hidden">Continue</span>
+
+            <div class="wish-emoji">
                 {% if type == 'Birthday' %}🎂
                 {% elif type == 'Anniversary' %}💑
                 {% elif type == 'Love' %}💖
@@ -40,77 +207,92 @@
                 {% else %}✨{% endif %}
             </div>
 
-            <h2 class="text-xl md:text-2xl font-black mb-2 text-white/80 group-hover:text-white z-10 tracking-tight transition-colors">
-                {{ type }}
-            </h2>
-            
-            <div class="h-1 w-0 group-hover:w-16 bg-gradient-to-r from-blue-500 to-pink-500 transition-all duration-500 rounded-full mb-4 z-10"></div>
-
-            <p class="text-gray-500 text-[10px] md:text-xs uppercase tracking-[0.3em] font-black group-hover:text-pink-400 transition-colors z-10">
-                Explore
-            </p>
-
-            <div class="absolute top-0 -left-[100%] w-full h-full bg-gradient-to-r from-transparent via-white/10 to-transparent skew-x-[-25deg] group-hover:left-[100%] transition-all duration-1000 ease-in-out"></div>
+            <h2 class="wish-name">{{ type }}</h2>
+            <p class="wish-hint">Explore</p>
         </a>
         {% endfor %}
     </div>
+
+    <div id="noResults">
+        <p>No categories match your search.</p>
+    </div>
 </div>
 
-<style>
-    .wish-card {
-        box-shadow: 0 20px 40px -20px rgba(0,0,0,0.7);
-        transform-style: preserve-3d;
-        will-change: transform, opacity;
-        -webkit-tap-highlight-color: transparent; 
-        touch-action: manipulation;
-    }
-
-    .wish-card:hover {
-        box-shadow: 0 30px 60px -15px rgba(0,0,0,0.8);
-        border-color: rgba(255,255,255,0.1);
-    }
-
-    .wish-card:active {
-        transform: scale(0.92) translateY(5px) !important;
-    }
-
-    /* Spotlights in Background */
-    body::before {
-        content: "";
-        position: fixed;
-        top: 20%; left: 10%;
-        width: 400px; height: 400px;
-        background: radial-gradient(circle, rgba(59,130,246,0.1) 0%, transparent 70%);
-        z-index: -1;
-    }
-</style>
-
-<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
 <script>
-    document.addEventListener('DOMContentLoaded', () => {
-        const tl = gsap.timeline({ defaults: { ease: "power4.out" } });
+document.addEventListener('DOMContentLoaded', () => {
+    const cards = Array.from(document.querySelectorAll('.wish-card'));
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-        // Header animation
-        tl.from(".header-animate", {
-            y: -100,
-            opacity: 0,
-            duration: 1.2,
-            filter: "blur(15px)"
+    // ---------- Cursor-following spotlight ----------
+    if (!reduceMotion) {
+        cards.forEach((card) => {
+            card.addEventListener('mousemove', (e) => {
+                const rect = card.getBoundingClientRect();
+                card.style.setProperty('--mx', `${e.clientX - rect.left}px`);
+                card.style.setProperty('--my', `${e.clientY - rect.top}px`);
+            });
         });
+    }
 
-        // Staggered cards entry
-        tl.from(".wish-card", {
-            scale: 0.7,
-            opacity: 0,
-            y: 80,
-            duration: 1,
-            stagger: {
-                amount: 0.6,
-                grid: "auto",
-                from: "start"
-            },
-            ease: "elastic.out(1, 0.8)"
-        },
+    // ---------- Remember + highlight last-chosen category ----------
+    const lastType = localStorage.getItem('surprise_last_category');
+    if (lastType) {
+        const card = document.querySelector(`.wish-card[data-type="${CSS.escape(lastType)}"]`);
+        if (card) card.querySelector('.continue-badge').classList.remove('hidden');
+    }
+
+    // ---------- Search filter, with a smooth leave transition ----------
+    const searchInput = document.getElementById('categorySearch');
+    const noResults = document.getElementById('noResults');
+    const LEAVE_MS = 220;
+
+    if (searchInput) {
+        searchInput.addEventListener('input', () => {
+            const q = searchInput.value.trim().toLowerCase();
+            let visible = 0;
+
+            cards.forEach((card) => {
+                const match = card.dataset.type.toLowerCase().includes(q);
+
+                if (match) {
+                    card.classList.remove('is-leaving', 'is-hidden');
+                    visible++;
+                } else if (!card.classList.contains('is-hidden')) {
+                    card.classList.add('is-leaving');
+                    setTimeout(() => {
+                        if (card.classList.contains('is-leaving')) card.classList.add('is-hidden');
+                    }, LEAVE_MS);
+                }
+            });
+
+            noResults.style.display = visible === 0 ? 'block' : 'none';
+        });
+    }
+
+    // ---------- Keyboard grid navigation (arrow keys) ----------
+    const grid = document.getElementById('categoryGrid');
+    grid.addEventListener('keydown', (e) => {
+        if (!['ArrowRight', 'ArrowLeft', 'ArrowDown', 'ArrowUp'].includes(e.key)) return;
+        const visibleCards = cards.filter((c) => !c.classList.contains('is-hidden') && !c.classList.contains('is-leaving'));
+        const currentIndex = visibleCards.indexOf(document.activeElement);
+        if (currentIndex === -1) return;
+
+        const columns = window.innerWidth >= 1024 ? 4 : window.innerWidth >= 768 ? 3 : 2;
+        let nextIndex = currentIndex;
+        if (e.key === 'ArrowRight') nextIndex++;
+        if (e.key === 'ArrowLeft') nextIndex--;
+        if (e.key === 'ArrowDown') nextIndex += columns;
+        if (e.key === 'ArrowUp') nextIndex -= columns;
+
+        if (nextIndex >= 0 && nextIndex < visibleCards.length) {
+            e.preventDefault();
+            visibleCards[nextIndex].focus();
+        }
     });
+});
+
+function rememberCategory(type) {
+    localStorage.setItem('surprise_last_category', type);
+}
 </script>
 {% endblock %}
