@@ -1,9 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    
+
     <title>{% block title %}Surprise Me | Create Magical Digital Wishes & Surprises{% endblock %}</title>
     <meta name="description" content="{% block meta_description %}Create and send magical, interactive digital surprises for birthdays, anniversaries, and special moments. The most unique way to wish your loved ones.{% endblock %}">
     <meta name="keywords" content="digital surprise, birthday wish, interactive cards, magical wishes, surprise me, online gift, personalized greetings">
@@ -24,52 +25,245 @@
 
     <link rel="canonical" href="{{ request.build_absolute_uri }}">
 
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 
     <script type="application/ld+json">
     {
-      "@context": "https://schema.org",
-      "@type": "WebApplication",
-      "name": "Surprise Me",
-      "url": "https://{{ request.get_host }}",
-      "description": "A platform to create and send interactive digital surprises.",
-      "applicationCategory": "EntertainmentApplication",
-      "operatingSystem": "All",
-      "author": {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "Surprise Me",
+    "url": "https://{{ request.get_host }}",
+    "description": "A platform to create and send interactive digital surprises.",
+    "applicationCategory": "EntertainmentApplication",
+    "operatingSystem": "All",
+    "author": {
         "@type": "Person",
         "name": "Abishek Khawas"
-      }
+    }
     }
     </script>
 
+    <style>
+        :root {
+            --ink: #16141C;
+            --panel: #1F1B28;
+            --panel-line: rgba(245, 241, 234, 0.08);
+            --text: #F5F1EA;
+            --text-muted: #A79FB0;
+            --coral: #FF6B4A;
+            --coral-dim: #E05A3C;
+            --gold: #FFC857;
+        }
+        body {
+            background: var(--ink);
+            color: var(--text);
+            font-family: 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif;
+        }
+        .sm-serif { font-family: 'Fraunces', ui-serif, Georgia, serif; }
+
+        .sm-nav {
+            background: rgba(31, 27, 40, 0.75);
+            backdrop-filter: blur(14px);
+            border-bottom: 1px solid var(--panel-line);
+        }
+        .sm-brand {
+            font-family: 'Fraunces', serif;
+            font-weight: 700;
+            font-size: 1.15rem;
+            color: var(--text);
+        }
+        .sm-brand span { color: var(--coral); }
+
+        .sm-nav-link {
+            position: relative;
+            color: var(--text-muted);
+            transition: color 0.2s ease;
+        }
+        .sm-nav-link::after {
+            content: '';
+            position: absolute;
+            left: 0.75rem; right: 0.75rem; bottom: 0.15rem;
+            height: 2px;
+            background: var(--coral);
+            border-radius: 999px;
+            transform: scaleX(0);
+            transform-origin: left;
+            transition: transform 0.25s ease;
+        }
+        .sm-nav-link:hover { color: var(--text); }
+        .sm-nav-link:hover::after { transform: scaleX(1); }
+        .sm-nav-link.is-active { color: var(--coral); font-weight: 600; }
+        .sm-nav-link.is-active::after { transform: scaleX(1); }
+
+        .sm-nav-cta {
+            background: var(--coral);
+            color: #1A1210;
+            font-weight: 700;
+            transition: background 0.2s ease, transform 0.2s ease;
+        }
+        .sm-nav-cta:hover { background: #FF7E5F; transform: translateY(-1px); }
+
+        .sm-panel {
+            background: var(--panel);
+            border: 1px solid var(--panel-line);
+        }
+        .sm-panel-item:hover { background: rgba(255, 107, 74, 0.12); color: var(--coral); }
+        .sm-panel-eyebrow {
+            font-size: 0.6rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.14em;
+            color: var(--text-muted); padding: 0.35rem 0.5rem 0.6rem;
+        }
+        .sm-count-badge {
+            display: inline-flex; align-items: center; justify-content: center;
+            min-width: 1.1rem; height: 1.1rem; padding: 0 0.3rem;
+            border-radius: 999px; background: rgba(255,107,74,0.16); color: var(--coral);
+            font-size: 0.62rem; font-weight: 700;
+        }
+        .sm-view-all {
+            display: flex; align-items: center; justify-content: space-between;
+            margin-top: 0.5rem; padding-top: 0.6rem;
+            border-top: 1px solid var(--panel-line);
+            padding-left: 0.5rem; padding-right: 0.5rem;
+        }
+        .sm-view-all span {
+            font-size: 0.72rem; font-weight: 700; color: var(--coral);
+        }
+        .sm-view-all i { color: var(--coral); font-size: 0.7rem; transition: transform 0.2s ease; }
+        .sm-view-all:hover i { transform: translateX(3px); }
+
+        /* Dropdown panels: animated open/close instead of hard show/hide */
+        [data-dropdown-panel] {
+            opacity: 0;
+            pointer-events: none;
+            transform: translateY(-6px) scale(0.98);
+            transition: opacity 0.16s ease, transform 0.16s ease;
+        }
+        [data-dropdown-panel].is-open {
+            opacity: 1;
+            pointer-events: auto;
+            transform: translateY(0) scale(1);
+        }
+        .dropdown-btn[aria-expanded="true"] i.fa-chevron-down { transform: rotate(180deg); }
+
+        .sm-footer {
+            background: #100E15;
+            border-top: 1px solid var(--panel-line);
+        }
+        .sm-footer-glow {
+            position: absolute; top: -6rem; left: 50%; transform: translateX(-50%);
+            width: 22rem; height: 12rem; border-radius: 999px;
+            background: radial-gradient(circle, rgba(255,107,74,0.08) 0%, transparent 70%);
+            pointer-events: none;
+        }
+        .sm-footer-brand { font-family: 'Fraunces', serif; font-weight: 700; color: var(--text); }
+        .sm-footer-brand span { color: var(--coral); }
+        .sm-footer-link { color: var(--text-muted); font-size: 0.82rem; transition: color 0.2s ease; }
+        .sm-footer-link:hover { color: var(--coral); }
+        .sm-footer a.sm-credit:hover { color: var(--coral); }
+        .sm-back-top {
+            display: inline-flex; align-items: center; gap: 0.4rem;
+            color: var(--text-muted); font-size: 0.72rem; font-weight: 700;
+            text-transform: uppercase; letter-spacing: 0.1em;
+            transition: color 0.2s ease, transform 0.2s ease;
+        }
+        .sm-back-top:hover { color: var(--coral); transform: translateY(-2px); }
+
+        /* Floating back-to-top: fixed to the viewport, not the footer */
+        #backToTop {
+            position: fixed !important;
+            right: 1.1rem !important;
+            bottom: 1.1rem !important;
+            left: auto !important;
+            top: auto !important;
+            z-index: 999 !important;
+            width: 2.75rem; height: 2.75rem;
+            border-radius: 999px;
+            background: var(--panel);
+            border: 1px solid var(--panel-line);
+            color: var(--coral);
+            display: flex; align-items: center; justify-content: center;
+            box-shadow: 0 10px 26px -8px rgba(0,0,0,0.5);
+            opacity: 0;
+            transform: translateY(0.6rem);
+            pointer-events: none;
+            transition: opacity 0.25s ease, transform 0.25s ease, border-color 0.2s ease;
+        }
+        #backToTop.is-visible { opacity: 1; transform: translateY(0); pointer-events: auto; }
+        #backToTop:hover { border-color: rgba(255,107,74,0.4); }
+        @media (min-width: 768px) { #backToTop { right: 1.75rem !important; bottom: 1.75rem !important; } }
+
+        /* Mobile menu slide */
+        #mobile-menu {
+            max-height: 0;
+            overflow: hidden;
+            opacity: 0;
+            transition: max-height 0.3s ease, opacity 0.25s ease;
+            padding-top: 0; padding-bottom: 0;
+        }
+        #mobile-menu.is-open {
+            max-height: 40rem;
+            opacity: 1;
+            padding-top: 0.5rem; padding-bottom: 1.5rem;
+        }
+
+        a:focus-visible, button:focus-visible {
+            outline: 2px solid var(--gold);
+            outline-offset: 2px;
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            [data-dropdown-panel], #mobile-menu, .sm-nav-link::after, .dropdown-btn i, #backToTop { transition: none; }
+        }
+    </style>
+
     {% block extra_head %}{% endblock %}
 </head>
-<body class="bg-slate-900 text-white min-h-screen flex flex-col">
 
-    <nav class="bg-slate-800/50 backdrop-blur-md border-b border-white/10 sticky top-0 z-[100]">
+<body class="min-h-screen flex flex-col">
+
+    <a href="#main-content" class="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-[200] px-4 py-2 rounded-lg" style="background: var(--coral); color: #1A1210;">
+        Skip to content
+    </a>
+
+    <nav class="sm-nav sticky top-0 z-[100]">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex items-center justify-between h-16">
                 <div class="flex-shrink-0 flex items-center gap-2">
-                    <span class="text-2xl">✨</span>
-                    <a href="/" class="text-xl font-black bg-clip-text text-transparent bg-gradient-to-r from-pink-500 to-yellow-500">
-                        SURPRISE ME
+                    <span class="text-xl">✨</span>
+                    <a href="{% url 'home' %}" class="sm-brand">
+                        Surprise<span>Me</span>
                     </a>
                 </div>
 
-                <div class="hidden md:flex space-x-8 items-center">
-                    <a href="{% url 'home' %}" class="hover:text-pink-500 transition">Home</a>
-                    
-                    <div class="relative group">
-                        <button class="flex items-center gap-1 hover:text-pink-500 py-4 transition-colors">
-                            🎁 Quick Wish <i class="fas fa-chevron-down text-[10px] ml-1"></i>
+                {% url 'select_type' as select_type_url %}
+                {% url 'create_wish' as create_wish_url %}
+                {% url 'birthday:create_wish' as birthday_wish_url %}
+
+                <div class="hidden md:flex space-x-1 items-center" id="desktop-nav"> <a href="{% url 'home' %}" class="sm-nav-link px-3 py-2 rounded-lg text-sm {% if request.path == '/' %}is-active{% endif %}">Home
+                </a>
+
+                    <!-- Occasions dropdown -->
+                    <div class="relative" data-dropdown>
+                        <button type="button" data-dropdown-toggle
+                            class="dropdown-btn sm-nav-link flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm transition-colors {% if request.resolver_match.url_name == 'select_template' or request.path == select_type_url %}is-active{% endif %}"
+                            aria-haspopup="true" aria-expanded="false" aria-controls="occasions-menu">
+                            Occasions
+                            <span class="sm-count-badge">{{ types|length }}</span>
+                            <i class="fas fa-chevron-down text-[10px] ml-1 transition-transform"></i>
                         </button>
-                        
-                        <div class="absolute hidden group-hover:block w-64 bg-slate-900 border border-white/10 rounded-2xl shadow-2xl p-2 top-full z-50">
+
+                        <div id="occasions-menu" data-dropdown-panel
+                            class="sm-panel absolute w-64 rounded-2xl shadow-2xl p-3 top-full mt-2 z-50">
+                            <p class="sm-panel-eyebrow">Popular occasions</p>
                             <div class="grid grid-cols-1 gap-1">
-                                {% for type in types|slice:":8" %}
-                                <a href="{% url 'select_template' type|lower %}" class="flex items-center gap-3 p-3 hover:bg-pink-600/20 hover:text-pink-400 rounded-xl transition-all group/item">
-                                    <span class="text-xl group-hover/item:scale-110 transition-transform">
+                                {% for type in types|slice:":3" %}
+                                {% url 'select_template' type|lower as type_url %}
+                                <a href="{{ type_url }}" class="sm-panel-item flex items-center gap-2 p-2.5 rounded-xl transition-all group/item {% if request.path == type_url %}is-active{% endif %}">
+                                    <span class="text-lg group-hover/item:scale-110 transition-transform">
                                         {% if type == 'Birthday' %}🎂
                                         {% elif type == 'Anniversary' %}💑
                                         {% elif type == 'Love' %}💖
@@ -84,138 +278,250 @@
                                 </a>
                                 {% endfor %}
                             </div>
-                            <div class="mt-2 pt-2 border-t border-white/5">
-                                <a href="{% url 'select_type' %}" class="flex items-center justify-between px-4 py-3 bg-white/5 hover:bg-white/10 rounded-xl transition-all group/all">
-                                    <span class="text-[11px] font-bold uppercase tracking-widest text-gray-400 group-hover/all:text-white">View All Categories</span>
-                                    <i class="fas fa-arrow-right text-[10px] text-pink-500 group-hover/all:translate-x-1 transition-transform"></i>
-                                </a>
-                            </div>
+                            <a href="{{ select_type_url }}" class="sm-view-all {% if request.path == select_type_url %}is-active{% endif %}">
+                                <span>View all {{ types|length }} categories</span>
+                                <i class="fas fa-arrow-right"></i>
+                            </a>
                         </div>
                     </div>
 
-                    <div class="relative group">
-                        <button class="relative flex items-center gap-2 py-4 hover:text-pink-400 transition-colors">
-                            <span class="flex h-2 w-2">
-                                <span class="animate-ping absolute inline-flex h-2 w-2 rounded-full bg-pink-400 opacity-75"></span>
-                                <span class="relative inline-flex rounded-full h-2 w-2 bg-pink-500"></span>
-                            </span>
-                            <span class="font-semibold text-sm">Magic Wish ✨</span>
-                            <i class="fas fa-chevron-down text-[10px] ml-1 group-hover:rotate-180 transition-transform"></i>
+                    <!-- Quick-start dropdown -->
+                    <div class="relative" data-dropdown>
+                        <button type="button" data-dropdown-toggle
+                            class="dropdown-btn sm-nav-link relative flex items-center gap-2 px-3 py-2 rounded-lg transition-colors {% if request.path == create_wish_url or request.path == birthday_wish_url %}is-active{% endif %}"
+                            aria-haspopup="true" aria-expanded="false" aria-controls="quickstart-menu">
+                            <span class="font-semibold text-sm">Quick Start ✨</span>
+                            <i class="fas fa-chevron-down text-[10px] ml-1 transition-transform"></i>
                         </button>
 
-                        <div class="absolute hidden group-hover:block w-56 bg-slate-900 border border-white/10 rounded-2xl shadow-2xl p-2 top-full right-0 z-50">
+                        <div id="quickstart-menu" data-dropdown-panel
+                            class="sm-panel absolute w-64 rounded-2xl shadow-2xl p-2 top-full right-0 mt-2 z-50">
                             <div class="grid grid-cols-1 gap-1">
-                                <a href="{% url 'create_wish' %}" class="flex items-center gap-3 p-3 hover:bg-pink-600/20 hover:text-pink-400 rounded-xl transition-all group/sub">
-                                    <div class="w-8 h-8 rounded-lg bg-pink-500/10 flex items-center justify-center group-hover/sub:bg-pink-500/20">
+                                <a href="{{ create_wish_url }}" class="sm-panel-item flex items-center gap-3 p-3 rounded-xl transition-all group/sub {% if request.path == create_wish_url %}is-active{% endif %}">
+                                    <div class="w-8 h-8 rounded-lg flex items-center justify-center" style="background: rgba(255,107,74,0.12);">
                                         <i class="fas fa-plus text-sm"></i>
                                     </div>
                                     <div>
-                                        <p class="text-sm font-bold">Master Magic Wish</p>
-                                        <p class="text-[10px] text-gray-500 leading-none">For Everyone!</p>
+                                        <p class="text-sm font-bold">Any Occasion Wish</p>
+                                        <p class="text-[10px] leading-none" style="color: var(--text-muted);">Build a wish for anyone</p>
                                     </div>
                                 </a>
-                                <a href="{% url 'birthday:create_wish' %}" class="flex items-center gap-3 p-3 hover:bg-purple-600/20 hover:text-purple-400 rounded-xl transition-all group/sub">
-                                    <div class="w-8 h-8 rounded-lg bg-purple-500/10 flex items-center justify-center group-hover/sub:bg-purple-500/20">
+                                <a href="{{ birthday_wish_url }}" class="sm-panel-item flex items-center gap-3 p-3 rounded-xl transition-all group/sub {% if request.path == birthday_wish_url %}is-active{% endif %}">
+                                    <div class="w-8 h-8 rounded-lg flex items-center justify-center" style="background: rgba(255,200,87,0.14);">
                                         <i class="fas fa-bolt text-sm"></i>
                                     </div>
                                     <div>
-                                        <p class="text-sm font-bold">Lover's Special Birthday Wish</p>
-                                        <p class="text-[10px] text-gray-500 leading-none"> for Your Loved One ❤️</p>
+                                        <p class="text-sm font-bold">Birthday Wish for a Loved One</p>
+                                        <p class="text-[10px] leading-none" style="color: var(--text-muted);">Romantic birthday template ❤️</p>
                                     </div>
                                 </a>
                             </div>
                         </div>
                     </div>
+
+                    <a href="{{ select_type_url }}"
+                    class="sm-nav-cta ml-2 px-5 py-2 rounded-full text-sm transition-all transform hover:scale-105">
+                        Create Now
+                    </a>
                 </div>
 
                 <div class="md:hidden">
-                    <button id="mobile-menu-button" class="text-gray-300 hover:text-white focus:outline-none p-2" aria-label="Toggle menu">
-                        <i class="fa-solid fa-bars text-2xl"></i>
+                    <button id="mobile-menu-button" class="p-2" style="color: var(--text-muted);" aria-label="Toggle menu" aria-expanded="false" aria-controls="mobile-menu">
+                        <i class="fa-solid fa-bars text-2xl" id="mobile-menu-icon"></i>
                     </button>
                 </div>
             </div>
         </div>
 
-        <div id="mobile-menu" class="hidden md:hidden bg-slate-900 border-b border-white/10 px-4 pt-2 pb-6 space-y-4">
-            <a href="{% url 'home' %}" class="block py-3 px-4 hover:bg-white/5 rounded-lg transition">Home</a>
-            
-            <div class="py-2 px-4 text-gray-400 font-bold text-xs uppercase tracking-widest border-t border-white/5 mt-2">🎁 Quick Wish</div>
-            <div class="grid grid-cols-2 gap-2">
-                {% if types %}
-                    {% for type in types|slice:":8" %}
-                    <a href="{% url 'select_template' type|lower %}" class="flex items-center gap-2 p-3 bg-white/5 rounded-xl text-sm">
-                        <span>{% if type == 'Birthday' %}🎂{% elif type == 'Love' %}💖{% else %}✨{% endif %}</span>
-                        {{ type }}
-                    </a>
-                    {% endfor %}
-                {% endif %}
+        <div id="mobile-menu" class="md:hidden px-4 space-y-4" style="background: var(--panel); border-top: 1px solid var(--panel-line);">
+            <a href="{% url 'home' %}" class="sm-nav-link block py-3 px-4 rounded-lg transition {% if request.path == '/' %}is-active{% endif %}">Home</a>
+
+            <div class="py-2 px-4 font-bold text-xs uppercase tracking-widest mt-2" style="color: var(--text-muted); border-top: 1px solid var(--panel-line);">Occasions</div>
+            <div class="grid grid-cols-1 gap-2">
+                {% for type in types|slice:":3" %}
+                {% url 'select_template' type|lower as type_url_m %}
+                <a href="{{ type_url_m }}" class="sm-nav-link flex items-center gap-2 p-3 rounded-xl text-sm {% if request.path == type_url_m %}is-active{% endif %}" style="background: rgba(245,241,234,0.04);">
+                    <span>
+                        {% if type == 'Birthday' %}🎂
+                        {% elif type == 'Anniversary' %}💑
+                        {% elif type == 'Love' %}💖
+                        {% elif type == 'Sorry' %}🙏
+                        {% elif type == 'Friendship' %}🤝
+                        {% elif type == 'Good Luck' %}🍀
+                        {% elif type == 'Graduation' %}🎓
+                        {% elif type == 'Thank You' %}💐
+                        {% else %}✨{% endif %}
+                    </span>
+                    {{ type }}
+                </a>
+                {% endfor %}
             </div>
 
-            <div class="space-y-2 pt-4 border-t border-white/5">
-                <a href="{% url 'select_type' %}" class="block py-3 px-4 text-pink-500 font-bold text-center border border-pink-500/30 rounded-xl hover:bg-pink-500/10 transition text-sm">
-                    View All Categories
+            <div class="space-y-2 pt-4" style="border-top: 1px solid var(--panel-line);">
+                <a href="{{ select_type_url }}" class="sm-nav-link flex items-center justify-center gap-2 py-3 px-4 font-bold text-center rounded-xl {% if request.path == select_type_url %}is-active{% endif %}" style="color: var(--coral); border: 1px solid rgba(255,107,74,0.35);">
+                    <i class="fas fa-magnifying-glass text-[11px]"></i> View All {{ types|length }} Categories
                 </a>
 
-                <a href="{% url 'create_wish' %}" class="flex items-center justify-between py-3 px-4 bg-slate-800/50 border border-white/10 rounded-xl text-white">
+                <a href="{{ create_wish_url }}" class="sm-nav-link flex items-center justify-between py-3 px-4 rounded-xl {% if request.path == create_wish_url %}is-active{% endif %}" style="background: rgba(245,241,234,0.04); border: 1px solid var(--panel-line);">
                     <div class="flex items-center gap-3">
-                        <i class="fas fa-wand-magic-sparkles text-pink-400"></i>
-                        <span class="font-bold text-sm">Master Magic Wish</span>
+                        <i class="fas fa-wand-magic-sparkles" style="color: var(--coral);"></i>
+                        <span class="font-bold text-sm">Any Occasion Wish</span>
                     </div>
-                    <span class="text-[9px] bg-pink-500/20 text-pink-400 px-2 py-0.5 rounded-full">Everyone</span>
+                    <span class="text-[9px] px-2 py-0.5 rounded-full" style="background: rgba(255,107,74,0.16); color: var(--coral);">Everyone</span>
                 </a>
 
-                <a href="{% url 'birthday:create_wish' %}" class="flex items-center justify-between py-3 px-4 bg-slate-800/50 border border-white/10 rounded-xl text-white">
+                <a href="{{ birthday_wish_url }}" class="sm-nav-link flex items-center justify-between py-3 px-4 rounded-xl {% if request.path == birthday_wish_url %}is-active{% endif %}" style="background: rgba(245,241,234,0.04); border: 1px solid var(--panel-line);">
                     <div class="flex items-center gap-3">
                         <span class="relative flex h-2 w-2">
-                            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
-                            <span class="relative inline-flex rounded-full h-2 w-2 bg-red-500"></span>
+                            <span class="animate-ping absolute inline-flex h-full w-full rounded-full opacity-75" style="background: var(--gold);"></span>
+                            <span class="relative inline-flex rounded-full h-2 w-2" style="background: var(--gold);"></span>
                         </span>
-                        <span class="font-bold text-sm text-red-400">Lover's Special Birthday Wish</span>
+                        <span class="font-bold text-sm" style="color: var(--gold);">Birthday Wish for a Loved One</span>
                     </div>
-                    <i class="fas fa-heart text-red-500 text-xs"></i>
+                    <i class="fas fa-heart text-xs" style="color: var(--gold);"></i>
                 </a>
             </div>
         </div>
     </nav>
 
-    <main class="flex-grow">
+    <main id="main-content" class="flex-grow">
         {% block content %}{% endblock %}
     </main>
 
-    <footer class="relative bg-slate-950 border-t border-white/5 pt-16 pb-10 overflow-hidden">
+    <footer class="sm-footer relative pt-16 pb-10 overflow-hidden">
+        <div class="sm-footer-glow" aria-hidden="true"></div>
         <div class="max-w-7xl mx-auto px-4 relative z-10 text-center md:text-left">
-             <div class="flex flex-col items-center mb-8">
-                <div class="flex items-center gap-2 mb-4 group cursor-default">
-                    <i class="fas fa-wand-magic-sparkles text-2xl text-pink-500"></i>
-                    <span class="text-xl font-black text-white">SURPRISE<span class="text-pink-500">ME</span></span>
+            <div class="flex flex-col items-center mb-8">
+                <div class="flex items-center gap-2 mb-4">
+                    <i class="fas fa-wand-magic-sparkles text-xl" style="color: var(--coral);"></i>
+                    <span class="sm-footer-brand text-lg">Surprise<span>Me</span></span>
                 </div>
-                <p class="text-gray-500 text-xs md:text-sm max-w-sm text-center">Making the world a bit more magical, one surprise at a time. ✨</p>
+                <p class="text-xs md:text-sm max-w-sm text-center mb-6" style="color: var(--text-muted);">Making the world a bit more magical, one surprise at a time. ✨</p>
+
+                <div class="flex items-center gap-6 flex-wrap justify-center">
+                    <a href="{% url 'home' %}" class="sm-footer-link">Home</a>
+                    <a href="{% url 'select_type' %}" class="sm-footer-link">Browse Categories</a>
+                    <a href="{% url 'create_wish' %}" class="sm-footer-link">Start Creating</a>
+                </div>
             </div>
-            <div class="pt-8 border-t border-white/5 flex flex-col md:flex-row items-center justify-between gap-4">
-                <p class="text-[10px] md:text-xs text-gray-500 uppercase tracking-widest font-medium">
-                 Copyright &copy; <span id="current-year"></span> <span class="text-white">Surprise Me</span>. All Rights Reserved.
+            <div class="pt-8 flex flex-col md:flex-row items-center justify-between gap-4" style="border-top: 1px solid var(--panel-line);">
+                <p class="text-[10px] md:text-xs uppercase tracking-widest font-medium" style="color: var(--text-muted);">
+                Copyright &copy; {% now "Y" %} <span style="color: var(--text);">Surprise Me</span>. All Rights Reserved.
                 </p>
-                <p class="text-[10px] md:text-xs text-gray-500 flex items-center gap-1.5">
+                <p class="text-[10px] md:text-xs flex items-center gap-1.5" style="color: var(--text-muted);">
                     <span>Designed & Developed by</span>
-                    <a href="https://www.abishekkhawas.com.np" target="_blank" class="text-gray-300 hover:text-white font-black">Abishek Khawas</a>
+                    <a href="https://www.abishekkhawas.com.np" target="_blank" rel="noopener noreferrer" class="sm-credit font-bold transition-colors" style="color: var(--text);">Abishek Khawas</a>
                 </p>
             </div>
         </div>
     </footer>
 
+    <button type="button" id="backToTop" aria-label="Back to top">
+        <i class="fas fa-arrow-up"></i>
+    </button>
+
     <script>
-        const btn = document.getElementById('mobile-menu-button');
-        const menu = document.getElementById('mobile-menu');
-        btn.addEventListener('click', (e) => { 
+        // ---------- Mobile menu ----------
+        const mobileBtn = document.getElementById('mobile-menu-button');
+        const mobileMenu = document.getElementById('mobile-menu');
+        const mobileIcon = document.getElementById('mobile-menu-icon');
+
+        function setMobileMenu(open) {
+            mobileMenu.classList.toggle('is-open', open);
+            mobileBtn.setAttribute('aria-expanded', open ? 'true' : 'false');
+            mobileIcon.classList.toggle('fa-bars', !open);
+            mobileIcon.classList.toggle('fa-xmark', open);
+        }
+
+        mobileBtn.addEventListener('click', (e) => {
             e.stopPropagation();
-            menu.classList.toggle('hidden'); 
+            setMobileMenu(!mobileMenu.classList.contains('is-open'));
         });
+
+        // Close mobile menu after a link inside it is tapped
+        mobileMenu.addEventListener('click', (e) => {
+            if (e.target.closest('a')) setMobileMenu(false);
+        });
+
         window.addEventListener('click', (e) => {
-            if (!menu.contains(e.target) && !btn.contains(e.target)) {
-                menu.classList.add('hidden');
+            if (!mobileMenu.contains(e.target) && !mobileBtn.contains(e.target)) {
+                setMobileMenu(false);
             }
         });
-        document.getElementById('current-year').textContent = new Date().getFullYear();
+
+        // ---------- Desktop dropdowns ----------
+        // Opens on: hover (desktop pointer only), click (touch/mouse), and keyboard focus.
+        // Closes on: mouse leaving (with a short delay so moving toward the panel doesn't
+        // trip it), click elsewhere, Escape, or focus leaving the dropdown entirely.
+        const dropdowns = document.querySelectorAll('[data-dropdown]');
+        const canHover = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+        let closeTimer = null;
+
+        function openDropdown(dropdown) {
+            clearTimeout(closeTimer);
+            closeAllDropdowns(dropdown);
+            const panel = dropdown.querySelector('[data-dropdown-panel]');
+            const toggle = dropdown.querySelector('[data-dropdown-toggle]');
+            panel.classList.add('is-open');
+            toggle.setAttribute('aria-expanded', 'true');
+        }
+
+        function closeDropdown(dropdown) {
+            const panel = dropdown.querySelector('[data-dropdown-panel]');
+            const toggle = dropdown.querySelector('[data-dropdown-toggle]');
+            panel.classList.remove('is-open');
+            toggle.setAttribute('aria-expanded', 'false');
+        }
+
+        function closeAllDropdowns(except) {
+            dropdowns.forEach((d) => { if (d !== except) closeDropdown(d); });
+        }
+
+        dropdowns.forEach((dropdown) => {
+            const toggle = dropdown.querySelector('[data-dropdown-toggle]');
+            const panel = dropdown.querySelector('[data-dropdown-panel]');
+
+            toggle.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const isOpen = panel.classList.contains('is-open');
+                if (isOpen) { closeDropdown(dropdown); } else { openDropdown(dropdown); }
+            });
+
+            if (canHover) {
+                dropdown.addEventListener('mouseenter', () => openDropdown(dropdown));
+                dropdown.addEventListener('mouseleave', () => {
+                    closeTimer = setTimeout(() => closeDropdown(dropdown), 180);
+                });
+            }
+
+            // Keyboard: opening on focus-in, closing when focus fully leaves the dropdown
+            dropdown.addEventListener('focusin', () => openDropdown(dropdown));
+            dropdown.addEventListener('focusout', (e) => {
+                if (!dropdown.contains(e.relatedTarget)) closeDropdown(dropdown);
+            });
+        });
+
+        // ---------- Back to top ----------
+        // ---------- Back to top: fixed floating button, shows after scrolling down ----------
+        const backToTop = document.getElementById('backToTop');
+        if (backToTop) {
+            const toggleVisibility = () => {
+                backToTop.classList.toggle('is-visible', window.scrollY > 300);
+            };
+            toggleVisibility();
+            window.addEventListener('scroll', toggleVisibility, { passive: true });
+            backToTop.addEventListener('click', () => {
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            });
+        }
+
+        document.addEventListener('click', () => closeAllDropdowns());
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                closeAllDropdowns();
+                setMobileMenu(false);
+            }
+        });
     </script>
 
     {% block scripts %}{% endblock %}
