@@ -1,200 +1,522 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ne">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    
-    <title>A Special Surprise for {{ wish.receiver_name }}! ✨</title>
-    <meta name="description" content="{{ wish.sender_name }} has sent you a magical {{ wish.wish_type }} surprise. Click to unlock the magic!">
-    
-    <meta property="og:title" content="A Special Surprise for {{ wish.receiver_name }}! ✨">
-    <meta property="og:description" content="Open the link to see a magical surprise from {{ wish.sender_name }}.">
-    <meta property="og:url" content="{{ request.build_absolute_uri }}">
-    
-    {% if wish.images.exists %}
-    <meta property="og:image" content="{{ request.scheme }}://{{ request.get_host }}{{ wish.images.first.image.url }}">
-    {% endif %}
-    
-    <meta property="og:type" content="website">
-    <title>{{ wish.receiver_name }} | Royal {{ wish.wish_type|title }}</title>
-    
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700;900&family=Great+Vibes&family=Montserrat:wght@100;300;600&display=swap" rel="stylesheet">
-    
-    <style>
-        :root {
-            {% if wish.wish_type|lower == 'love' or wish.wish_type|lower == 'proposal' or wish.wish_type|lower == 'anniversary' %}
-                --primary: #ff3366; --primary-light: #ff80ab;
-            {% elif wish.wish_type|lower == 'graduation' %}
-                --primary: #00c8ff; --primary-light: #80e5ff;
-            {% else %}
-                --primary: #d4af37; --primary-light: #f9e29c;
-            {% endif %}
-            --glass: rgba(255, 255, 255, 0.03);
-        }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>A Royal Celebration For You</title>
 
-        body, html { 
-            margin: 0; padding: 0; width: 100%; height: 100dvh; 
-            background: #000; color: var(--primary);
-            font-family: 'Montserrat', sans-serif;
-            overflow: hidden; position: fixed;
-        }
+<!-- Fonts -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700;900&family=Great+Vibes&family=Montserrat:wght@300;400;600&display=swap" rel="stylesheet">
 
-        .royal-bg {
-            position: fixed; inset: 0;
-            background: radial-gradient(circle at 50% 50%, rgba(212, 175, 55, 0.05) 0%, transparent 70%), #050505;
-            z-index: -1;
-        }
+<!-- Tailwind CSS CDN -->
+<script src="https://cdn.tailwindcss.com"></script>
 
-        #particles-js { position: fixed; inset: 0; z-index: 1; pointer-events: none; }
+<!-- Font Awesome Icons -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
-        .premium-title {
-            font-family: 'Cinzel Decorative', cursive;
-            background: linear-gradient(75deg, #8a6d3b 0%, var(--primary-light) 50%, #8a6d3b 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-size: 200% auto;
-            animation: shine 5s infinite linear;
+<script>
+    tailwind.config = {
+    theme: {
+        extend: {
+        colors: {
+            gold: {
+            300: '#fde047',
+            400: '#facc15',
+            500: '#eab308',
+            600: '#ca8a04',
+            glow: '#ffe57f'
+            }
+        },
+        fontFamily: {
+            royal: ['"Cinzel Decorative"', 'serif'],
+            script: ['"Great Vibes"', 'cursive'],
+            body: ['"Montserrat"', 'sans-serif']
         }
-        @keyframes shine { to { background-position: 200% center; } }
+        }
+    }
+    }
+</script>
 
-        .luxury-card {
-            background: var(--glass);
-            border: 1px solid rgba(212, 175, 55, 0.1);
-            padding: 5px; border-radius: 10px;
-            width: 80px; height: 80px; opacity: 0;
-        }
-        @media (min-width: 768px) { .luxury-card { width: 140px; height: 140px; } }
+<style>
+    body {
+    background-color: #05020a;
+    color: #f3f4f6;
+    overflow-x: hidden;
+    font-family: 'Montserrat', sans-serif;
+    }
 
-        .luxury-card img {
-            width: 100%; height: 100%; object-fit: cover; border-radius: 8px;
-        }
+    /* Luxury Gold Gradient Text */
+    .gold-gradient-text {
+    background: linear-gradient(135deg, #bf953f 0%, #fcf6ba 25%, #b38728 50%, #fbf5b7 75%, #aa771c 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    }
 
-        .btn-unlock {
-            padding: 15px 35px; font-family: 'Cinzel Decorative', cursive;
-            border: 1px solid var(--primary); color: var(--primary);
-            background: transparent; letter-spacing: 3px; font-size: 0.8rem;
-        }
+    .gold-border {
+    border: 1px solid rgba(212, 175, 55, 0.4);
+    box-shadow: 0 0 15px rgba(212, 175, 55, 0.15), inset 0 0 15px rgba(212, 175, 55, 0.1);
+    }
 
-        #scene {
-            height: 100dvh; display: flex; flex-direction: column;
-            justify-content: space-around; align-items: center;
-            padding: 1rem 0; z-index: 10; position: relative;
-        }
-    </style>
+    /* Glassmorphism Box with Gold Glow */
+    .glass-box {
+    background: rgba(18, 10, 28, 0.88);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(212, 175, 55, 0.4);
+    box-shadow: 0 25px 50px rgba(0, 0, 0, 0.9), 0 0 30px rgba(212, 175, 55, 0.2);
+    }
+
+    /* Scrollbar Styling */
+    .gold-scrollbar::-webkit-scrollbar {
+    width: 6px;
+    }
+    .gold-scrollbar::-webkit-scrollbar-track {
+    background: rgba(15, 7, 25, 0.6);
+    border-radius: 10px;
+    }
+    .gold-scrollbar::-webkit-scrollbar-thumb {
+    background: linear-gradient(to bottom, #bf953f, #aa771c);
+    border-radius: 10px;
+    box-shadow: 0 0 5px rgba(255, 215, 0, 0.5);
+    }
+
+    /* Realistic Candle Flame Animation */
+    .flame {
+    width: 18px;
+    height: 28px;
+    background: radial-gradient(ellipse at bottom, #ffffff 0%, #ffde59 30%, #ff914d 60%, transparent 90%);
+    border-radius: 50% 50% 35% 35%;
+    position: absolute;
+    top: -26px;
+    left: 50%;
+    transform: translateX(-50%);
+    filter: drop-shadow(0 0 10px #ff914d) drop-shadow(0 0 20px #ffde59);
+    opacity: 0;
+    transition: opacity 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .flame.lit {
+    opacity: 1;
+    animation: flicker 0.12s infinite alternate ease-in-out;
+    }
+
+    @keyframes flicker {
+    0% { transform: translateX(-50%) scale(1) rotate(-1.5deg); }
+    100% { transform: translateX(-50%) scale(1.1) rotate(1.5deg); }
+    }
+
+    /* Canvas Background */
+    #particle-canvas {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 0;
+    pointer-events: none;
+    }
+
+    /* Step Transitions */
+    .step-card {
+    transition: opacity 0.5s ease, transform 0.5s ease;
+    will-change: opacity, transform;
+    }
+
+    .step-card.active {
+    animation: fadeInUp 0.7s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+
+    @keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px) scale(0.97);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+    }
+</style>
 </head>
-<body>
+<body class="min-h-screen flex flex-col justify-between relative selection:bg-yellow-500/30 selection:text-yellow-200">
 
-    <div class="royal-bg"></div>
-    <div id="particles-js"></div>
+<!-- Canvas Background -->
+<canvas id="particle-canvas"></canvas>
 
-    {% if wish.custom_music or wish.selected_music %}
-        <audio id="bgMusic" src="{% if wish.custom_music %}{{ wish.custom_music.url }}{% else %}{{ wish.selected_music.audio_file.url }}{% endif %}" loop preload="auto"></audio>
-    {% endif %}
+<!-- Background Music Audio -->
+<audio id="bg-audio" loop src="https://assets.mixkit.co/music/preview/mixkit-romantic-wedding-488.mp3"></audio>
 
-    <div id="overlay" class="fixed inset-0 z-[1000] flex items-center justify-center bg-[#000]">
-        <div class="text-center px-6">
-            <div class="mb-6 text-5xl text-white/20">
-                <i class="fa-solid fa-crown animate-pulse"></i>
-            </div>
-            <button id="startBtn" class="btn-unlock uppercase font-bold hover:bg-white/5 transition-all">
-                Reveal Surprise
-            </button>
-            <p class="mt-6 text-[8px] tracking-[0.6em] text-white/30 uppercase">Especially for You</p>
+<!-- Header Navigation -->
+<header class="relative z-10 pt-6 text-center">
+    <div class="inline-flex items-center gap-2 px-5 py-2 rounded-full glass-box text-xs uppercase tracking-widest text-yellow-300 mb-2 border border-yellow-500/40 shadow-lg shadow-yellow-500/10">
+    <i class="fa-solid fa-crown text-yellow-400"></i> Royal Celebration Series
+    </div>
+</header>
+
+<!-- Main Display Area -->
+<main class="relative z-10 container mx-auto px-4 py-6 max-w-4xl flex-grow flex items-center justify-center">
+
+    <!-- STEP 1: Royal Invitation / Opening Envelope -->
+    <section id="step-1" class="step-card active w-full glass-box rounded-3xl p-8 md:p-12 text-center relative overflow-hidden">
+    <div class="absolute -top-24 -left-24 w-56 h-56 bg-yellow-500/10 rounded-full blur-3xl"></div>
+    <div class="absolute -bottom-24 -right-24 w-56 h-56 bg-amber-500/10 rounded-full blur-3xl"></div>
+
+    <div class="mb-6 inline-block relative">
+        <div class="w-24 h-24 rounded-full bg-gradient-to-tr from-yellow-600 via-amber-400 to-yellow-200 flex items-center justify-center mx-auto shadow-2xl shadow-yellow-500/40 animate-pulse">
+        <i class="fa-solid fa-envelope-open-text text-4xl text-slate-950"></i>
         </div>
     </div>
 
-    <main id="scene" class="hidden opacity-0 w-full">
-        <header class="text-center px-6">
-            <div class="uppercase tracking-[0.6em] text-[9px] mb-4 opacity-60">
-                {% with w_type=wish.wish_type|lower %}
-                    {% if w_type == 'anniversary' %} A Beautiful Milestone
-                    {% elif w_type == 'graduation' %} A Remarkable Success
-                    {% elif w_type == 'proposal' %} A Promise of Forever
-                    {% else %} A Royal Celebration {% endif %}
-                {% endwith %}
-            </div>
+    <h2 class="text-xs md:text-sm font-semibold tracking-widest uppercase text-yellow-400 mb-2">Exclusive Invitation</h2>
+    <h1 class="font-royal text-3xl md:text-5xl gold-gradient-text font-bold mb-4 leading-tight">
+        A Special Surprise Awaits
+    </h1>
 
-            <h1 class="premium-title text-3xl md:text-6xl font-black uppercase mb-4">
-                {% with w_type=wish.wish_type|lower %}
-                    {% if w_type == 'anniversary' %} Happy Anniversary
-                    {% elif w_type == 'graduation' %} Congratulations
-                    {% elif w_type == 'proposal' %} Marry Me?
-                    {% else %} Happy Birthday {% endif %}
-                {% endwith %}
-                <br>
-                <span class="text-white drop-shadow-lg">{{ wish.receiver_name }}</span>
-            </h1>
+    <p class="text-gray-300 text-sm md:text-base max-w-lg mx-auto mb-8 leading-relaxed">
+        Tap the royal seal below to unbox the celebration prepared exclusively for this special occasion.
+    </p>
 
-            <div class="h-[1px] w-24 bg-gradient-to-r from-transparent via-primary to-transparent mx-auto mb-6"></div>
+    <div class="pt-2">
+        <button onclick="goToStep(2)" class="px-9 py-4 rounded-full bg-gradient-to-r from-yellow-600 via-amber-500 to-yellow-600 text-black font-bold tracking-wider hover:scale-105 hover:brightness-110 transition duration-300 shadow-xl shadow-yellow-500/25 active:scale-95 flex items-center gap-3 mx-auto text-sm md:text-base">
+        <i class="fa-solid fa-key text-slate-950"></i>
+        <span>Open Celebration Scroll</span>
+        </button>
+    </div>
+    </section>
 
-            <p class="font-['Great_Vibes'] text-3xl md:text-5xl text-white/95 italic px-4 leading-snug">
-                "{{ wish.message }}"
-            </p>
-        </header>
+    <!-- STEP 2: Main Grand Anniversary Banner -->
+    <section id="step-2" class="step-card hidden w-full glass-box rounded-3xl p-8 md:p-12 text-center relative overflow-hidden">
+    <div class="mb-6 inline-block">
+        <i class="fa-solid fa-heart text-6xl text-yellow-500 drop-shadow-[0_0_15px_rgba(234,179,8,0.6)] animate-pulse"></i>
+    </div>
 
+    <h2 class="text-sm md:text-base font-semibold tracking-widest uppercase text-yellow-400 mb-2">Happy Anniversary</h2>
+    <h1 class="font-royal text-3xl md:text-5xl lg:text-6xl gold-gradient-text font-bold mb-6 leading-tight">
+        A Celebration of Pure Love & Grace
+    </h1>
+
+    <p class="font-script text-2xl md:text-4xl text-amber-200 mb-8 max-w-2xl mx-auto leading-relaxed">
+        "Every love story is beautiful, but ours is my absolute favorite."
+    </p>
+
+    <div class="pt-2">
+        <button onclick="goToStep(3)" class="px-9 py-4 rounded-full bg-gradient-to-r from-yellow-600 via-amber-500 to-yellow-600 text-black font-bold tracking-wider hover:scale-105 hover:brightness-110 transition duration-300 shadow-xl shadow-yellow-500/25 active:scale-95 flex items-center gap-3 mx-auto text-sm md:text-base">
+        <span>Proceed To Candle Ceremony</span>
+        <i class="fa-solid fa-arrow-right text-sm"></i>
+        </button>
+    </div>
+    </section>
+
+    <!-- STEP 3: Interactive Candle Ceremony -->
+    <section id="step-3" class="step-card hidden w-full glass-box rounded-3xl p-8 md:p-12 text-center relative">
+    <h2 class="text-xs md:text-sm font-semibold tracking-widest uppercase text-yellow-400/80 mb-2">Step 3 of 5</h2>
+    <h3 class="font-royal text-2xl md:text-4xl gold-gradient-text font-bold mb-4">Light The Royal Candle</h3>
+    <p class="text-gray-300 text-sm md:text-base mb-10 max-w-md mx-auto">
+        Tap the ignition button below to light the eternal candle and unveil your personal royal scroll.
+    </p>
+
+    <!-- Cake & Candle -->
+    <div class="relative w-48 h-48 mx-auto mb-10 flex flex-col items-center justify-end">
+        <div class="relative w-6 h-20 bg-gradient-to-t from-yellow-100 to-amber-200 rounded-t-sm shadow-md flex justify-center">
+        <div class="w-1 h-3 bg-gray-800 -top-3 absolute"></div>
+        <div id="candle-flame" class="flame"></div>
+        </div>
+        <div class="w-40 h-16 bg-gradient-to-r from-amber-900 via-yellow-900 to-amber-950 rounded-t-xl border-t-2 border-yellow-500/50 relative overflow-hidden flex items-center justify-center">
+        <div class="absolute inset-x-0 top-0 h-4 bg-yellow-600/30 rounded-b-full"></div>
+        <i class="fa-solid fa-crown text-yellow-500/40 text-3xl"></i>
+        </div>
+        <div class="w-52 h-8 bg-amber-950 rounded-b-lg border-t border-yellow-600/40 shadow-2xl"></div>
+    </div>
+
+    <div class="flex flex-col sm:flex-row gap-4 justify-center items-center">
+        <button id="light-btn" onclick="lightCandle()" class="px-8 py-3.5 rounded-full bg-gradient-to-r from-amber-500 to-yellow-500 text-slate-950 font-bold hover:scale-105 transition shadow-lg shadow-amber-500/20 active:scale-95 flex items-center gap-2">
+        <i class="fa-solid fa-fire text-amber-950"></i>
+        <span>Light Candle</span>
+        </button>
+
+        <button id="step3-next" onclick="goToStep(4)" class="px-8 py-3.5 rounded-full bg-gray-800 text-gray-400 border border-gray-700 font-semibold cursor-not-allowed transition flex items-center gap-2" disabled>
+        <span>Reveal Secret Letter</span>
+        <i class="fa-solid fa-lock text-xs"></i>
+        </button>
+    </div>
+    </section>
+
+    <!-- STEP 4: Secret Royal Message Container -->
+    <section id="step-4" class="step-card hidden w-full glass-box rounded-3xl p-6 md:p-10 relative">
+    <div class="text-center mb-6">
+        <span class="text-xs font-semibold tracking-widest uppercase text-yellow-400/80">Step 4 of 5</span>
+        <h3 class="font-royal text-2xl md:text-3xl gold-gradient-text font-bold">A Heartfelt Royal Message</h3>
+    </div>
+
+    <div class="relative bg-black/50 border border-yellow-500/30 rounded-2xl p-6 md:p-8 max-h-[360px] overflow-y-auto gold-scrollbar shadow-inner mb-8">
+        <div class="font-script text-2xl md:text-3xl text-amber-200/95 leading-relaxed space-y-4">
+        <p>My Dearest Love,</p>
+        <p>
+            From the very first moment our paths crossed, my world transformed into something infinitely more beautiful. Every shared smile, every quiet moment, and every adventure with you has become a treasured milestone in my life.
+        </p>
+        <p>
+            Today, as we celebrate this special day, I want to remind you how deeply loved, valued, and cherished you are. You bring warmth to my coldest days and light up every horizon.
+        </p>
+        <p>
+            Thank you for being my anchor, my joy, and my favorite partner in this journey. May our bond grow stronger and sweeter with each passing day.
+        </p>
+        <p class="text-right pt-4 text-yellow-400 font-royal text-lg">
+            Forever & Always Yours ❤️
+        </p>
+        </div>
+    </div>
+
+    <div class="text-center">
+        <button onclick="goToStep(5)" class="px-8 py-3.5 rounded-full bg-gradient-to-r from-yellow-600 to-amber-500 text-black font-semibold hover:scale-105 transition shadow-lg shadow-yellow-500/20 active:scale-95 inline-flex items-center gap-2">
+        <span>View Precious Memories</span>
+        <i class="fa-solid fa-images text-sm"></i>
+        </button>
+    </div>
+    </section>
+
+    <!-- STEP 5: Dynamic Django Photo Vault Gallery -->
+    <section id="step-5" class="step-card hidden w-full glass-box rounded-3xl p-6 md:p-10 relative">
+    <div class="text-center mb-6">
+        <span class="text-xs font-semibold tracking-widest uppercase text-yellow-400/80">Step 5 of 5</span>
+        <h3 class="font-royal text-2xl md:text-4xl gold-gradient-text font-bold">Our Memory Vault</h3>
+        <p class="text-gray-300 text-xs md:text-sm mt-1">Special moments captured in time ❤️</p>
+    </div>
+
+    <!-- Grid for Images -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-5 mb-8">
+        
         {% if wish.images.exists %}
-        <div class="flex justify-center gap-3 md:gap-6">
-            {% for img_obj in wish.images.all|slice:":3" %}
-            <div class="luxury-card shadow-2xl">
-                <img src="{{ img_obj.image.url }}" alt="Memory">
+        {% for img in wish.images.all %}
+            <div class="rounded-2xl border border-yellow-500/40 bg-slate-900/90 h-60 relative overflow-hidden group shadow-xl transition-all duration-500 hover:scale-105 hover:border-yellow-400 cursor-pointer"
+                onclick="openLightbox('{% if img.image %}{{ img.image.url }}{% else %}{{ img.url }}{% endif %}')">
+            
+            <img src="{% if img.image %}{{ img.image.url }}{% else %}{{ img.url }}{% endif %}" 
+                alt="Memory #{{ forloop.counter }}" 
+                class="w-full h-full object-cover rounded-2xl group-hover:scale-110 transition duration-700"
+                onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1518199266791-5375a83190b7?q=80&w=600';">
+            
+            <div class="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent opacity-80 group-hover:opacity-100 transition duration-300 flex flex-col justify-end p-4 text-left">
+                <span class="text-xs font-bold text-yellow-400 uppercase tracking-widest">Memory #{{ forloop.counter }}</span>
+                <p class="text-xs text-gray-200 mt-1 font-medium">Click to view full size ✨</p>
             </div>
-            {% endfor %}
+            </div>
+        {% endfor %}
+        {% else %}
+        <!-- Static Fallback Images if no dynamic images exist in Database -->
+        <div class="rounded-2xl border border-yellow-500/40 bg-slate-900/90 h-60 relative overflow-hidden group shadow-xl hover:scale-105 cursor-pointer" onclick="openLightbox('https://images.unsplash.com/photo-1518199266791-5375a83190b7?auto=format&fit=crop&w=800&q=80')">
+            <img src="https://images.unsplash.com/photo-1518199266791-5375a83190b7?auto=format&fit=crop&w=600&q=80" alt="Memory 1" class="w-full h-full object-cover rounded-2xl group-hover:scale-110 transition duration-700">
+            <div class="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent p-4 flex flex-col justify-end">
+            <span class="text-xs font-bold text-yellow-400 uppercase">Our Beginning</span>
+            <p class="text-xs text-gray-200 mt-1">Where our journey started ❤️</p>
+            </div>
+        </div>
+
+        <div class="rounded-2xl border border-yellow-500/40 bg-slate-900/90 h-60 relative overflow-hidden group shadow-xl hover:scale-105 cursor-pointer" onclick="openLightbox('https://images.unsplash.com/photo-1516589178581-6cd7833ae3b2?auto=format&fit=crop&w=800&q=80')">
+            <img src="https://images.unsplash.com/photo-1516589178581-6cd7833ae3b2?auto=format&fit=crop&w=600&q=80" alt="Memory 2" class="w-full h-full object-cover rounded-2xl group-hover:scale-110 transition duration-700">
+            <div class="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent p-4 flex flex-col justify-end">
+            <span class="text-xs font-bold text-yellow-400 uppercase">Unforgettable</span>
+            <p class="text-xs text-gray-200 mt-1">Laughter, joy and happiness ✨</p>
+            </div>
+        </div>
+
+        <div class="rounded-2xl border border-yellow-500/40 bg-slate-900/90 h-60 relative overflow-hidden group shadow-xl hover:scale-105 cursor-pointer" onclick="openLightbox('https://images.unsplash.com/photo-1522673607200-164d1b6ce486?auto=format&fit=crop&w=800&q=80')">
+            <img src="https://images.unsplash.com/photo-1522673607200-164d1b6ce486?auto=format&fit=crop&w=600&q=80" alt="Memory 3" class="w-full h-full object-cover rounded-2xl group-hover:scale-110 transition duration-700">
+            <div class="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent p-4 flex flex-col justify-end">
+            <span class="text-xs font-bold text-yellow-400 uppercase">Forever Yours</span>
+            <p class="text-xs text-gray-200 mt-1">To many more memories together 🥂</p>
+            </div>
         </div>
         {% endif %}
 
-        <footer class="flex flex-col items-center gap-4">
-            <p class="text-[10px] tracking-[0.8em] opacity-50 uppercase text-white">From {{ wish.sender_name }}</p>
-            <a href="{% url 'home' %}" class="text-[9px] text-primary/80 hover:text-primary transition-all tracking-widest border-b border-primary/20 pb-1">
-                CREATE YOUR OWN SURPRISE
-            </a>
-        </footer>
-    </main>
+    </div>
 
-    <script>
-        function initExperience() {
-            const music = document.getElementById('bgMusic');
-            if(music) music.play().catch(e => console.log("Audio play blocked"));
+    <!-- Lightbox Modal -->
+    <div id="lightbox" class="fixed inset-0 bg-black/90 z-50 hidden flex items-center justify-center p-4" onclick="closeLightbox()">
+        <div class="relative max-w-4xl w-full flex items-center justify-center" onclick="event.stopPropagation()">
+        <button onclick="closeLightbox()" class="absolute -top-10 right-0 text-yellow-400 text-3xl font-bold hover:text-white">&times;</button>
+        <img id="lightbox-img" src="" alt="Full Memory View" class="max-h-[85vh] w-auto rounded-2xl border-2 border-yellow-500/50 shadow-2xl">
+        </div>
+    </div>
 
-            const tl = gsap.timeline();
+    <!-- Toast Conclusion -->
+    <div class="text-center pt-2">
+        <p class="font-script text-3xl md:text-4xl gold-gradient-text mb-6">
+        Cheers to Many More Golden Years Together!
+        </p>
+        <button onclick="goToStep(1)" class="px-6 py-2.5 rounded-full border border-yellow-500/40 text-yellow-300 text-xs tracking-widest uppercase hover:bg-yellow-500/10 transition">
+        <i class="fa-solid fa-rotate-left mr-2"></i> Replay From Step 1
+        </button>
+    </div>
+    </section>
 
-            tl.to("#overlay", { 
-                opacity: 0, scale: 1.5, filter: "blur(20px)", duration: 1, 
-                onComplete: () => {
-                    document.getElementById('overlay').style.display = 'none';
-                    document.getElementById('scene').classList.remove('hidden');
-                }
-            })
-            .to("#scene", { opacity: 1, duration: 0.5 })
-            .from(".premium-title", { scale: 0.9, opacity: 0, duration: 1.2, ease: "expo.out" })
-            .from("p.italic", { y: 20, opacity: 0, duration: 1 }, "-=0.5")
-            .to(".luxury-card", {
-                opacity: 1, scale: 1, y: 0, stagger: 0.2, duration: 1,
-                ease: "power2.out"
-            }, "-=0.8");
+</main>
+
+<!-- Footer -->
+<footer class="relative z-10 py-4 text-center text-xs text-gray-500 border-t border-yellow-500/10">
+    Crafted with Grandeur • Royal Celebration Series
+</footer>
+
+<!-- Scripts -->
+<script>
+    let audioStarted = false;
+    const audio = document.getElementById('bg-audio');
+
+    function initAudio() {
+    if (audioStarted) return;
+    audioStarted = true;
+    audio.volume = 0.5;
+    audio.play().catch(() => console.log("Audio policy bypass active"));
+    }
+
+    document.addEventListener('click', initAudio, { once: true });
+
+    // Step Navigation Controller
+    function goToStep(stepNum) {
+    initAudio();
+    triggerSparkleBurst();
+
+    for (let i = 1; i <= 5; i++) {
+        const el = document.getElementById(`step-${i}`);
+        if (el) {
+        el.classList.add('hidden');
+        el.classList.remove('active');
         }
+    }
 
-        document.getElementById('startBtn').addEventListener('click', initExperience);
+    const currentStep = document.getElementById(`step-${stepNum}`);
+    if (currentStep) {
+        currentStep.classList.remove('hidden');
+        setTimeout(() => {
+        currentStep.classList.add('active');
+        }, 10);
+    }
+    }
 
-        // Particle System
-        let pColor = "#d4af37";
-        {% if wish.wish_type|lower == 'love' or wish.wish_type|lower == 'anniversary' %} pColor = "#ff3366";
-        {% elif wish.wish_type|lower == 'graduation' %} pColor = "#00c8ff"; {% endif %}
+    // Candle Ignition
+    function lightCandle() {
+    initAudio();
+    const flame = document.getElementById('candle-flame');
+    const lightBtn = document.getElementById('light-btn');
+    const nextBtn = document.getElementById('step3-next');
 
-        particlesJS("particles-js", {
-            "particles": {
-                "number": { "value": 40, "density": { "enable": true, "value_area": 800 } },
-                "color": { "value": pColor },
-                "opacity": { "value": 0.3 },
-                "size": { "value": 2 },
-                "move": { "enable": true, "speed": 1, "direction": "top", "random": true }
-            }
+    flame.classList.add('lit');
+    triggerSparkleBurst();
+
+    lightBtn.innerHTML = `<i class="fa-solid fa-check text-green-950"></i> <span>Candle Lit!</span>`;
+    lightBtn.classList.remove('from-amber-500', 'to-yellow-500');
+    lightBtn.classList.add('bg-green-500', 'text-slate-950', 'cursor-default');
+    lightBtn.onclick = null;
+
+    nextBtn.disabled = false;
+    nextBtn.classList.remove('bg-gray-800', 'text-gray-400', 'border-gray-700', 'cursor-not-allowed');
+    nextBtn.classList.add('bg-gradient-to-r', 'from-yellow-600', 'to-amber-500', 'text-black', 'hover:scale-105', 'shadow-lg', 'shadow-yellow-500/20');
+    nextBtn.querySelector('i').className = 'fa-solid fa-arrow-right text-xs';
+    }
+
+    // Lightbox Controls
+    function openLightbox(src) {
+    const lightbox = document.getElementById('lightbox');
+    const lightboxImg = document.getElementById('lightbox-img');
+    lightboxImg.src = src;
+    lightbox.classList.remove('hidden');
+    }
+
+    function closeLightbox() {
+    const lightbox = document.getElementById('lightbox');
+    lightbox.classList.add('hidden');
+    }
+
+    /* Gold Particle Canvas Engine */
+    const canvas = document.getElementById('particle-canvas');
+    const ctx = canvas.getContext('2d');
+
+    function resizeCanvas() {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    }
+    window.addEventListener('resize', resizeCanvas);
+    resizeCanvas();
+
+    const particles = [];
+    const particleCount = 65;
+
+    class GoldParticle {
+    constructor() {
+        this.reset();
+    }
+    reset() {
+        this.x = Math.random() * canvas.width;
+        this.y = Math.random() * canvas.height + canvas.height;
+        this.size = Math.random() * 2.5 + 0.8;
+        this.speedY = Math.random() * 0.7 + 0.3;
+        this.speedX = (Math.random() - 0.5) * 0.5;
+        this.opacity = Math.random() * 0.7 + 0.2;
+        this.type = Math.random() > 0.85 ? 'heart' : 'dot';
+    }
+    update() {
+        this.y -= this.speedY;
+        this.x += this.speedX;
+        if (this.y < -20) this.reset();
+    }
+    draw() {
+        ctx.fillStyle = `rgba(212, 175, 55, ${this.opacity})`;
+        if (this.type === 'heart') {
+        ctx.font = `${this.size * 5}px serif`;
+        ctx.fillText('♥', this.x, this.y);
+        } else {
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+        ctx.fill();
+        }
+    }
+    }
+
+    let burstParticles = [];
+    function triggerSparkleBurst() {
+    for (let i = 0; i < 45; i++) {
+        burstParticles.push({
+        x: canvas.width / 2,
+        y: canvas.height / 2,
+        vx: (Math.random() - 0.5) * 12,
+        vy: (Math.random() - 0.5) * 12,
+        size: Math.random() * 3 + 1,
+        life: 1,
+        color: `hsl(${Math.random() * 30 + 40}, 100%, 70%)`
         });
-    </script>
+    }
+    }
+
+    for (let i = 0; i < particleCount; i++) {
+    particles.push(new GoldParticle());
+    }
+
+    function animateParticles() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    
+    particles.forEach(p => {
+        p.update();
+        p.draw();
+    });
+
+    burstParticles.forEach((bp, index) => {
+        bp.x += bp.vx;
+        bp.y += bp.vy;
+        bp.life -= 0.02;
+        ctx.fillStyle = bp.color;
+        ctx.globalAlpha = Math.max(0, bp.life);
+        ctx.beginPath();
+        ctx.arc(bp.x, bp.y, bp.size, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.globalAlpha = 1;
+
+        if (bp.life <= 0) burstParticles.splice(index, 1);
+    });
+
+    requestAnimationFrame(animateParticles);
+    }
+    animateParticles();
+</script>
 </body>
 </html>
