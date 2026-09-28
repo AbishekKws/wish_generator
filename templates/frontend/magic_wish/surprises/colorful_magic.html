@@ -1,277 +1,555 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="h-full">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    
-    <title>A Special Surprise for {{ wish.receiver_name }}! ✨</title>
-    <meta name="description" content="{{ wish.sender_name }} has sent you a magical {{ wish.wish_type }} surprise. Click to unlock the magic!">
-    
-    <meta property="og:title" content="A Special Surprise for {{ wish.receiver_name }}! ✨">
-    <meta property="og:description" content="Open the link to see a magical surprise from {{ wish.sender_name }}.">
-    <meta property="og:url" content="{{ request.build_absolute_uri }}">
-    
-    {% if wish.images.exists %}
-    <meta property="og:image" content="{{ request.scheme }}://{{ request.get_host }}{{ wish.images.first.image.url }}">
-    {% endif %}
-    
-    <meta property="og:type" content="website">
-    <title>Colour Blast | {{ wish.receiver_name }}</title>
-    
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+
+    <title>Colour Blast Extreme | {{ wish.receiver_name }} ✨</title>
+    <meta name="description" content="{{ wish.sender_name }} has sent you an ultra-animated {{ wish.wish_type }} surprise!">
+
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;900&display=swap" rel="stylesheet">
-    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;800;900&family=Outfit:wght@400;600;800;900&display=swap" rel="stylesheet">
+
     <style>
-        body, html { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background: #000; font-family: 'Inter', sans-serif; color: white; }
-        
+        * {
+            -webkit-tap-highlight-color: transparent;
+            user-select: none;
+            box-sizing: border-box;
+        }
+
+        body, html {
+            margin: 0; padding: 0;
+            width: 100%; height: 100%;
+            overflow: hidden;
+            background: #020005;
+            font-family: 'Outfit', sans-serif;
+            color: white;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* Continuous Dynamic Color Nebula Background */
         .magic-bg {
             position: fixed; inset: 0;
-            background: radial-gradient(circle at 50% 50%, #1a0b2e 0%, #000 100%);
-            z-index: -1; transition: all 1s ease;
+            background: radial-gradient(circle at 50% 50%, #1a0033 0%, #020005 100%);
+            z-index: -3;
+            transition: all 1.2s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
         .magic-bg.active {
-            background: linear-gradient(45deg, #ff0055, #7000ff, #00d4ff, #00ffaa);
-            background-size: 400% 400%;
-            animation: gradientMove 8s ease infinite;
+            background: radial-gradient(circle at 50% 40%, #2b004f 0%, #120024 50%, #020005 100%);
         }
-        @keyframes gradientMove { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
 
-        .wish-prefix {
-            font-size: clamp(0.7rem, 2vw, 1rem);
-            letter-spacing: 0.4em;
+        /* Pulsing Glow Mesh */
+        .color-blob {
+            position: fixed;
+            border-radius: 50%;
+            filter: blur(80px);
+            opacity: 0.6;
+            animation: blobMorph 10s infinite alternate ease-in-out;
+            z-index: -2;
+            pointer-events: none;
+        }
+
+        .blob-1 { top: -10%; left: -10%; width: 55vw; height: 55vw; background: #ff007f; animation-delay: 0s; }
+        .blob-2 { bottom: -10%; right: -10%; width: 55vw; height: 55vw; background: #00dfd8; animation-delay: -3s; }
+        .blob-3 { top: 40%; left: 30%; width: 50vw; height: 50vw; background: #7928ca; animation-delay: -6s; }
+
+        @keyframes blobMorph {
+            0% { transform: translate(0, 0) scale(1) rotate(0deg); }
+            50% { transform: translate(50px, -70px) scale(1.25) rotate(180deg); }
+            100% { transform: translate(-60px, 50px) scale(0.85) rotate(360deg); }
+        }
+
+        /* Ultra-Glassmorphism Panel */
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(25px) saturate(200%);
+            -webkit-backdrop-filter: blur(25px) saturate(200%);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.7),
+                        inset 0 1px 0 rgba(255, 255, 255, 0.3);
+            transform-style: preserve-3d;
+            will-change: transform;
+        }
+
+        /* Extreme Text Shimmer */
+        .blast-text {
+            font-weight: 900;
             text-transform: uppercase;
-            font-weight: 800;
-            margin-bottom: 0.5rem;
-            display: block;
-            opacity: 0.8;
-            color: #fff;
+            background: linear-gradient(90deg, #ff007f, #ff71ce, #00dfd8, #05ffa1, #b967ff, #ff007f);
+            background-size: 400% auto;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: textShine 4s linear infinite;
+            filter: drop-shadow(0 0 25px rgba(255, 0, 127, 0.5));
+        }
+
+        @keyframes textShine { to { background-position: 400% center; } }
+
+        /* Multi-Ring Portal Button */
+        .portal-btn-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         .portal-btn {
-            position: relative; width: 90px; height: 90px;
-            background: linear-gradient(45deg, #f472b6, #8b5cf6, #06b6d4);
+            position: relative; 
+            width: 115px; height: 115px;
+            background: linear-gradient(135deg, #ff007f, #7928ca, #00dfd8);
+            background-size: 200% 200%;
             border-radius: 50%; display: flex; align-items: center; justify-content: center;
-            box-shadow: 0 0 40px rgba(236, 72, 153, 0.8); z-index: 10;
-            animation: heartbeat 1.2s infinite ease-in-out;
+            box-shadow: 0 0 60px rgba(255, 0, 127, 0.8), 0 0 100px rgba(0, 223, 216, 0.5); 
+            z-index: 10;
+            animation: pulsePortal 2s infinite ease-in-out, gradientShift 4s ease infinite;
             cursor: pointer;
-        }
-        @keyframes heartbeat { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.1); box-shadow: 0 0 60px rgba(236, 72, 153, 1); } }
-
-        .spark-ring {
-            position: absolute; inset: -15px; border: 2px dashed #06b6d4; border-radius: 50%;
-            animation: rotate-spark 3s linear infinite; opacity: 0.6;
-        }
-        @keyframes rotate-spark { to { transform: rotate(360deg); } }
-
-        .blast-text {
-            font-weight: 900; text-transform: uppercase;
-            background: linear-gradient(to right, #fff, #f472b6, #8b5cf6, #06b6d4);
-            background-size: 200% auto;
-            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-            animation: shine 3s linear infinite;
-        }
-        @keyframes shine { to { background-position: 200% center; } }
-
-        .glass-panel { 
-            background: rgba(0, 0, 0, 0.4); backdrop-filter: blur(15px); 
-            border: 1px solid rgba(255,255,255,0.2);
-            box-shadow: 0 0 30px rgba(236, 72, 153, 0.2);
+            transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
         }
 
-        .image-container { position: relative; width: 100%; height: 200px; perspective: 1000px; }
-        @media (min-width: 1024px) { .image-container { height: 400px; } }
-
-        .image-frame { 
-            position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); 
-            border: 2px solid rgba(255,255,255,0.3);
-            opacity: 0;
+        .portal-btn:hover {
+            transform: scale(1.18) rotate(8deg);
         }
-        .image-frame img { width: 110px; height: 140px; object-fit: cover; border-radius: 8px; }
-        @media (min-width: 1024px) { .image-frame img { width: 250px; height: 320px; } }
+
+        @keyframes pulsePortal {
+            0%, 100% { transform: scale(1); box-shadow: 0 0 50px rgba(255, 0, 127, 0.7); }
+            50% { transform: scale(1.1); box-shadow: 0 0 95px rgba(0, 223, 216, 1); }
+        }
+
+        .orbit-ring {
+            position: absolute; border-radius: 50%; pointer-events: none;
+        }
+        .ring-1 { inset: -20px; border: 2px dashed rgba(255, 0, 127, 0.8); animation: rotateRing 6s linear infinite; }
+        .ring-2 { inset: -35px; border: 2px dotted rgba(0, 223, 216, 0.7); animation: rotateRing 10s linear infinite reverse; }
+        .ring-3 { inset: -50px; border: 1px solid rgba(255, 255, 255, 0.25); animation: rotateRing 14s linear infinite; }
+
+        @keyframes rotateRing { to { transform: rotate(360deg); } }
+
+        /* Interactive 3D Stacked Gallery */
+        .image-container { 
+            position: relative; 
+            width: 100%; 
+            height: 280px; 
+            perspective: 1200px; 
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        @media (min-width: 768px) { .image-container { height: 380px; } }
+
+        .image-frame {
+            position: absolute;
+            left: 50%; top: 50%;
+            transform: translate(-50%, -50%);
+            border: 2px solid rgba(255, 255, 255, 0.35);
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.8);
+            transition: border-color 0.3s ease, transform 0.6s cubic-bezier(0.23, 1, 0.32, 1);
+            cursor: pointer;
+            will-change: transform, opacity;
+        }
+
+        .image-frame img { 
+            width: 160px; height: 220px; 
+            object-fit: cover; 
+            border-radius: 16px;
+            pointer-events: none;
+        }
+        @media (min-width: 768px) { .image-frame img { width: 230px; height: 310px; } }
 
         #particle-canvas { position: fixed; inset: 0; pointer-events: none; z-index: 50; }
+
+        /* Sound Toggle Button */
+        .music-toggle {
+            position: fixed; top: 20px; right: 20px; z-index: 80;
+            height: 42px; padding: 0 18px; border-radius: 30px;
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            display: flex; align-items: center; gap: 10px;
+            color: #fff; font-size: 0.8rem; font-weight: 700; cursor: pointer;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.4);
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .music-toggle:hover { transform: scale(1.05); background: rgba(255,255,255,0.18); }
+
+        .custom-scrollbar::-webkit-scrollbar { width: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(255, 0, 127, 0.6); border-radius: 10px; }
     </style>
 </head>
-<body>
+<body class="flex items-center justify-center min-h-screen relative overflow-hidden select-none">
 
     {% if wish.custom_music or wish.selected_music %}
         <audio id="bgMusic" src="{% if wish.custom_music %}{{ wish.custom_music.url }}{% else %}{{ wish.selected_music.audio_file.url }}{% endif %}" loop></audio>
+        <button class="music-toggle hidden" id="musicToggle" onclick="toggleMusic()">
+            <i class="fas fa-compact-disc text-pink-400 animate-spin" style="animation-duration: 3s;" id="musicIcon"></i>
+            <span id="musicStatus" class="tracking-widest uppercase">PLAYING</span>
+        </button>
     {% endif %}
 
+    <!-- Celestial Motion Backgrounds -->
     <div class="magic-bg" id="mainBg"></div>
+    <div class="color-blob blob-1"></div>
+    <div class="color-blob blob-2"></div>
+    <div class="color-blob blob-3"></div>
+
     <canvas id="particle-canvas"></canvas>
 
-    <div id="overlay" class="fixed inset-0 z-[100] flex items-center justify-center bg-black">
-        <div class="relative">
-            <div class="spark-ring"></div>
-            <button onclick="revealBlast()" class="flex flex-col items-center gap-6">
-                <div class="portal-btn">
-                    <i class="fa-solid fa-burst text-4xl text-white"></i>
-                </div>
-                <div class="text-center">
-                    <span class="block text-[10px] font-black tracking-[0.6em] text-pink-500 uppercase">Surprise</span>
-                    <span class="block text-xs font-bold text-white mt-1">Tap To Open!</span>
-                </div>
-            </button>
+    <!-- Overlay Screen -->
+    <div id="overlay" class="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-black/85 backdrop-blur-3xl px-4 transition-all duration-700">
+        <div class="relative flex flex-col items-center">
+            
+            <div class="portal-btn-wrapper mb-8">
+                <div class="orbit-ring ring-1"></div>
+                <div class="orbit-ring ring-2"></div>
+                <div class="orbit-ring ring-3"></div>
+                
+                <button onclick="revealBlast()" class="portal-btn focus:outline-none group">
+                    <i class="fa-solid fa-wand-magic-sparkles text-4xl text-white group-hover:scale-125 transition-transform duration-300"></i>
+                </button>
+            </div>
+
+            <div class="text-center max-w-sm">
+                <span class="block text-xs font-black tracking-[0.5em] text-cyan-400 uppercase mb-2">A Magical Surprise Awaits</span>
+                <h2 class="text-2xl md:text-3xl font-black text-white tracking-wide leading-tight">
+                    Tap To Unlock <br> <span class="blast-text">{{ wish.receiver_name }}</span>
+                </h2>
+                <p class="text-[11px] text-gray-400 mt-4 font-semibold tracking-widest uppercase animate-pulse">✨ Touch Anywhere To Launch Blast ✨</p>
+            </div>
         </div>
     </div>
 
-    <main id="magic-content" class="hidden opacity-0 flex flex-col items-center justify-center p-4 min-h-screen relative">
-        
-        <header class="mb-6 text-center">
-            <span class="wish-prefix">
+    <!-- Main Content Container -->
+    <main id="magic-content" class="hidden opacity-0 flex flex-col items-center justify-between p-4 md:p-8 h-full max-h-screen w-full max-w-6xl mx-auto z-20 py-6">
+
+        <!-- Dynamic Header -->
+        <header class="text-center w-full mt-2">
+            <span class="text-xs md:text-sm font-black tracking-[0.4em] uppercase text-pink-400 block mb-1 drop-shadow-[0_0_10px_rgba(244,114,182,0.8)]">
                 {% with w_type=wish.wish_type|lower %}
-                    {% if w_type == 'birthday' %} Happy Level Up Day🎂!
-                    {% elif w_type == 'anniversary' %} Happy Anniversary
-                    {% elif w_type == 'friendship' %} The Best Kind of Friend
-                    {% elif w_type == 'love' %} I Love You
-                    {% elif w_type == 'sorry' %} I Am Sorry
-                    {% elif w_type == 'congratulations' %} Congratulations
-                    {% elif w_type == 'festival' %}Happy Festive Moments ✨
-                    {% elif w_type == 'new year' %}
-                        <span class="block text-xl md:text-2xl mb-2 font-medium opacity-90 tracking-[0.2em] uppercase">
-                            Cheers to <span id="year-display"></span> 🥂
-                        </span>
-                        Bright Starts & Big Dreams, {{ wish.receiver_name }}! ✨
-                    {% elif w_type == 'graduation' %}Commending Your Academic Excellence! Congratulations!
-                    {% else %} Best Wishes {% endif %}
+                    {% if w_type == 'birthday' %} 🎂 Happy Level Up Day!
+                    {% elif w_type == 'anniversary' %} 💍 Happy Anniversary
+                    {% elif w_type == 'friendship' %} 🤝 The Best Kind of Friend
+                    {% elif w_type == 'love' %} ❤️ Eternal Love Wish
+                    {% elif w_type == 'sorry' %} 🕊️ Warmest Apology
+                    {% elif w_type == 'congratulations' %} 🎉 Big Congratulations!
+                    {% elif w_type == 'festival' %} ✨ Festive Happiness & Glory
+                    {% elif w_type == 'new year' %} 🥂 Cheers To <span id="year-display"></span>
+                    {% elif w_type == 'graduation' %} 🎓 Academic Excellence!
+                    {% else %} ⭐ Special Surprise For You ⭐ {% endif %}
                 {% endwith %}
             </span>
-            <h1 class="text-4xl md:text-8xl blast-text italic">{{ wish.receiver_name }}</h1>
+            <h1 class="text-4xl sm:text-6xl md:text-7xl blast-text font-black tracking-tight font-serif">
+                {{ wish.receiver_name }}
+            </h1>
         </header>
 
-        <div class="flex flex-col lg:flex-row items-center justify-center gap-8 max-w-6xl w-full mb-20 lg:mb-0">
-            <div class="glass-panel w-full lg:w-1/2 p-6 md:p-10 rounded-2xl relative">
-                <p class="text-lg md:text-2xl font-medium leading-relaxed mb-6">
-                    "{{ wish.message }}"
-                </p>
-                <div class="flex items-center gap-4 border-t border-white/10 pt-4">
-                    <div class="w-10 h-10 rounded-full bg-gradient-to-tr from-pink-500 to-violet-600 flex items-center justify-center font-black">
-                        {{ wish.sender_name|slice:":1" }}
+        <!-- Content Flex Layout -->
+        <div class="flex flex-col lg:flex-row items-center justify-center gap-6 lg:gap-10 w-full my-auto">
+            
+            <!-- Wish Message Box (With 3D Tilt Effect) -->
+            <div class="glass-panel tilt-card w-full lg:w-1/2 p-6 md:p-8 rounded-3xl relative flex flex-col justify-between min-h-[200px] md:min-h-[280px]">
+                <div class="max-h-[160px] md:max-h-[200px] overflow-y-auto custom-scrollbar pr-2">
+                    <p class="text-base md:text-xl font-medium leading-relaxed italic text-gray-100 font-serif opacity-95">
+                        "{{ wish.message }}"
+                    </p>
+                </div>
+
+                <div class="flex items-center gap-4 border-t border-white/10 pt-4 mt-4">
+                    <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-pink-500 via-purple-600 to-cyan-400 p-0.5 shadow-lg flex-shrink-0">
+                        <div class="w-full h-full bg-black/80 rounded-[10px] flex items-center justify-center font-black text-pink-400 text-sm">
+                            {{ wish.sender_name|slice:":1" }}
+                        </div>
                     </div>
                     <div>
-                        <p class="text-[8px] uppercase tracking-widest text-pink-400">Sent by</p>
-                        <p class="text-sm font-bold">{{ wish.sender_name }}</p>
+                        <p class="text-[9px] uppercase tracking-[0.3em] text-cyan-400 font-bold">Warm Wishes From</p>
+                        <p class="text-sm md:text-base font-bold text-white tracking-wide">{{ wish.sender_name }}</p>
                     </div>
                 </div>
             </div>
 
+            <!-- 3D Card Stack Gallery -->
             <div class="image-container lg:w-1/2">
                 {% if wish.images.exists %}
                     {% for img_obj in wish.images.all|slice:":5" %}
-                    <div class="image-frame glass-panel p-1 rounded-lg shadow-2xl" id="img-{{ forloop.counter0 }}">
-                        <img src="{{ img_obj.image.url }}">
+                    <div class="image-frame glass-panel p-1.5 shadow-2xl" id="img-{{ forloop.counter0 }}">
+                        <img src="{{ img_obj.image.url }}" alt="Surprise Memory">
                     </div>
                     {% endfor %}
                 {% else %}
-                    <div class="image-frame glass-panel p-4 rounded-lg shadow-2xl flex items-center justify-center opacity-100" style="opacity: 1;">
-                         <i class="fa-solid fa-heart text-6xl text-pink-500 animate-pulse"></i>
+                    <!-- Sparkle Heart Fallback -->
+                    <div class="image-frame glass-panel p-8 rounded-3xl shadow-2xl flex flex-col items-center justify-center border border-pink-500/30">
+                        <i class="fa-solid fa-heart text-7xl text-pink-500 animate-pulse drop-shadow-[0_0_30px_rgba(236,72,153,0.9)]"></i>
+                        <span class="mt-4 text-[10px] tracking-widest text-pink-300 uppercase font-black">Sent With Love</span>
                     </div>
                 {% endif %}
             </div>
         </div>
 
-        <footer class="absolute bottom-6 w-full flex justify-center opacity-70">
+        <!-- Dynamic Action Footer -->
+        <footer class="mb-2 w-full flex justify-center opacity-80 hover:opacity-100 transition-opacity">
             <a href="{% url 'home' %}" class="flex flex-col items-center gap-1 group">
-                <span class="text-[7px] tracking-[0.3em] uppercase text-gray-400">Made With ❤️</span>
-                <span class="text-[10px] font-black tracking-widest blast-text">SURPRISE ME</span>
+                <span class="text-[8px] tracking-[0.4em] uppercase text-gray-400 font-bold">Craft Your Own Magic ✨</span>
+                <span class="text-xs font-black tracking-widest blast-text group-hover:scale-105 transition-transform">CREATE A SURPRISE</span>
             </a>
         </footer>
     </main>
 
     <script>
+        // High Performance Particle Physics Engine & Interactive Stardust Trail
         const canvas = document.getElementById('particle-canvas');
         const ctx = canvas.getContext('2d');
         let particles = [];
+        let trailParticles = [];
 
         function resize() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
         window.addEventListener('resize', resize); resize();
 
-        class Particle {
+        class PowderParticle {
             constructor(x, y) {
                 this.x = x; this.y = y;
-                this.size = Math.random() * 8 + 2;
-                this.speedX = (Math.random() - 0.5) * 18;
-                this.speedY = (Math.random() - 0.5) * 18;
-                this.color = `hsl(${Math.random() * 360}, 100%, 60%)`;
+                this.size = Math.random() * 8 + 3;
+                const angle = Math.random() * Math.PI * 2;
+                const speed = Math.random() * 26 + 6;
+                this.speedX = Math.cos(angle) * speed;
+                this.speedY = Math.sin(angle) * speed;
+                this.colors = ['#ff007f', '#00dfd8', '#7928ca', '#05ffa1', '#b967ff', '#ff0055'];
+                this.color = this.colors[Math.floor(Math.random() * this.colors.length)];
+                this.gravity = 0.12;
+                this.friction = 0.95;
+                this.alpha = 1;
             }
             update() {
-                this.x += this.speedX; this.y += this.speedY;
-                if (this.size > 0.1) this.size -= 0.12;
+                this.speedX *= this.friction;
+                this.speedY *= this.friction;
+                this.speedY += this.gravity;
+                this.x += this.speedX; 
+                this.y += this.speedY;
+                this.alpha -= 0.008;
             }
             draw() {
-                ctx.fillStyle = this.color; ctx.beginPath();
-                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2); ctx.fill();
+                ctx.save();
+                ctx.globalAlpha = Math.max(0, this.alpha);
+                ctx.fillStyle = this.color; 
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2); 
+                ctx.shadowBlur = 15;
+                ctx.shadowColor = this.color;
+                ctx.fill();
+                ctx.restore();
             }
         }
 
-        function revealBlast() {
+        // Stardust Cursor Trail Particles
+        class TrailParticle {
+            constructor(x, y) {
+                this.x = x; this.y = y;
+                this.size = Math.random() * 4 + 1;
+                this.speedX = (Math.random() - 0.5) * 2;
+                this.speedY = (Math.random() - 0.5) * 2;
+                this.colors = ['#ff007f', '#00dfd8', '#05ffa1'];
+                this.color = this.colors[Math.floor(Math.random() * this.colors.length)];
+                this.alpha = 0.8;
+            }
+            update() {
+                this.x += this.speedX;
+                this.y += this.speedY;
+                this.alpha -= 0.02;
+            }
+            draw() {
+                ctx.save();
+                ctx.globalAlpha = Math.max(0, this.alpha);
+                ctx.fillStyle = this.color;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.restore();
+            }
+        }
+
+        window.addEventListener('pointermove', (e) => {
+            for(let i=0; i<2; i++) {
+                trailParticles.push(new TrailParticle(e.clientX, e.clientY));
+            }
+        });
+
+        // Web Audio Synthesizer Explosion Sound Effect
+        function playBlastSound() {
+            try {
+                const AudioCtx = window.AudioContext || window.webkitAudioContext;
+                if (!AudioCtx) return;
+                const ctxAudio = new AudioCtx();
+                
+                const osc = ctxAudio.createOscillator();
+                const gain = ctxAudio.createGain();
+                
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(220, ctxAudio.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(40, ctxAudio.currentTime + 0.8);
+                
+                gain.gain.setValueAtTime(0.3, ctxAudio.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, ctxAudio.currentTime + 0.8);
+                
+                osc.connect(gain);
+                gain.connect(ctxAudio.destination);
+                
+                osc.start();
+                osc.stop(ctxAudio.currentTime + 0.8);
+            } catch(e) {}
+        }
+
+        function toggleMusic() {
             const music = document.getElementById('bgMusic');
-            if(music) music.play().catch(e => {});
+            const icon = document.getElementById('musicIcon');
+            const status = document.getElementById('musicStatus');
+            if (!music) return;
+            if (music.paused) {
+                music.play().catch(() => {});
+                icon.className = 'fas fa-compact-disc text-pink-400 animate-spin';
+                status.innerText = 'PLAYING';
+            } else {
+                music.pause();
+                icon.className = 'fas fa-volume-xmark text-gray-400';
+                status.innerText = 'MUTED';
+            }
+        }
+
+        /* --- Revealing Blast Animation --- */
+        function revealBlast() {
+            playBlastSound();
+
+            const music = document.getElementById('bgMusic');
+            const toggle = document.getElementById('musicToggle');
+            if (music) {
+                music.play().then(() => { 
+                    if (toggle) toggle.classList.remove('hidden'); 
+                }).catch(e => console.log("Autoplay blocked:", e));
+            }
 
             document.getElementById('mainBg').classList.add('active');
-            gsap.to("body", { x: 12, duration: 0.05, repeat: 8, yoyo: true });
+            
+            // Dramatic Screen Shake
+            gsap.to("body", { x: 14, y: -14, duration: 0.04, repeat: 14, yoyo: true });
 
-            for (let i = 0; i < 150; i++) particles.push(new Particle(window.innerWidth/2, window.innerHeight/2));
+            // Trigger Particle Physics Explosions
+            for (let i = 0; i < 250; i++) {
+                particles.push(new PowderParticle(window.innerWidth / 2, window.innerHeight / 2));
+            }
             animateParticles();
 
-            const end = Date.now() + 3000;
+            // Explosive Multi-Stream Confetti
+            const duration = 3.5 * 1000;
+            const animationEnd = Date.now() + duration;
+
             (function frame() {
-                confetti({ particleCount: 6, angle: 60, spread: 55, origin: { x: 0 }, colors: ['#ff0055', '#00d4ff'] });
-                confetti({ particleCount: 6, angle: 120, spread: 55, origin: { x: 1 }, colors: ['#7000ff', '#00ffaa'] });
-                if (Date.now() < end) requestAnimationFrame(frame);
+                confetti({ particleCount: 8, angle: 60, spread: 70, origin: { x: 0, y: 0.7 }, colors: ['#ff007f', '#00dfd8', '#ffffff'] });
+                confetti({ particleCount: 8, angle: 120, spread: 70, origin: { x: 1, y: 0.7 }, colors: ['#7928ca', '#05ffa1', '#b967ff'] });
+                if (Date.now() < animationEnd) requestAnimationFrame(frame);
             }());
 
-            gsap.to("#overlay", { 
-                scale: 3, opacity: 0, duration: 0.7, ease: "power2.in",
+            // Transition Overlay
+            gsap.to("#overlay", {
+                scale: 2, opacity: 0, duration: 0.7, ease: "power4.in",
                 onComplete: () => {
                     document.getElementById('overlay').style.display = 'none';
                     const content = document.getElementById('magic-content');
                     content.classList.remove('hidden');
-                    gsap.to(content, { opacity: 1, duration: 0.8, onComplete: animateImageStack });
+                    gsap.to(content, { opacity: 1, duration: 0.8, onComplete: () => {
+                        animateImageStack();
+                        setup3DTilt();
+                    }});
                 }
             });
         }
 
         function animateParticles() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
-            particles.forEach((p, i) => { p.update(); p.draw(); if (p.size <= 0.2) particles.splice(i, 1); });
-            if(particles.length > 0) requestAnimationFrame(animateParticles);
+            
+            // Blast Particles
+            particles.forEach((p) => { p.update(); p.draw(); });
+            particles = particles.filter((p) => p.alpha > 0);
+
+            // Stardust Trail Particles
+            trailParticles.forEach((tp) => { tp.update(); tp.draw(); });
+            trailParticles = trailParticles.filter((tp) => tp.alpha > 0);
+
+            if (particles.length > 0 || trailParticles.length > 0) requestAnimationFrame(animateParticles);
         }
 
+        /* --- 3D Card Tilt Interaction --- */
+        function setup3DTilt() {
+            const card = document.querySelector('.tilt-card');
+            if(!card) return;
+
+            window.addEventListener('mousemove', (e) => {
+                const { clientX, clientY } = e;
+                const { innerWidth, innerHeight } = window;
+                const rotX = ((clientY - innerHeight / 2) / innerHeight) * -15;
+                const rotY = ((clientX - innerWidth / 2) / innerWidth) * 15;
+
+                gsap.to(card, {
+                    rotationX: rotX,
+                    rotationY: rotY,
+                    duration: 0.5,
+                    ease: "power2.out"
+                });
+            });
+        }
+
+        /* --- 3D Stacked Card Gallery Engine --- */
         function animateImageStack() {
             const frames = document.querySelectorAll('.image-frame');
             if(frames.length === 0) return;
-            
+
             let currentIndex = 0;
-            const isMobile = window.innerWidth < 1024;
 
             function updateFrames() {
+                const isMobile = window.innerWidth < 768;
                 frames.forEach((frame, i) => {
                     let diff = (i - currentIndex + frames.length) % frames.length;
                     const zIndex = 50 - diff;
-                    const ty = isMobile ? (diff * 10) : (diff * 20);
-                    const tx = isMobile ? "-50%" : `calc(-40% + ${diff * 15}px)`;
+                    const ty = isMobile ? (diff * 10) : (diff * 18);
+                    const tx = isMobile ? "-50%" : `calc(-50% + ${diff * 18}px)`;
 
                     gsap.to(frame, {
-                        zIndex: zIndex, opacity: 1 - (diff * 0.3), scale: 1 - (diff * 0.1),
-                        y: `calc(-50% + ${ty}px)`, x: tx, rotation: diff * 8,
-                        duration: 0.6, ease: "back.out(1.5)"
+                        zIndex: zIndex, 
+                        opacity: 1 - (diff * 0.22), 
+                        scale: 1 - (diff * 0.07),
+                        y: `calc(-50% + ${ty}px)`, 
+                        x: tx, 
+                        rotation: diff * 6,
+                        duration: 0.6, 
+                        ease: "back.out(1.5)"
                     });
                 });
             }
+
             updateFrames();
-            setInterval(() => { currentIndex = (currentIndex + 1) % frames.length; updateFrames(); }, 2500);
+            
+            // Manual click card flip
+            frames.forEach(f => {
+                f.addEventListener('click', () => {
+                    currentIndex = (currentIndex + 1) % frames.length;
+                    updateFrames();
+                });
+            });
+
+            // Automatic timing transition
+            setInterval(() => { 
+                currentIndex = (currentIndex + 1) % frames.length; 
+                updateFrames(); 
+            }, 3200);
         }
+
+        // Automatic Year display
         const year = new Date().getFullYear();
-            if(document.getElementById('year-display')) {
-                document.getElementById('year-display').textContent = year;
+        if(document.getElementById('year-display')) {
+            document.getElementById('year-display').textContent = year;
         }
     </script>
 </body>
