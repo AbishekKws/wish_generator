@@ -5,14 +5,14 @@
 
 {% block content %}
 <div class="min-h-[calc(100vh-80px)] flex items-center justify-center p-4 relative overflow-hidden my-2 lg:my-6">
-    
+
     <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 lg:w-96 lg:h-96 bg-pink-500/10 rounded-full blur-[100px] pointer-events-none animate-pulse"></div>
 
     <div class="w-full max-w-lg z-10 transition-all duration-500">
         <div class="transition-all duration-500 mx-auto text-center
-            lg:bg-white/5 lg:backdrop-blur-2xl lg:border lg:border-white/10 lg:p-8 lg:rounded-[2.5rem] lg:shadow-2xl 
+            lg:bg-white/5 lg:backdrop-blur-2xl lg:border lg:border-white/10 lg:p-8 lg:rounded-[2.5rem] lg:shadow-2xl
             p-6 rounded-none bg-transparent border-none shadow-none">
-            
+
             <div class="relative inline-block mb-4">
                 <div class="text-6xl lg:text-7xl animate-bounce">🎉</div>
                 <div class="absolute -top-1 -right-1 w-6 h-6 bg-green-500 rounded-full border-4 border-slate-900 flex items-center justify-center shadow-lg">
@@ -32,14 +32,14 @@
             </p>
 
             <div class="space-y-6">
-                <button onclick="copyLink()" id="copyBtn" 
+                <button onclick="copyLink()" id="copyBtn"
                         class="w-full py-4 rounded-2xl bg-white text-black font-extrabold text-sm hover:scale-[1.02] active:scale-[0.95] transition-all duration-300 flex flex-col items-center justify-center gap-1 shadow-xl relative overflow-hidden group">
-                    
+
                     <div class="flex items-center gap-2 relative z-10">
                         <i class="fas fa-copy" id="copyIcon"></i>
                         <span id="copyBtnText">Copy Magic Link</span>
                     </div>
-                    
+
                     <p id="copyHint" class="text-[9px] text-gray-400 uppercase tracking-widest font-bold group-hover:text-pink-500 transition-colors">
                         Click to copy
                     </p>
@@ -51,18 +51,14 @@
                                 class="w-11 h-11 rounded-full bg-[#25D366] text-white flex items-center justify-center shadow-lg shadow-green-500/20 hover:scale-110 active:scale-90 transition-all">
                             <i class="fab fa-whatsapp text-lg"></i>
                         </button>
-                        
-                        <button onclick="sharePlatform('messenger')" title="Share on Messenger"
-                                class="w-11 h-11 rounded-full bg-[#0084FF] text-white flex items-center justify-center shadow-lg shadow-blue-500/20 hover:scale-110 active:scale-90 transition-all">
-                            <i class="fab fa-facebook-messenger text-lg"></i>
-                        </button>
 
-                        <button onclick="sharePlatform('instagram')" title="Share on Instagram"
-                                class="w-11 h-11 rounded-full bg-gradient-to-tr from-[#f9ce34] via-[#ee2a7b] to-[#6228d7] text-white flex items-center justify-center shadow-lg shadow-purple-500/20 hover:scale-110 active:scale-90 transition-all">
-                            <i class="fab fa-instagram text-lg"></i>
+                        <button onclick="sharePlatform('share')" title="Share"
+                                class="w-11 h-11 rounded-full bg-gradient-to-tr from-pink-600 to-violet-600 text-white flex items-center justify-center shadow-lg shadow-purple-500/20 hover:scale-110 active:scale-90 transition-all">
+                            <i class="fas fa-share-nodes text-lg"></i>
                         </button>
                     </div>
                     <p class="text-[7px] text-gray-500 uppercase font-bold tracking-widest">Tap to share with social Media</p>
+                    <p id="shareToast" class="hidden text-[10px] font-bold text-pink-400 mt-1"></p>
                 </div>
 
                 <a href="{% url 'wish_detail' wish.slug %}" target="_blank"
@@ -84,7 +80,7 @@
 {% block scripts %}
 <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 <script>
-    // 1. Confetti effect (Same as original)
+    // 1. Confetti effect (unchanged)
     window.onload = function() {
         const duration = 3 * 1000;
         const end = Date.now() + duration;
@@ -111,60 +107,116 @@
         }());
     };
 
-    // Copy Function (Same as original)
-    function copyLink() {
-        const linkText = document.getElementById('wishLink').innerText.trim();
-        navigator.clipboard.writeText(linkText).then(() => {
-            const btn = document.getElementById('copyBtn');
-            const btnText = document.getElementById('copyBtnText');
-            
-            const originalContent = btnText.innerText;
-            btnText.innerText = 'Copied to Clipboard! ✨';
-            btn.classList.add('bg-pink-600', 'text-white');
-            btn.classList.remove('bg-white', 'text-black');
-            
-            confetti({
-                particleCount: 40,
-                spread: 70,
-                origin: { y: 0.8 },
-                colors: ['#ec4899', '#ffffff']
-            });
+    // 2. Copy function — now with a legacy fallback for browsers/contexts
+    // where navigator.clipboard isn't available (e.g. non-HTTPS, old WebViews)
+    function getWishLink() {
+        return document.getElementById('wishLink').innerText.trim();
+    }
 
-            setTimeout(() => {
-                btnText.innerText = originalContent;
-                btn.classList.remove('bg-pink-600', 'text-white');
-                btn.classList.add('bg-white', 'text-black');
-            }, 2000);
+    function legacyCopy(text) {
+        const temp = document.createElement('textarea');
+        temp.value = text;
+        temp.style.position = 'fixed';
+        temp.style.opacity = '0';
+        document.body.appendChild(temp);
+        temp.focus();
+        temp.select();
+        let ok = false;
+        try { ok = document.execCommand('copy'); } catch (err) { ok = false; }
+        document.body.removeChild(temp);
+        return ok;
+    }
+
+    function setCopiedState() {
+        const btn = document.getElementById('copyBtn');
+        const btnText = document.getElementById('copyBtnText');
+
+        btnText.innerText = 'Copied to Clipboard! ✨';
+        btn.classList.add('bg-pink-600', 'text-white');
+        btn.classList.remove('bg-white', 'text-black');
+
+        confetti({
+            particleCount: 40,
+            spread: 70,
+            origin: { y: 0.8 },
+            colors: ['#ec4899', '#ffffff']
+        });
+
+        setTimeout(() => {
+            btnText.innerText = 'Copy Magic Link';
+            btn.classList.remove('bg-pink-600', 'text-white');
+            btn.classList.add('bg-white', 'text-black');
+        }, 2000);
+    }
+
+    function copyLink() {
+        const linkText = getWishLink();
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(linkText).then(setCopiedState).catch(() => {
+                if (legacyCopy(linkText)) setCopiedState();
+            });
+        } else if (legacyCopy(linkText)) {
+            setCopiedState();
+        }
+    }
+
+    function copyLinkAsync() {
+        return new Promise((resolve) => {
+            const linkText = getWishLink();
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(linkText).then(() => { setCopiedState(); resolve(true); })
+                    .catch(() => resolve(legacyCopy(linkText) && (setCopiedState(), true)));
+            } else {
+                resolve(legacyCopy(linkText) && (setCopiedState(), true));
+            }
         });
     }
 
-    // Share Function (Same as original)
-    function sharePlatform(platform) {
-        const linkText = document.getElementById('wishLink').innerText.trim();
+    function showShareToast(message) {
+        const toast = document.getElementById('shareToast');
+        toast.textContent = message;
+        toast.classList.remove('hidden');
+        setTimeout(() => toast.classList.add('hidden'), 3000);
+    }
+
+    // 3. Share function
+    // WhatsApp keeps its own dedicated deep link always — it's the one
+    // platform that reliably opens with a prefilled message AND its own
+    // contact picker, so it should never be rerouted through the generic
+    // native share sheet.
+    // Messenger + Instagram have no public API for that, so both go
+    // through the OS-level native share sheet (Web Share API) instead —
+    // the person picks whichever app they want, and that app runs its own
+    // native share/DM flow. navigator.share() is called directly and
+    // synchronously from this click handler, which is required for it to
+    // work reliably on iOS Safari and Android Chrome.
+    async function sharePlatform(platform) {
+        const linkText = getWishLink();
         const shareMessage = "I've created a magical surprise for you! ✨ Click to open: ";
         const fullMessage = shareMessage + linkText;
 
-        if (navigator.share && /Android|iPhone|iPad|iPod/i.test(navigator.userAgent)) {
-            navigator.share({
-                title: 'A Magic Surprise for You! ✨',
-                text: shareMessage,
-                url: linkText,
-            }).catch((err) => console.log("Share failed"));
-        } 
-        else {
-            if (platform === 'whatsapp') {
-                window.open("https://api.whatsapp.com/send?text=" + encodeURIComponent(fullMessage), "_blank");
-            } 
-            else if (platform === 'messenger') {
-                const messengerUrl = "https://www.facebook.com/sharer/sharer.php?u=" + encodeURIComponent(linkText);
-                window.open(messengerUrl, "_blank", "width=600,height=400");
-            } 
-            else if (platform === 'instagram') {
-                copyLink();
-                alert("Link Copied! Please paste it in Instagram DMs. 🚀");
-                window.open("https://www.instagram.com/direct/inbox/", "_blank");
+        if (platform === 'whatsapp') {
+            window.open("https://api.whatsapp.com/send?text=" + encodeURIComponent(fullMessage), "_blank");
+            return;
+        }
+
+        // platform === 'share'
+        if (navigator.share) {
+            try {
+                await navigator.share({
+                    title: 'A Magic Surprise for You! ✨',
+                    text: shareMessage,
+                    url: linkText,
+                });
+                return;
+            } catch (err) {
+                if (err.name === 'AbortError') return; // user closed the sheet on purpose
+                // otherwise fall through to the copy fallback below
             }
         }
+
+        const ok = await copyLinkAsync();
+        showShareToast(ok ? "Link copied — paste it anywhere you like 🚀" : "Couldn't copy automatically — use the button above");
     }
 </script>
 {% endblock %}
