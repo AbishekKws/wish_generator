@@ -3,259 +3,463 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     
-    <title>A Special Surprise for {{ wish.receiver_name }}! ✨</title>
-    <meta name="description" content="{{ wish.sender_name }} has sent you a magical {{ wish.wish_type }} surprise. Click to unlock the magic!">
+    <title>Matrix Wish | {{ wish.receiver_name|default:"Target User" }}</title>
+    <meta name="description" content="{{ wish.sender_name|default:'Unknown User' }} has transmitted an encrypted {{ wish.wish_type|default:'classified' }} payload. Execute bypass to decrypt!">
     
-    <meta property="og:title" content="A Special Surprise for {{ wish.receiver_name }}! ✨">
-    <meta property="og:description" content="Open the link to see a magical surprise from {{ wish.sender_name }}.">
+    <!-- Open Graph Metadata -->
+    <meta property="og:title" content="CLASSIFIED: Encrypted Surprise for {{ wish.receiver_name|default:'Target' }}! ⚡">
+    <meta property="og:description" content="Access granted from {{ wish.sender_name|default:'Agent' }}. Click to execute terminal decrypt sequence.">
     <meta property="og:url" content="{{ request.build_absolute_uri }}">
-    
     {% if wish.images.exists %}
     <meta property="og:image" content="{{ request.scheme }}://{{ request.get_host }}{{ wish.images.first.image.url }}">
     {% endif %}
-    
     <meta property="og:type" content="website">
-    <title>Matrix Wish | {{ wish.receiver_name }}</title>
-    
+
+    <!-- Dependencies -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@300;500;700&display=swap" rel="stylesheet">
-    
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@300;400;500;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
     <style>
-        :root { --matrix-green: #00ff41; --deep-black: #0d0208; }
+        :root { 
+            --matrix-green: #00ff41; 
+            --matrix-dark-green: #003b00;
+            --matrix-glow: rgba(0, 255, 65, 0.5);
+            --deep-black: #020502; 
+            --terminal-bg: rgba(2, 12, 4, 0.95);
+        }
+
+        * {
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
 
         body, html { 
-            margin: 0; padding: 0; background: var(--deep-black);
-            color: var(--matrix-green); overflow: hidden; 
-            font-family: 'Fira Code', monospace; height: 100dvh; width: 100%;
+            margin: 0; padding: 0; 
+            background: var(--deep-black);
+            color: var(--matrix-green); 
+            overflow: hidden; 
+            font-family: 'Fira Code', monospace; 
+            height: 100dvh; width: 100%;
             position: fixed;
+            user-select: none;
         }
 
+        /* Matrix Digital Rain Canvas */
         canvas#matrix-canvas {
-            position: fixed; inset: 0; z-index: -1; opacity: 0.3;
+            position: fixed; inset: 0; z-index: 1; opacity: 0.45;
+            pointer-events: none;
         }
 
+        /* Scanlines Overlay */
+        .scanline-overlay {
+            position: fixed; inset: 0; z-index: 99;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.4) 50%),
+                        linear-gradient(90deg, rgba(255, 0, 0, 0.03), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.03));
+            background-size: 100% 4px, 6px 100%;
+            pointer-events: none;
+        }
+
+        /* Cyberpunk Box Styling */
         .terminal-box {
-            background: rgba(0, 5, 0, 0.95);
+            background: var(--terminal-bg);
             border: 1px solid var(--matrix-green);
-            box-shadow: 0 0 20px rgba(0, 255, 65, 0.2);
-            width: 92%; max-width: 450px;
+            box-shadow: 0 0 35px var(--matrix-glow), inset 0 0 20px rgba(0, 255, 65, 0.2);
+            width: 92%; max-width: 520px;
             position: relative; z-index: 10;
-            padding: 1.2rem;
+            padding: 1.75rem 1.25rem 1.25rem 1.25rem;
+            border-radius: 8px;
+            backdrop-filter: blur(12px);
         }
 
         .terminal-header {
             position: absolute; top: 0; left: 0; right: 0;
-            background: var(--matrix-green); color: black;
-            font-size: 8px; font-weight: bold; padding: 1px 6px;
-            display: flex; justify-content: space-between;
+            background: var(--matrix-green); color: #000;
+            font-size: 10px; font-weight: 800; padding: 4px 10px;
+            display: flex; justify-content: space-between; align-items: center;
+            letter-spacing: 1px;
+            border-top-left-radius: 6px; border-top-right-radius: 6px;
         }
 
+        /* Glitch Effect */
+        .glitch-text {
+            position: relative;
+            display: inline-block;
+            text-shadow: 0 0 10px var(--matrix-green);
+        }
+
+        .glitch-text::before, .glitch-text::after {
+            content: attr(data-text);
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            clip: rect(0, 0, 0, 0);
+        }
+
+        .glitch-text:hover::before {
+            left: -2px; text-shadow: 2px 0 #ff0055;
+            clip: rect(24px, 550px, 90px, 0);
+            animation: glitch-anim 1.5s infinite linear alternate-reverse;
+        }
+
+        @keyframes glitch-anim {
+            0% { clip: rect(12px, 9999px, 44px, 0); }
+            50% { clip: rect(32px, 9999px, 12px, 0); }
+            100% { clip: rect(5px, 9999px, 60px, 0); }
+        }
+
+        /* Blinking Terminal Cursor */
         .cursor {
             display: inline-block; width: 8px; height: 1.1em;
             background: var(--matrix-green); margin-left: 4px;
-            animation: blink 1s infinite; vertical-align: middle;
+            animation: blink 0.8s infinite; vertical-align: middle;
+            box-shadow: 0 0 10px var(--matrix-green);
         }
         @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
 
-        /* Images Grid Fix */
+        /* Memory Cards Grid */
         .image-container {
-            display: flex; justify-content: center; gap: 8px;
-            width: 100%; margin-top: 10px;
+            display: flex; justify-content: center; gap: 12px;
+            width: 100%; margin-top: 14px;
         }
 
         .data-card {
-            width: 80px; height: 100px;
+            width: 90px; height: 115px;
             border: 1px solid var(--matrix-green);
             background: #000; overflow: hidden;
             position: relative; opacity: 0; transform: translateY(20px);
+            cursor: pointer;
+            transition: all 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            border-radius: 6px;
         }
-        @media (min-width: 768px) { .data-card { width: 130px; height: 160px; } }
+        @media (min-width: 640px) { .data-card { width: 130px; height: 160px; } }
+
+        .data-card:hover {
+            transform: scale(1.1) translateY(-6px) !important;
+            border-color: #ffffff;
+            box-shadow: 0 0 25px var(--matrix-green);
+            z-index: 30;
+        }
 
         .data-card img {
             width: 100%; height: 100%; object-fit: cover;
-            filter: sepia(1) hue-rotate(90deg) brightness(0.8) contrast(1.2);
+            filter: sepia(1) hue-rotate(85deg) brightness(0.85) contrast(1.3);
+            transition: filter 0.3s;
         }
 
-        .data-card::after {
-            content: ""; position: absolute; inset: 0;
-            background: linear-gradient(rgba(0, 255, 65, 0.1) 50%, transparent 50%);
-            background-size: 100% 4px; pointer-events: none;
+        .data-card:hover img {
+            filter: sepia(0) hue-rotate(0deg) brightness(1) contrast(1);
         }
 
-        #scene {
-            height: 100dvh; display: flex; flex-direction: column;
-            justify-content: center; align-items: center; gap: 1.5rem;
-            padding: 1rem 0;
-        }
-
+        /* Cyber Connect Button */
         .btn-connect {
             border: 1px solid var(--matrix-green); color: var(--matrix-green);
-            padding: 12px 24px; background: transparent;
-            font-size: 11px; letter-spacing: 4px; font-weight: bold;
-            text-transform: uppercase; transition: all 0.3s;
+            padding: 14px 32px; background: rgba(0, 20, 0, 0.85);
+            font-size: 12px; letter-spacing: 4px; font-weight: 700;
+            text-transform: uppercase; transition: all 0.3s ease;
+            position: relative; overflow: hidden; border-radius: 4px;
+            box-shadow: 0 0 20px rgba(0, 255, 65, 0.3);
         }
-        .btn-connect:hover { background: var(--matrix-green); color: black; box-shadow: 0 0 20px var(--matrix-green); }
+        .btn-connect:hover { 
+            background: var(--matrix-green); color: #000; 
+            box-shadow: 0 0 40px var(--matrix-green); 
+            transform: scale(1.05);
+        }
     </style>
 </head>
 <body>
 
+    <div class="scanline-overlay"></div>
     <canvas id="matrix-canvas"></canvas>
 
-    <div id="overlay" class="fixed inset-0 z-[100] flex items-center justify-center bg-black">
-        <div class="text-center">
-            <div id="loading-text" class="mb-6 font-mono text-[10px] tracking-[0.5em] text-green-500 h-6"></div>
-            <button id="connectBtn" class="btn-connect">Execute Bypass</button>
+    {% if wish.selected_music or wish.custom_music %}
+    <audio id="bgMusic" loop preload="auto">
+        <source src="{% if wish.custom_music %}{{ wish.custom_music.url }}{% else %}{{ wish.selected_music.audio_file.url }}{% endif %}" type="audio/mpeg">
+    </audio>
+    {% else %}
+    <audio id="bgMusic" loop preload="auto">
+        <source src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_c8c8a73220.mp3?filename=cyberpunk-2099-21508.mp3" type="audio/mpeg">
+    </audio>
+    {% endif %}
+
+    <!-- Top Right Audio Control Switch -->
+    <div id="audio-widget" class="fixed top-4 right-4 z-[150] hidden">
+        <button onclick="toggleAudio()" class="px-3 py-1.5 border border-green-500/50 bg-black/80 text-[10px] text-green-400 hover:bg-green-500 hover:text-black transition-all flex items-center gap-2 rounded shadow-[0_0_10px_rgba(0,255,65,0.3)]">
+            <i id="audio-icon" class="fas fa-volume-up"></i>
+            <span id="audio-status" class="tracking-widest">AUDIO_ON</span>
+        </button>
+    </div>
+
+    <!-- OVERLAY 1: Security Trigger -->
+    <div id="overlay" class="fixed inset-0 z-[100] flex items-center justify-center bg-black/95 px-4">
+        <div class="text-center max-w-sm">
+            <div class="inline-block mb-4 p-4 border border-green-500/50 rounded-full bg-green-950/20 shadow-[0_0_30px_rgba(0,255,65,0.3)]">
+                <i class="fas fa-terminal text-3xl text-green-400 animate-pulse"></i>
+            </div>
+            <div id="loading-text" class="mb-6 font-mono text-[11px] sm:text-xs tracking-[0.4em] text-green-400 h-6 uppercase font-bold">
+                INITIALIZING PROTOCOL...
+            </div>
+            <button id="connectBtn" class="btn-connect" onclick="playSynthSound('click')">
+                Execute Bypass ⚡
+            </button>
         </div>
     </div>
 
-    <main id="scene" class="hidden opacity-0">
+    <!-- MAIN SCENE -->
+    <main id="scene" class="hidden opacity-0 p-4 min-h-dvh flex flex-col justify-center items-center relative z-10">
         
         <div class="w-full flex flex-col items-center">
-            <div class="text-[9px] mb-2 tracking-[0.5em] text-green-400 font-bold uppercase">
-                {% with w_type=wish.wish_type|lower %}
-                    {% if w_type == 'graduation' %}
-                        >> STATUS: SUCCESS_DIPLOMA_DECRYPTED
-                    {% elif w_type == 'new year' %}
-                        >> STATUS: SYSTEM_REBOOT_SUCCESS_2026
-                    {% else %}
-                        >> STATUS: DATA_DECRYPT_COMPLETE
-                    {% endif %}
-                {% endwith %}
+            
+            <div class="text-[9px] sm:text-[10px] mb-2 tracking-[0.4em] text-green-400 font-bold uppercase text-center drop-shadow-[0_0_8px_var(--matrix-green)]">
+                >> STATUS: DECRYPT_SUCCESSFUL_ACCESS_GRANTED
             </div>
             
+            <!-- Terminal Container -->
             <div class="terminal-box">
                 <div class="terminal-header">
-                    <span>ROOT@DECRYPTOR:~ MEMORY_STRM</span>
-                    <span>[V 3.0]</span>
+                    <span><i class="fas fa-shield-cat mr-1"></i> ROOT@DECRYPTOR:~ MEMORY_STRM</span>
+                    <span>[V 4.0.1]</span>
                 </div>
                 
-                <div class="mt-2 text-[9px] opacity-40 leading-tight">
-                    > TARGET_ID: {{ wish.receiver_name|upper }}<br>
-                    > ENCRYPTION: 256-BIT_AES<br>
-                    > STATUS: ACCESS_GRANTED
+                <div class="mt-2 text-[9px] opacity-70 leading-relaxed tracking-wider font-mono">
+                    > TARGET_ID: <span class="text-white font-bold">{{ wish.receiver_name|default:"TARGET_USER"|upper }}</span><br>
+                    > ENCRYPTION: 256-BIT_CYBER_AES<br>
+                    > STATUS: UNRESTRICTED_ACCESS
                 </div>
                 
                 <div class="mt-4">
-                    <h2 class="text-green-500 text-[10px] tracking-widest uppercase opacity-70 mb-1">
-                        {% if wish.wish_type|lower == 'graduation' %}
-                            Executing_Congratulations...
-                        {% elif wish.wish_type|lower == 'new year' %}
-                            Initiating_New_Year_Wish...
-                        {% else %}
-                            Displaying_Message...
-                        {% endif %}
+                    <h2 class="text-green-500/80 text-[10px] tracking-widest uppercase mb-1 font-mono">
+                        Executing_Payload_Sequence...
                     </h2>
-                    <h1 id="receiver-name" class="text-xl md:text-3xl font-black tracking-tighter text-white leading-none">
-                        {% if wish.wish_type|lower == 'graduation' %}
-                            CONGRATULATIONS,
-                        {% elif wish.wish_type|lower == 'new year' %}
-                            HAPPY NEW YEAR,<span class="block text-xl md:text-2xl mb-2 font-medium opacity-90 tracking-[0.2em] uppercase">
-                            <span id="year-display"></span>
-                        {% endif %}
-                        <br>
-                        <span class="text-green-400">{{ wish.receiver_name }}</span>
+                    
+                    <h1 id="receiver-name" class="text-xl sm:text-2xl md:text-3xl font-black tracking-tight text-white leading-tight font-mono">
+                        FOR: 
+                        <span class="text-green-400 glitch-text" data-text="{{ wish.receiver_name|default:'Agent' }}">
+                            {{ wish.receiver_name|default:"Agent" }}
+                        </span>
                     </h1>
                 </div>
                 
-                <div class="h-[1px] w-full bg-green-500/30 my-3"></div>
+                <div class="h-[1px] w-full bg-gradient-to-r from-transparent via-green-500/50 to-transparent my-3"></div>
                 
-                <p id="message-text" class="text-xs md:text-sm leading-relaxed text-green-100/90 font-medium italic">
-                    "{{ wish.message }}"
-                </p>
+                <!-- Typing Animate Target Container -->
+                <div class="min-h-[70px] flex items-center">
+                    <p id="typewriter-message" class="text-xs sm:text-sm leading-relaxed text-green-100/90 font-mono italic">
+                        <!-- Animated via JS -->
+                    </p>
+                </div>
                 
-                <div class="mt-4 text-[9px] font-bold">
-                    <span class="opacity-40 text-white">UPLOADED_BY:</span> {{ wish.sender_name }}<span class="cursor"></span>
+                <div class="mt-4 pt-2 border-t border-green-900/50 flex justify-between items-center text-[9px] font-bold">
+                    <div>
+                        <span class="opacity-50 text-white">TRANSMITTED_BY:</span> 
+                        <span class="text-green-400 uppercase tracking-widest">{{ wish.sender_name|default:"Anonymous Agent" }}</span>
+                        <span class="cursor"></span>
+                    </div>
+                    <button onclick="triggerCyberSpark()" class="text-[8px] border border-green-500/40 px-2.5 py-1 rounded hover:bg-green-500 hover:text-black transition-all">
+                        ⚡ RE-SPARK
+                    </button>
                 </div>
             </div>
 
+            <!-- Image Cards -->
             {% if wish.images.exists %}
             <div class="image-container">
                 {% for img_obj in wish.images.all|slice:":3" %}
-                <div class="data-card shadow-lg shadow-green-900/20">
-                    <img src="{{ img_obj.image.url }}" alt="Decrypted Memory">
-                    <div class="absolute bottom-0 left-0 bg-green-600 text-black text-[7px] px-1 font-bold">BYTE_{{ forloop.counter }}</div>
+                <div class="data-card shadow-xl shadow-green-950/50" onclick="openMatrixLightbox('{{ img_obj.image.url }}')">
+                    <img src="{{ img_obj.image.url }}" alt="Decrypted Memory Byte" onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?q=80&w=400';">
+                    <div class="absolute bottom-0 left-0 right-0 bg-green-950/90 border-t border-green-500/40 text-green-300 text-[7px] px-1 font-bold flex justify-between">
+                        <span>BYTE_0{{ forloop.counter }}</span>
+                        <span>[VIEW]</span>
+                    </div>
                 </div>
                 {% endfor %}
+            </div>
+            {% else %}
+            <div class="image-container">
+                <div class="data-card" onclick="openMatrixLightbox('https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?q=80&w=500')">
+                    <img src="https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?q=80&w=500" alt="Cyber Grid 1">
+                    <div class="absolute bottom-0 left-0 right-0 bg-green-950/90 border-t border-green-500/40 text-green-300 text-[7px] px-1 font-bold flex justify-between">
+                        <span>BYTE_01</span><span>[VIEW]</span>
+                    </div>
+                </div>
+                <div class="data-card" onclick="openMatrixLightbox('https://images.unsplash.com/photo-1510511459019-5dda7724fd87?q=80&w=500')">
+                    <img src="https://images.unsplash.com/photo-1510511459019-5dda7724fd87?q=80&w=500" alt="Cyber Grid 2">
+                    <div class="absolute bottom-0 left-0 right-0 bg-green-950/90 border-t border-green-500/40 text-green-300 text-[7px] px-1 font-bold flex justify-between">
+                        <span>BYTE_02</span><span>[VIEW]</span>
+                    </div>
+                </div>
             </div>
             {% endif %}
         </div>
 
-        <div class="text-center mt-3">
-            <a href="{% url 'home' %}" class="text-[9px] border border-green-500/40 px-6 py-2 hover:bg-green-500/20 transition-all uppercase tracking-[0.3em] font-bold">
-                Create New One
+        <div class="text-center mt-3 z-20">
+            <a href="{% url 'home' %}" class="text-[9px] border border-green-500/50 bg-black/80 text-green-400 px-6 py-2.5 hover:bg-green-500 hover:text-black transition-all uppercase tracking-[0.3em] font-bold rounded shadow-[0_0_15px_rgba(0,255,65,0.2)]">
+                <i class="fas fa-plus-circle mr-1"></i> Create New Wish
             </a>
-            <p class="mt-3 text-[7px] opacity-20 tracking-[0.5em] text-white">THE_MATRIX_SURPRISE_V3</p>
         </div>
     </main>
 
+    <!-- Matrix Lightbox -->
+    <div id="matrix-lightbox" class="fixed inset-0 z-[300] hidden bg-black/90 flex items-center justify-center p-4 backdrop-blur-md" onclick="closeMatrixLightbox()">
+        <div class="relative max-w-lg w-full border border-green-500 bg-black p-3 rounded shadow-[0_0_50px_var(--matrix-green)]" onclick="event.stopPropagation()">
+            <div class="bg-green-500 text-black text-[10px] font-bold px-2 py-1 mb-2 flex justify-between items-center">
+                <span>HOLOGRAPHIC_PREVIEW.RAW</span>
+                <button onclick="closeMatrixLightbox()" class="hover:text-white font-black">[X]</button>
+            </div>
+            <img id="matrix-lightbox-img" src="" alt="Hologram Detail" class="w-full max-h-[70vh] object-contain border border-green-900 rounded">
+            <div class="mt-3 text-center">
+                <button onclick="closeMatrixLightbox()" class="text-[9px] text-green-400 border border-green-500/40 px-5 py-1.5 hover:bg-green-500 hover:text-black transition-all uppercase tracking-widest font-bold">
+                    CLOSE DECRYPTOR
+                </button>
+            </div>
+        </div>
+    </div>
+
     <script>
-        // Matrix Rain Logic
+        // Matrix Rain Setup
         const canvas = document.getElementById('matrix-canvas');
         const ctx = canvas.getContext('2d');
         let width = canvas.width = window.innerWidth;
         let height = canvas.height = window.innerHeight;
-        const characters = "0101010101ABCDEF";
+        
+        const characters = "アァカサタナハマヤャラワガザダバパイィキシチニヒミリヰギジヂビピウゥクスツヌフムユュルグズブヅプエェケセテネヘメレヱゲゼデベペオォコソトノホモヨョロヲゴゾドボポヴッン0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
         const fontSize = 14;
-        const columns = width / fontSize;
-        const drops = Array(Math.floor(columns)).fill(1);
+        let columns = Math.floor(width / fontSize);
+        let drops = Array(columns).fill(1);
 
         function drawMatrix() {
-            ctx.fillStyle = "rgba(0, 0, 0, 0.1)";
+            ctx.fillStyle = "rgba(0, 5, 0, 0.08)";
             ctx.fillRect(0, 0, width, height);
             ctx.fillStyle = "#00ff41";
             ctx.font = fontSize + "px monospace";
+
             for (let i = 0; i < drops.length; i++) {
                 const text = characters.charAt(Math.floor(Math.random() * characters.length));
                 ctx.fillText(text, i * fontSize, drops[i] * fontSize);
-                if (drops[i] * fontSize > height && Math.random() > 0.98) drops[i] = 0;
+
+                if (drops[i] * fontSize > height && Math.random() > 0.975) {
+                    drops[i] = 0;
+                }
                 drops[i]++;
             }
         }
-        setInterval(drawMatrix, 45);
+        setInterval(drawMatrix, 35);
 
-        // Loading Text
-        const phrases = ["GATHERING FRAGMENTS...", "DECRYPTING HASH...", "BYPASSING PROTOCOLS...", "READY."];
-        let pIndex = 0;
-        function cycleText() {
-            if(pIndex < phrases.length) {
-                document.getElementById('loading-text').innerText = phrases[pIndex++];
-                setTimeout(cycleText, 500);
+        // Web Audio SFX
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        let audioCtx = null;
+
+        function playSynthSound(type) {
+            try {
+                if (!audioCtx) audioCtx = new AudioContext();
+                if (audioCtx.state === 'suspended') audioCtx.resume();
+
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+
+                if (type === 'click') {
+                    osc.type = 'sawtooth';
+                    osc.frequency.setValueAtTime(900, audioCtx.currentTime);
+                    osc.frequency.exponentialRampToValueAtTime(300, audioCtx.currentTime + 0.08);
+                    gain.gain.setValueAtTime(0.15, audioCtx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.08);
+                    osc.start(); osc.stop(audioCtx.currentTime + 0.08);
+                } else if (type === 'reveal') {
+                    osc.type = 'square';
+                    osc.frequency.setValueAtTime(200, audioCtx.currentTime);
+                    osc.frequency.exponentialRampToValueAtTime(1400, audioCtx.currentTime + 0.35);
+                    gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.35);
+                    osc.start(); osc.stop(audioCtx.currentTime + 0.35);
+                }
+            } catch(e) {}
+        }
+
+        // Typewriter Animation
+        const rawMessage = `"{{ wish.message|default:'No obstacle in the matrix can dim your light. Keep inspiring and breaking boundaries.' }}"`;
+        let charIndex = 0;
+        function typeWriter() {
+            if (charIndex < rawMessage.length) {
+                document.getElementById("typewriter-message").innerHTML += rawMessage.charAt(charIndex);
+                charIndex++;
+                setTimeout(typeWriter, 25);
             }
         }
-        cycleText();
 
-        // Reveal Sequence
+        // GSAP Reveal Sequence
         document.getElementById('connectBtn').addEventListener('click', () => {
+            playSynthSound('reveal');
+
+            const bgAudio = document.getElementById('bgMusic');
+            if (bgAudio) {
+                bgAudio.play().then(() => {
+                    document.getElementById('audio-widget').classList.remove('hidden');
+                }).catch(e => {});
+            }
+
             const tl = gsap.timeline();
-            
             tl.to("#overlay", { 
-                scale: 1.2, opacity: 0, duration: 0.6, ease: "power4.in",
+                scale: 1.15, opacity: 0, duration: 0.5, ease: "power4.in",
                 onComplete: () => {
                     document.getElementById('overlay').style.display = 'none';
                     document.getElementById('scene').classList.remove('hidden');
+                    triggerCyberSpark();
+                    setTimeout(typeWriter, 400);
                 }
             })
             .to("#scene", { opacity: 1, duration: 0.4 })
-            .from(".terminal-box", { 
-                y: 30, opacity: 0, duration: 0.8, ease: "back.out(1.7)" 
-            })
-            .to(".data-card", { 
-                opacity: 1, y: 0, stagger: 0.15, duration: 0.6, ease: "power2.out" 
-            }, "-=0.4");
+            .from(".terminal-box", { y: 40, opacity: 0, duration: 0.8, ease: "back.out(1.5)" })
+            .to(".data-card", { opacity: 1, y: 0, stagger: 0.15, duration: 0.6, ease: "power2.out" }, "-=0.3");
         });
+
+        // Confetti Spark
+        function triggerCyberSpark() {
+            playSynthSound('click');
+            confetti({
+                particleCount: 80,
+                spread: 100,
+                origin: { y: 0.6 },
+                colors: ['#00ff41', '#003b00', '#ffffff', '#008f11']
+            });
+        }
+
+        // Lightbox
+        function openMatrixLightbox(url) {
+            playSynthSound('click');
+            document.getElementById('matrix-lightbox-img').src = url;
+            document.getElementById('matrix-lightbox').classList.remove('hidden');
+        }
+        function closeMatrixLightbox() {
+            document.getElementById('matrix-lightbox').classList.add('hidden');
+        }
+
+        // Audio Toggle
+        let audioPlaying = true;
+        function toggleAudio() {
+            const bgAudio = document.getElementById('bgMusic');
+            const icon = document.getElementById('audio-icon');
+            const status = document.getElementById('audio-status');
+            if (audioPlaying) {
+                bgAudio.pause();
+                icon.className = "fas fa-volume-mute text-red-400";
+                status.textContent = "AUDIO_MUTED";
+            } else {
+                bgAudio.play();
+                icon.className = "fas fa-volume-up text-green-400";
+                status.textContent = "AUDIO_ON";
+            }
+            audioPlaying = !audioPlaying;
+        }
 
         window.addEventListener('resize', () => {
             width = canvas.width = window.innerWidth;
             height = canvas.height = window.innerHeight;
+            columns = Math.floor(width / fontSize);
+            drops = Array(columns).fill(1);
         });
-        const year = new Date().getFullYear();
-            if(document.getElementById('year-display')) {
-                document.getElementById('year-display').textContent = year;
-        }
     </script>
 </body>
 </html>
